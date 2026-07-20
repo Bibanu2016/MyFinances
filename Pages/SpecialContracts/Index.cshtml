@@ -1,0 +1,28 @@
+﻿@page
+@model MyFinances.Pages.SpecialContracts.IndexModel
+@{
+    ViewData["Title"] = "Special Contracts List";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div class="row">
+        <div class=" col col-3">
+            <div class="input-group">
+                <select class="form-select border-success-subtle" asp-for="CreateContractType" asp-items="Model.ContractTypes">
+                    <option value="0">Choose ..</option>
+                </select>
+                <button class="btn btn-success" type="submit">Create</button>
+            </div>
+            <span asp-validation-for="CreateContractType" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+
+<hr />
+<br />
+
+
+
+

@@ -1,0 +1,208 @@
+﻿@page "{pid?}"
+@model MyFinances.Pages.Contracts.ContractDeleteModel
+
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<h3 class="text-danger-emphasis">@ViewData["Confirmation"]</h3>
+<div>
+    <br />
+    <hr />
+    <div id="contractData">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.ContractType)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ContractNames.ContractTypeName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.ContractName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.ContractName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.ContractDetails)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.ContractDetails)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdOrganisation)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ContractNames.OrganisationName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdContractor)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ContractNames.ContractortName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.StartDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.StartDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.EndDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.EndDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdEndAction)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ContractNames.EndActionName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.InvoiceDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.InvoiceDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.InvoiceNetDays)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.InvoiceNetDays)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdFrequency)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ContractNames.FrequencyName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdFinAccount)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.IdFinAccount)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdPayAccount)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.IdPayAccount)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IdBankAccount)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.IdBankAccount)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.IsActiveContract)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.IsActiveContract)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.ClosedDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.ClosedDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Contract.EquivMonthlyRate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Contract.EquivMonthlyRate)
+            </dd>
+        </dl>
+        <hr />
+        <br />
+    </div>
+    @if(Model.HasTransactions)
+    {
+        <div class="row row-gap-2">
+            <div class="col col-md-3">
+                <label class="form-label" for="lastBalance">Balance [AUD]</label>
+            </div>
+            <div class="col col-md-3">
+                <input type="number" id="lastBalance" asp-for="LastBalance" disabled />
+            </div>
+            <div class="col col-md-3">
+                <label class="form-label" for="balDate">Balance date</label>
+            </div>
+            <div class="col col-md-3">
+                <input type="date" asp-for="BalanceDate" disabled />
+            </div>
+            @if(Model.LastBalance > 0)
+            {
+                <div class="form-text">
+                    Balance value will be transfered to the @Model.ContractNames.ContractortName receivable account at the balance date above
+                </div>
+            }
+            @if(Model.LastBalance < 0)
+            {
+                <div class="form-text">
+                    Balance value will be transfered to the @Model.ContractNames.ContractortName payable account at the balance date above
+                </div>
+            }
+        </div>
+    }
+    @if (Model.HasTransactions)
+    {
+                
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button class="btn btn-danger" id="buttonTerm" onclick="openConfirm()">Terminate</button>
+        </div>
+    }
+    else
+    {
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button class="btn btn-danger" id="buttonDel" onclick="openConfirm()">Delete</button>
+        </div>
+    }
+    <form method="post" id="deleteContract">
+        <input type="hidden" asp-for="IdContract" />
+        <input type="hidden" asp-for="HasTransactions" />
+    </form>
+    <div class="modal fade" id="confirmDialog" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color:darkorange;">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    Are you sure?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Yes, proceed</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <hr />
+    <a asp-page="./ContractsList">Back to List</a>
+    <hr />
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        
+        function openConfirm() {
+            var modal = new bootstrap.Modal(document.getElementById('confirmDialog'));
+            modal.show();
+        }
+
+        function confirmDelete() {
+            document.getElementById('deleteContract').submit();
+        }
+    </script>
+
+}

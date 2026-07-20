@@ -1,0 +1,72 @@
+﻿@page
+@model MyFinances.Pages.Organisations.OrgIndexModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Business organisations list";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index business organisations</title>
+    <hr />
+    <h1>@ViewData["Title"]</h1>
+</head>
+<body>
+    <hr />
+<p>
+    <a class="btn btn-success" role="button" asp-page="./OrgCreate" asp-route-fc="@false" asp-route-ct="0">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Organisation[0].IdCateg)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Organisation[0].OrganisationName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Organisation[0].NumberContracts)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    @if(Model.Organisation.Count > 0)
+    {
+            <tbody>
+                @foreach (var item in Model.Organisation)
+                {
+                    <tr>
+                        <td>
+                            <div>@Model._orgTypes.Where(x => x.Id == item.IdCateg).Select(x => x.CategoryName).FirstOrDefault()</div>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrganisationName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NumberContracts)
+                        </td>
+                        <td>
+                            <a asp-page="./OrgEdit" asp-route-id="@item.IdOrg"><i class="bi-pencil-fill" style="color:orange"></i></a> |
+                            <a asp-page="./OrgDetails" asp-route-id="@item.IdOrg"><i class="bi-eye-fill" style="color:lightblue"></i></a> |
+                            @if(item.NumberContracts == 0)
+                            {
+                            <a asp-page="./OrgDelete" asp-route-id="@item.IdOrg"><i class="bi-eraser-fill" style="color:lightcoral"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+    }
+    else
+    {
+            <tbody>
+                <tr> No organisations are recorded</tr>
+            </tbody>
+    }
+</table>
+</body>
+</html>

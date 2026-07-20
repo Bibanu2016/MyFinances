@@ -1,0 +1,60 @@
+@page
+@model MyFinances.Pages.AccountCategoryPages.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountCategory[0].IdAccountClass)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountCategory[0].AccountCategoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountCategory[0].IdContractCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountCategory[0].IdPayable)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountCategory[0].CategoryRoles)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.AccountCategory) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.IdAccountClass)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.AccountCategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.IdContractCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.IdPayable)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.CategoryRoles)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.IdAccountCategory">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.IdAccountCategory">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.IdAccountCategory">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

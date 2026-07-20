@@ -1,0 +1,76 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.TransDictIndexModel
+
+@{
+    ViewData["Title"] = "Transaction Key List";
+}
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["SuccessMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<hr />
+<div class="row row-cols-4 row-gap-3">
+    <div class="col mb-2">
+        <a class="btn btn-success" asp-page="CreateTransacDictKey">Create New</a>
+    </div>
+    <div class="col mb-2">
+        <a class="btn btn-info" asp-page="UploadForDictionaryKey">Create from statements</a>
+    </div>
+</div>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TransacDictionary[0].IdSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransacDictionary[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TransacDictionary[0].IdTarget)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.TransacDictionary.Count > 0 && Model.AccountsList.Count > 0)
+        {
+            @foreach (var item in Model.TransacDictionary) 
+            {
+                <tr>
+                    <td>
+                        @Model.AccountsList.Where(x=>x.ItemID == item.IdSource).Select(y => y.Name).FirstOrDefault()
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Model.AccountsList.Where(x => x.ItemID == item.IdTarget).Select(y => y.Name).FirstOrDefault()
+                    </td>
+                    <td>
+                        <a asp-page="./EditTransKey" asp-route-id="@item.IdKey">Edit</a> |
+                        <a asp-page="./DeleteTransKey" asp-route-id="@item.IdKey">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>No transaction dictionary data is available</tr>
+        }
+    </tbody>
+</table>

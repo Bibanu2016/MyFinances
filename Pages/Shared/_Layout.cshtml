@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyFinances</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MyFinances.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm border-bottom border-top" style="background-color: lightcyan">
+            <div class="container container-fluid">
+                <a class="navbar-brand" asp-page="/Index">My Finance</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0" aria-labelledby="mainNav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" asp-page="/Index">
+                                <i class="bi-house-fill"> Home</i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlContracts" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#">Contracts</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlTransactions">
+                                <li><a class="nav-link" asp-page="/Contracts/ContractsList">Standard contracts</a></li>
+                                <li><a class="nav-link" asp-page="/SpecialContracts/Index">Special contracts</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlTransactions" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" >Transactions</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlTransactions">
+                                <li><a class="dropdown-item" asp-page="/FinTransactions/ImportTransactions">Import transactions</a></li>
+                                <li><a class="dropdown-item" asp-page="/FinTransactions/FutureTransactions">Planned transaction</a></li>
+                                <li><a class="dropdown-item" asp-page="/FinTransactions/IndexFinTransactions">Recorded transaction</a></li>
+                                <li><a class="dropdown-item" asp-page="/FinTransactions/AccountTransactions">Account transactions</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="">Close FY</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlStatements" role="button" data-bs-toggle="dropdown" aria-expanded="false" asp-page="">Statements</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlStatements">
+                                <li><a class="dropdown-item" asp-page="">Cash Flow</a></li>
+                                <li><a class="dropdown-item" asp-page="">Balance Sheet</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="">Close FY</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlSettings" role="button" data-bs-toggle="dropdown" aria-expanded="false" asp-page="">Settings</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlSettings">
+                                <li><a class="dropdown-item" asp-page="">Planning details</a></li>
+                                <li><a class="dropdown-item" asp-page="/AccountCategoryPages/Index">Account categories</a></li>
+                                <li><a class="dropdown-item" asp-page="/Organisations/OrgIndex">Business organisations</a></li>
+                                <li><a class="dropdown-item" asp-page="/Accounts/IndexFinAccount">Accounts</a></li>
+                                <li><a class="dropdown-item" asp-page="/FinTransactions/TransDictIndex">Transaction keys list</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="">User details</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlHelp" role="button" data-bs-toggle="dropdown" aria-expanded="false" asp-page="">Help</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlHelp">
+                                <li><a class="dropdown-item" asp-page="">Application manual</a></li>
+                                <li><a class="dropdown-item" asp-page="">Check for updates</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="">Contact details</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Error">Errors</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container text-nowrap">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel"><strong>Warning!</strong></h5>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - MyFinances - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+<!-- SCRIPS -->
+    <!--<script src="~/lib/popper.js/esm/popper-base.min.js"></script>-->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

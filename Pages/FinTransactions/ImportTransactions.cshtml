@@ -1,0 +1,55 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.ImportTransactionsModel
+@{
+    ViewData["Title"] = "Import transactions";
+}
+
+<h1 class="border-bottom">@ViewData["Title"]</h1>
+
+<div class="row row-gap-3 col-6">
+    <div class="col mb-3">
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label">Select souurce for transactions import</label>
+                <select class="form-select" asp-for="@Model.ImportSourceID">
+                    <option selected>Choose ..</option>
+                    @for(int i = 0; i<Model.AccountsList.Count; i++)
+                    {
+                        <option value="@Model.AccountsList[i].ItemID">@Model.AccountsList[i].Name</option>            
+                    }
+                </select>
+                <span asp-validation-for="@Model.ImportSourceID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Upload" class="form-label"></label>
+                <input asp-for="Upload" type="file" class="form-control" />
+                <span asp-validation-for="Upload" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+</div>
+<a class="link-light" asp-page="TransDictIndex">Bacl to keys list</a>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if(@TempData["ErrorMessage"] <> null)
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+
+    </script>
+}
+
+

@@ -1,0 +1,119 @@
+﻿@page "{handler?}/{id?}"
+@model MyFinances.Pages.Contracts.ContractsListModel
+
+@{
+    ViewData["Title"] = "Contracts List";   
+}
+
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Error message!</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+            if('@TempData["SuccessMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Success</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if(Model.ContractTypes.Count > 0){
+    <div class="dropdown bg-success-subtle">
+        <a class="btn btn-success dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Add contract
+        </a>
+        <ul class="dropdown-menu">
+            @foreach (var item in Model.ContractTypes)
+            {
+                @if(item.IdContractType < 8)
+                {
+                    <li><a class="dropdown-item" asp-page="./ContractAdd" asp-route-sct="@item.IdContractType">@item.ContractTypeName</a></li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item" asp-page="./InvestFundContractAdd">@item.ContractTypeName</a></li>
+                }
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <p class="text-warning">No contract can be created</p>
+}
+<br />
+@if(Model.ContractListVM != null){
+    <form method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContractListVM[0].ContractType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContractListVM[0].ContractName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContractListVM[0].OwnerName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ContractListVM[0].EquivMonthlyRate)
+                    </th>
+                    <th> Actions </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ContractListVM)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContractType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContractName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OwnerName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EquivMonthlyRate)
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-sm" asp-page-handler="edit" asp-route-id="@item.IdFinContract"><i class="bi-pencil-fill" style="color:orange"></i></button> |
+                            <a asp-page="./ContractDetails" asp-route-id="@item.IdFinContract"><i class="bi-eye-fill" style="color:blue"></i></a> |
+                            <button type="submit" class="btn btn-sm" asp-page-handler="delete" asp-route-id="@item.IdFinContract"><i class="bi-eraser-fill" style="color:crimson"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+    <br />
+    <hr />
+    <br />
+    <h3>Total equivalent monthly cash flow state: <b>AUD @Model.CashFlowState</b></h3>
+}
+else
+{
+    <h3 class="display-5">No financial contracts are recorded.</h3>
+}
+

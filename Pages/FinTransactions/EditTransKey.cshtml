@@ -1,0 +1,69 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.EditTransKeyModel
+
+@{
+    ViewData["Title"] = "Edit Key for Transaction Identification";
+    ViewBag.FinAccList = Model.FinAccList;
+    ViewBag.SourcesList = Model.SourcesList;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>TransacDictionary</h4>
+<hr />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="TransacDictionary.IdKey" />
+    <div class="row row-gap-4">
+        <div class=" col col-3 col-md-3">
+            <label asp-for="TransacDictionary.IdSource" class="form-label"></label>
+        </div>
+        <div class="col col-3 col-md-3">
+            <select class="form-select" asp-for="TransacDictionary.IdSource" asp-items="@ViewBag.SourcesList">
+                <option value="0">Select source ..</option>
+            </select>
+        </div>
+    </div>
+    <div class="row row-gap-4">
+        <div class=" col col-3 col-md-3">
+            <span class="text-danger">*</span>
+            <label asp-for="TransacDictionary.Name" class="form-label"></label>
+        </div>
+        <div class="col col-3 col-md-9">
+            <input asp-for="TransacDictionary.Name" class="form-control" aria-required="true" />
+            <span asp-validation-for="TransacDictionary.Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row row-gap-4">
+        <div class=" col col-3 col-md-3">
+            <label asp-for="TransacDictionary.Name" class="form-label"></label>
+        </div>
+        <div class="col col-3 col-md-9">
+            <select class="form-select" asp-for="TransacDictionary.IdTarget" asp-items="@ViewBag.FinAccList">
+                <option value="0">Select target ..</option>
+            </select>
+        </div>
+    </div>
+    <div class="row row-gap-4">
+        <div class=" col col-3 col-md-3">
+        </div>
+        <div class="col col-3 col-md-9 align-content-end">
+            <a class="btn btn-outline-info" asp-page="/Accounts/CreateFinAccount" asp-route-redirect="@Model.FARedirect">Create Target Account</a>
+        </div>
+    </div>
+    <hr />
+    <hr />
+    <br />
+    <div class="row row-gap-4">
+        <div class=" col col-3 col-md-3">
+            <a asp-page="./TransDictIndex">Back to List</a>
+        </div>
+        <div class="col col-md-9 align-content-end">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,103 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.AddPlanTransactionModel
+
+@{
+    ViewData["Title"] = "Create plan transaction";
+    ViewBag.FAL = Model.FinAccList;
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row alert-primary">
+    Create one-off planned transaction with no contract associated
+</div>
+<hr />
+<br />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="container container-sm">
+        <input type="hidden" asp-for="PlanTransaction.ContractIdentifier" value="0" />
+        <input type="hidden" asp-for="PlanTransaction.ExecutedTransaction" value="@false" />
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <span class="text-danger">*</span>
+                <label asp-for="PlanTransaction.TransactionDate" class="form-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input type="date" asp-for="PlanTransaction.TransactionDate" class="form-control" aria-required="true" />
+                <span asp-validation-for="PlanTransaction.TransactionDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <span class="text-danger">*</span>
+                <label asp-for="PlanTransaction.DebitAccount" class="form-label"></label>
+            </div>
+            <div class="col col-sm">
+                <select asp-for="PlanTransaction.DebitAccount" class="form-select" aria-required="true" aria-label="Select account" asp-items="@ViewBag.FAL">
+                    <option value="0" selected>Choose an account ..</option>
+                </select>
+                <span asp-validation-for="PlanTransaction.DebitAccount" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <span class="text-danger">*</span>
+                <label asp-for="PlanTransaction.CreditAccount" class="form-label"></label>
+            </div>
+            <div class="col col-sm">
+                <select asp-for="PlanTransaction.CreditAccount" class="form-select" aria-required="true" aria-label="Select account" asp-items="@ViewBag.FAL">
+                    <option value="0" selected>Choose an account ..</option>
+                </select>
+                <span asp-validation-for="PlanTransaction.CreditAccount" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <span class="text-danger">*</span>
+                <label asp-for="PlanTransaction.TransactionValue" class="form-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input asp-for="PlanTransaction.TransactionValue" class="form-control" aria-required="true" type="number" />
+                <span asp-validation-for="PlanTransaction.TransactionValue" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <label asp-for="PlanTransaction.IdSource" class="form-label"></label>
+            </div>
+            <div class="col col-sm">
+                <select asp-for="PlanTransaction.IdSource" class="form-select" aria-required="true" aria-label="Select account" asp-items="@ViewBag.FAL">
+                    <option value="0" selected>Choose a source ..</option>
+                </select>
+                <span asp-validation-for="PlanTransaction.IdSource" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 pb-2">
+            <div class="col col-sm-2">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="PlanTransaction.TransactionDetail"></label>
+            </div>
+            <div class="col col-sm">
+                <input asp-for="PlanTransaction.TransactionDetail" class="form-control" aria-required="true" />
+                <span asp-validation-for="PlanTransaction.TransactionDetail" class="text-danger"></span>
+            </div>
+            <div class="row row-cols-6 pb-2">
+                <div class="col col-sm-2">
+                </div>
+                <div class="col col-sm align-content-end">
+                    <input type="submit" value="Create" class="btn btn-outline-success" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+<br />
+<div class="row row-cols-1">
+    <a asp-page="../Index">Back</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

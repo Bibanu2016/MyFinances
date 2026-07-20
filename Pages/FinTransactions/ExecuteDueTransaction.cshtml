@@ -1,0 +1,114 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.ExecuteDueTransactionModel
+@{
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="DueTransaction.IdTransaction" />
+    <input type="hidden" asp-for="TotalExecTransactions" />
+    <input type="hidden" asp-for="TotalPlanTransactions" />
+    <div class=" container-sm">
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.TransactionDate"></label>
+            </div>
+            <div class="col col-4">
+                <p>@Model.DueTransaction.TransactionDate.ToShortDateString()</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.DebitAccount"></label>
+            </div>
+            <div class="col col-4">
+                <p>@Model.DueTransaction.DebitAccount @Model.AccList.FirstOrDefault(predicate => predicate.Value == Model.DueTransaction.DebitAccount.ToString())?.Text</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.CreditAccount"></label>
+            </div>
+            <div class="col col-4">
+                <p>@Model.DueTransaction.CreditAccount @Model.AccList.FirstOrDefault(predicate => predicate.Value == Model.DueTransaction.CreditAccount.ToString())?.Text</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.TransactionValue"></label>
+            </div>
+            <div class="col col-4">
+                <p>AUD @Model.DueTransaction.TransactionValue</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.TransactionDetail"></label>
+            </div>
+            <div class="col col-4">
+                <p>@Model.DueTransaction.TransactionDetail</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <label class="form-label" asp-for="DueTransaction.ContractIdentifier"></label>
+            </div>
+            <div class="col col-4">
+                <p>@Model.DueTransaction.ContractIdentifier @Model.AccList.FirstOrDefault(predicate => predicate.Value == Model.DueTransaction.ContractIdentifier.ToString())?.Text</p>
+            </div>
+        </div>
+        @if(Model.TotalExecTransactions < Model.TotalPlanTransactions)
+            {
+                <div class="row">
+                    <div class="alert-warning">Less transactions recorded than planned</div>
+                </div>
+            }
+            <div class="row">
+            <div class="col col-2"></div>
+            <div class="col col-4">
+                <input class="form-check-input" type="checkbox" asp-for="DueTransaction.ExecutedTransaction" id="checkExec" />
+                <label class="form-check-label" asp-for="DueTransaction.ExecutedTransaction" for="checkExec"></label>
+            </div>
+        </div>
+        <hr />
+        <br />
+        <hr />
+        <div class="row col-6">
+            <h3>List of identified recorded transactions</h3>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <div class="form-label">Total executed transactions:</div>
+            </div>
+            <div class="col">
+                <div class="text-success">@Model.TotalExecTransactions</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-2">
+                <div class="form-label">Total planned transactions:</div>
+            </div>
+            <div class="col">
+                <div class="text-warning">@Model.TotalPlanTransactions</div>
+            </div>
+        </div>
+        <div class="row justify-content-end">
+            <div class="col col-2">
+            </div>
+            <div class="col col-4">
+                <button type="submit" class="btn btn-outline-success">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+<hr />
+<a asp-page="OverduePlanTransactions">Back</a>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+

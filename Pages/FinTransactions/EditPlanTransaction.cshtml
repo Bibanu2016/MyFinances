@@ -1,0 +1,212 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.EditPlanTransactionModel
+
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+
+<form method="post">
+    <input type="hidden" asp-for="MyPlanTransaction.IdTransaction" />
+    <input type="hidden" asp-for="IsPastTransac" />
+    <input type="hidden" asp-for="DeltaPlanRecord" />
+    @if(Model.IsPastTransac == false)
+    {
+        @if (Model.MyPlanTransaction.ContractIdentifier > 0)
+        {
+            <div class="container container-sm">
+                <input type="hidden" asp-for="MyPlanTransaction.ContractIdentifier" />
+                <div class="row">
+                    <div class="alert-warning text-wrap">
+                        This transaction is part of contract @Model.MyPlanTransaction.ContractIdentifier and connot be edited manually. Update the contract if changes are required to the transaction.
+                    </div>
+                </div>
+            </div>
+        }
+        else{
+            <div class="container container-sm">
+                <!--transaction date-->
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.TransactionDate" for="transdate"></label>
+                    </div>
+                    <div class="col">
+                        <input class="form-control" type="date" asp-for="MyPlanTransaction.TransactionDate" id="transdate" />
+                        <span asp-validation-for="MyPlanTransaction.TransactionDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.DebitAccount" for="debit"></label>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" asp-for="MyPlanTransaction.DebitAccount" asp-items="@Model.AccList" id="debit">
+                            <option>Select ..</option>
+                        </select>
+                        <span asp-validation-for="MyPlanTransaction.DebitAccount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.CreditAccount" for="credit"></label>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" asp-for="MyPlanTransaction.CreditAccount" asp-items="@Model.AccList" id="credit">
+                            <option value="0">Select ..</option>
+                        </select>
+                        <span asp-validation-for="MyPlanTransaction.CreditAccount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.TransactionValue" for="transvalue"></label>
+                    </div>
+                    <div class="col">
+                        <input class="form-control" type="number" asp-for="MyPlanTransaction.TransactionValue" id="transvalue" />
+                        <span asp-validation-for="MyPlanTransaction.TransactionValue" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.TransactionDetail" for="transdet"></label>
+                    </div>
+                    <div class="col">
+                        <input class="form-control" type="text" asp-for="MyPlanTransaction.TransactionDetail" id="transdet" />
+                        <span asp-validation-for="MyPlanTransaction.TransactionDetail" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                        <label class="form-label" asp-for="MyPlanTransaction.IdSource" for="sourceid"></label>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" asp-for="MyPlanTransaction.DebitAccount" asp-items="@Model.AccList" id="sourceid">
+                            <option value="0">Select ..</option>
+                        </select>
+                        <span asp-validation-for="MyPlanTransaction.IdSource" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-check" asp-for="MyPlanTransaction.ExecutedTransaction" id="exect" disabled />
+                        <label class="form-check-label" asp-for="MyPlanTransaction.ExecutedTransaction"></label>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <!--Restrict editing to execution status only-->
+        <div class="container container-sm">
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.TransactionDate" for="transdate"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.MyPlanTransaction.TransactionDate.ToShortDateString()</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.TransactionDate" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.DebitAccount" for="debit"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.AccList.Where(predicate => predicate.Value == Model.MyPlanTransaction.DebitAccount.ToString()).FirstOrDefault()?.Text</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.DebitAccount" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.CreditAccount" for="credit"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.AccList.Where(predicate => predicate.Value == Model.MyPlanTransaction.CreditAccount.ToString()).FirstOrDefault()?.Text</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.CreditAccount" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.TransactionValue" for="transvalue"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.MyPlanTransaction.TransactionValue</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.TransactionValue" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.TransactionDetail" for="transdet"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.MyPlanTransaction.TransactionDetail</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.TransactionDetail" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.IdSource" for="sourceid"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.AccList.Where(predicate => predicate.Value == Model.MyPlanTransaction.IdSource.ToString()).FirstOrDefault()?.Text</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.IdSource" />
+            </div>
+            <div class="row row-cols-auto pb-2">
+                <div class="col col-2">
+                    <label class="form-label" asp-for="MyPlanTransaction.ContractIdentifier" for="sourceid"></label>
+                </div>
+                <div class="col">
+                    <p class="form-text">@Model.AccList.Where(predicate => predicate.Value == Model.MyPlanTransaction.ContractIdentifier.ToString()).FirstOrDefault()?.Text</p>
+                </div>
+                <input type="hidden" asp-for="MyPlanTransaction.ContractIdentifier" />
+            </div>
+            @if (Model.DeltaPlanRecord >= 1)
+            {
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-check" value="@false" asp-for="MyPlanTransaction.ExecutedTransaction" id="exect" />
+                        <label class="form-check-label" asp-for="MyPlanTransaction.ExecutedTransaction"></label>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-auto pb-2">
+                    <div class="col col-2">
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" class="form-check" value="@false" asp-for="MyPlanTransaction.ExecutedTransaction" id="exect" disabled />
+                        <label class="form-check-label" asp-for="MyPlanTransaction.ExecutedTransaction"></label>
+                    </div>
+                </div>
+                <div class="row row-cols-auto text-wrap">
+                    <div class="alert-warning text-bg-danger text-wrap">
+                        Insuficient number of recorded transactions to enable change in execution status of this transaction. At least one recorded transaction for this type is required.
+                    </div>
+                </div>
+            }
+        </div>
+
+    }
+    <br />
+    <br />
+    <div class="row row-cols-auto pb-2 align-content-end">
+        <div class="col col-5"></div>
+        <div class="col">
+            <button class="btn btn-outline-success">Update</button>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a class="link-primary" asp-page="./FutureTransactions">Back to List</a>
+</div>
+

@@ -1,0 +1,426 @@
+﻿@page "{pid?}"
+@model MyFinances.Pages.Contracts.ContractEditModel
+
+@{
+    ViewData["Title"] = "Edit Contract";
+    ViewBag.Frequency = Model.Frequency;
+    ViewBag.EndAction = Model.EndAction;
+    ViewBag.Organisation = Model.Organisation;
+    ViewBag.Payable = Model.Payable;
+    ViewBag.Bank = Model.Bank;
+    ViewBag.Users = Model.Users;
+    ViewBag.TangibleAsset = Model.TangibleAsset;
+    ViewBag.SuperAccount = Model.SuperAccount;
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+
+<hr />
+<form method="post">
+    <h4>Main contract data</h4>
+    <div class="col-md-6">
+        <label class="form-label" style="color:crimson">Changes to forecast transactions will be applied starting on @DateTime.Today.ToString("d")</label>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <!---->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="validation-summary-valid text-danger" data-valmsg-summary="true"><ul></ul></div>
+            <input type="hidden" asp-for="CFM.FinContract.IdFinContract" />
+            <div class="mb-3">
+                <label asp-for="CFM.FinContract.ContractType" class="control-label"></label>
+                <input hidden asp-for="CFM.FinContract.ContractType" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.ContractName" class="control-label"></label>
+                <input id="inContractName" asp-for="CFM.FinContract.ContractName" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.ContractName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.ContractDetails" class="control-label"></label>
+                <input asp-for="CFM.FinContract.ContractDetails" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.ContractDetails" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.IdOrganisation" class="control-label"></label>
+                <select class="form-select" aria-label="Select organisation" asp-for="CFM.FinContract.IdOrganisation" asp-items="@ViewBag.Organisation">
+                    <option>Choose a value..</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdOrganisation" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CFM.FinContract.IdContractor" class="control-label"></label>
+                <select id="contractor" class="form-select" aria-label="Select contractor" asp-for="CFM.FinContract.IdContractor" asp-items="@ViewBag.Users">
+                    <option> Choose a value ..</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdContractor" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.StartDate" class="control-label"></label>
+                <input id="startDate" asp-for="CFM.FinContract.StartDate" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.StartDate" class="text-danger"></span>                
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.EndDate" class="control-label"></label>
+                <input id="endDate" asp-for="CFM.FinContract.EndDate" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.EndDate" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.IdEndAction" class="control-label"></label>
+                <select id="endAction" class="form-select" aria-label="Select end action" asp-for="CFM.FinContract.IdEndAction" asp-items="@ViewBag.EndAction">
+                    <option selected>Choose an option..</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdEndAction" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.InvoiceDate" class="control-label"></label>
+                <input id="invoiceDate" asp-for="CFM.FinContract.InvoiceDate" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.InvoiceDate" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.InvoiceNetDays" class="control-label"></label>
+                <input id="netDay" asp-for="CFM.FinContract.InvoiceNetDays" class="form-control" />
+                <span asp-validation-for="CFM.FinContract.InvoiceNetDays" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CFM.FinContract.IdFrequency" class="control-label"></label>
+                <select id="frequency" class="form-select" aria-label="Select a frequency" asp-for="CFM.FinContract.IdFrequency" asp-items="@ViewBag.Frequency">
+                    <option>Select..</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdFrequency" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="CFM.FinContract.IdFinAccount" />
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="CFM.FinContract.IdPayAccount" class="control-label"></label>
+                <select id="payAcc" class="form-select" aria-label="Pay account" asp-for="CFM.FinContract.IdPayAccount" asp-items="@ViewBag.Payable">
+                    <option>Select ..</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdPayAccount" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CFM.FinContract.IdBankAccount" class="control-label"></label>
+                <select id="bankAcc" class="form-select" aria-label="Bank account" asp-for="CFM.FinContract.IdBankAccount" asp-items="@ViewBag.Bank">
+                    <option>Select a pay account</option>
+                </select>
+                <span asp-validation-for="CFM.FinContract.IdBankAccount" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="CFM.FinContract.IsActiveContract" />
+            <input type="hidden" asp-for="CFM.FinContract.EquivMonthlyRate" />
+            <input type="hidden" asp-for="@Model.OriginalForeBalance" />
+            <input type="hidden" asp-for="@Model.OriginalCashBalance" />
+            <input type="hidden" asp-for="@Model.RestrictionsOn" />
+        </div>
+    </div>
+    <br />
+    <h4>Suplementary contract data</h4>
+    <div class="row">
+        <div class="col col-md-6">
+            @switch (Model.CFM.FinContract.ContractType)
+            {
+                case 1:
+                    <input type="hidden" asp-for="CFM.Deposit.IdDeposit" />
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Deposit.DepositRate" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Deposit.DepositRate" class="form-control" />
+                        <span asp-validation-for="CFM.Deposit.DepositRate" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Deposit.InterestRatePerYear" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Deposit.InterestRatePerYear" class="form-control" />
+                        <span asp-validation-for="CFM.Deposit.InterestRatePerYear" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="control-label" for="drBal">Current balance at @Model.BalanceDate.ToShortDateString()</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input id="drBal" type="number" asp-for="RealBalance" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="control-label" for="dpBal">Planned balance at @Model.BalanceDate.ToShortDateString()</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input id="dpBal" type="number" asp-for="ForecastBalance" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="checkUpdate" asp-for="BalanceUpdateOK">
+                            <label class="form-check-label" for="checkUpdate">
+                                Update payment rates to adjust the planned balance to real balance value
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="CFM.Deposit.InterestAccount" />
+                    break;
+                case 2:
+                <input type="hidden" asp-for="CFM.Loan.IdLoan" />    
+                <input type="hidden" asp-for="CFM.Loan.IdLoanType" />
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Loan.LoanAmount" class="control-label"></label>
+                        <input id="loanAmount" type="number" asp-for="CFM.Loan.LoanAmount" class="form-control" />
+                        <span asp-validation-for="CFM.Loan.LoanAmount" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="control-label" for="lrBal">Current balance at @Model.BalanceDate.ToShortDateString()</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" id="lrBal" asp-for="RealBalance" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="control-label" for="lpBal">Planned balance at @Model.BalanceDate.ToShortDateString()</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input id="lpBal" type="number" asp-for="ForecastBalance" class="form-control" disabled/>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="checkUpdate" asp-for="BalanceUpdateOK">
+                            <label class="form-check-label" for="checkUpdate">
+                                Update payment rates to adjust the planned balance to real balance value
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Loan.LoanInterest" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Loan.LoanInterest" class="form-control" />
+                        <span asp-validation-for="CFM.Loan.LoanInterest" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CFM.Loan.LoanSecurity" class="control-label"></label>
+                        <select id="security" class="form-select" aria-label="Select loan security" asp-for="CFM.Loan.LoanSecurity" asp-items="@ViewBag.TangibleAsset">
+                            <option value="@Guid.Empty" >Choose an option</option>
+                        </select>
+                        <span asp-validation-for="CFM.Loan.LoanSecurity" class="text-danger"></span>
+                    </div>
+                    <input type="hidden" asp-for="CFM.Loan.IdAccountInterest" />
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Loan.ExtraPay" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Loan.ExtraPay" class="form-control" />
+                        <span asp-validation-for="CFM.Loan.ExtraPay" class="text-danger"></span>
+                    </div>
+                    break;
+                case 3:
+                <input type="hidden" asp-for="CFM.CreditCard.IdCreditCard" />    
+                <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CreditCardLimit" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CreditCardLimit" class="form-control" />
+                        <span asp-validation-for="CFM.CreditCard.CreditCardLimit" class="text-danger"></span>
+                    </div>
+                    <div class="mb-6">
+                        <label class="control-label">Current card balance at @Model.BalanceDate.ToShortDateString() </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input id="crPurBal" type="number" asp-for="RealBalance" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Negative value represents Credit" />
+                            <span class="input-group-text">$</span>
+                            <input id="crCshBal" type="number" asp-for="CardCashRealBalance" class="form-control" data-bs-placement="top" data-bs-title="Negative value represents Credit" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="control-label">Planned total balance and cash-out component at @Model.BalanceDate.ToShortDateString()</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input id="cpPurBal" type="number" asp-for="ForecastBalance" class="form-control" disabled />
+                            <span class="input-group-text">$</span>
+                            <input id="cpCshBal" type="number" asp-for="CardCashPlanBalance" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="checkUpdate" asp-for="BalanceUpdateOK">
+                            <label class="form-check-label" for="checkUpdate">
+                                Update planned balance value to real balance value
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CreditCardInterest" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CreditCardInterest" class="form-control"/>
+                        <span asp-validation-for="CFM.CreditCard.CreditCardInterest" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CashRate" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CashRate" class="form-control" />
+                        <span asp-validation-for="CFM.CreditCard.CashRate" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CreditCardPayPercent" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CreditCardPayPercent" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Minimum percentage of the balance to be paid" />
+                        <span asp-validation-for="CFM.CreditCard.CreditCardPayPercent" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CycleFee" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CycleFee" class="form-control" />
+                        <span asp-validation-for="CFM.CreditCard.CycleFee" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.CreditCard.CreditCardInsuranceRate" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.CreditCardInsuranceRate" class="form-control" />
+                        <span asp-validation-for="CFM.CreditCard.CreditCardInsuranceRate" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CFM.CreditCard.ExtraPay" class="control-label"></label>
+                        <input type="number" asp-for="CFM.CreditCard.ExtraPay" class="form-control"/>
+                        <span asp-validation-for="CFM.CreditCard.ExtraPay" class="text-bg-danger"></span>
+                    </div>
+                    <input type="hidden" asp-for="CFM.CreditCard.FeeAccount" />
+                    <input type="hidden" asp-for="CFM.CreditCard.InsuranceAccount" />
+                    <input type="hidden" asp-for="CFM.CreditCard.InterestAccount" />
+                    <input type="hidden" asp-for="CFM.CreditCard.InterestCashOutAcc" />
+                    break;
+                case 4:
+                <input type="hidden" asp-for="CFM.Employment.IdEmployment" />    
+                <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Employment.GrossPaidCycle" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Employment.GrossPaidCycle" class="form-control" />
+                        <span asp-validation-for="CFM.Employment.GrossPaidCycle" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Employment.TaxPaidCycle" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Employment.TaxPaidCycle" class="form-control" />
+                        <span asp-validation-for="CFM.Employment.TaxPaidCycle" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Employment.SuperPaidCycle" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Employment.SuperPaidCycle" class="form-control" />
+                        <span asp-validation-for="CFM.Employment.SuperPaidCycle" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CFM.Employment.IdSuperAccount" class="control-label"></label>
+                        <select class="form-select" aria-label="Select superannuation account" asp-for="CFM.Employment.IdSuperAccount" asp-items="@ViewBag.SuperAccount">
+                            <option value="-1" selected>Choose an option</option>
+                        </select>
+                        <span asp-validation-for="CFM.Employment.IdSuperAccount" class="text-danger"></span>
+                    </div>
+                    break;
+                case 5:
+                <input type="hidden" asp-for="CFM.Income.IdIncome" />
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Income.GrossPerCycle" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Income.GrossPerCycle" class="form-control" />
+                        <span asp-validation-for="CFM.Income.GrossPerCycle" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Income.TaxPaidCycle" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Income.TaxPaidCycle" class="form-control" />
+                        <span asp-validation-for="CFM.Income.TaxPaidCycle" class="text-danger"></span>
+                    </div>
+                    break;
+                case 6 or 7:
+                <input type="hidden" asp-for="CFM.Bill.IdBill" />
+                    <div class="mb-3">
+                        <span class="text-danger">*</span>
+                        <label asp-for="CFM.Bill.BillCycleRate" class="control-label"></label>
+                        <input type="number" asp-for="CFM.Bill.BillCycleRate" class="form-control" />
+                        <span asp-validation-for="CFM.Bill.BillCycleRate" class="text-danger"></span>
+                    </div>
+                    break;
+                default:
+                    <p class="text-warning"> No contract category has been selected!</p>
+                    break;
+            }
+            <br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-md-4">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+        <div class="col">
+            <a asp-page="./ContractsList">Back to List</a>
+        </div>
+    </div>
+</form>
+
+
+
+@section Scripts {
+    <!--await Html.RenderPartialAsync("_ValidationScriptsPartial");--> 
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+        window.addEventListener("load",function(){
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            // get elements that are affected by execution status of the contract
+            const contE = document.getElementById('contractor');
+            const startD = document.getElementById('startDate');
+            const endD = document.getElementById('endDate');
+            const endA = document.getElementById('endAction');
+            const freq = document.getElementsById('frequency');
+            const cardRB = document.getElementById('realBal');
+            const cardCO = document.getElementById('cardCashOut');
+            const checkUp = document.getElementById('checkUpdate')
+            const loanA = document.getElementById('loanAmount');
+            let restOn = "@Model.RestrictionsOn";
+            let contType = "@Model.CFM.FinContract.ContractType";
+            if(restOn == 1) 
+            {
+                contE.disabled = true;
+                startD.disabled = true;
+                endA.disabled = true;
+                freq.disabled = true; 
+                switch(contType)
+                {
+                    case 1:
+                        cardRB.disabled = true;
+                        checkUp.disabled = true;
+                    break;
+                    case 2:
+                        cardRB.disabled = true;
+                        checkUp.disabled = true;
+                        endD.disabled = true;
+                        loanA.disabled = true;
+                    break;
+                    case 3:
+                        cardRB.disabled = true;
+                        cardCO.disabled = true;
+                        checkUp.disabled = true;
+                    break;
+                        
+                }
+            }
+            
+            return;
+        });
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#f08080"; // fire light
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}

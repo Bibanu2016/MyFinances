@@ -1,0 +1,59 @@
+﻿@page
+@model MyFinances.Pages.Organisations.EditModel
+
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+
+<h4>Organisation</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Organisation.IdOrg" />
+            <input type="hidden" asp-for="Organisation.IdCateg" />
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="control-label">Category</label>
+                <div>@Model.CategoryOrg</div>
+            </div>
+            <div class="fmb-3">
+                   <span class="text-danger">*</span>
+                <label asp-for="Organisation.OrganisationName" class="control-label"></label>
+                <input asp-for="Organisation.OrganisationName" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Organisation.OrganisationName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Organisation.OrganisationDetails" class="control-label"></label>
+                <input asp-for="Organisation.OrganisationDetails" class="form-control" />
+                <span asp-validation-for="Organisation.OrganisationDetails" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Organisation.NumberContracts" />
+            <hr />
+            <br />
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<br/>
+<div>
+    <a asp-page="./OrgIndex">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>
+</html>

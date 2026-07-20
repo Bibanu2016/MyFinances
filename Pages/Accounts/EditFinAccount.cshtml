@@ -1,0 +1,80 @@
+﻿@page "{handler?}"
+@model MyFinances.Pages.Accounts.EditModel
+
+@{
+    ViewData["Title"] = "Edit Financial Account";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+<br />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="FinAccount.IdFinAccount" />
+    <input type="hidden" asp-for="CanEdit" value="@Model.CanEdit" id="ce" />
+    <div class="row row-gap-md-2">
+        <div class="col col-md-2">
+            <span class="text-danger">*</span>
+            <label asp-for="FinAccount.Name" class="control-label" for="accName"></label>
+        </div>
+        <div class="col col-md text-wrap">
+            <input asp-for="FinAccount.Name" class="form-control" aria-required="true" id="accName" />
+            <span asp-validation-for="FinAccount.Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row row-gap-md-2">
+        <div class="col col-md-2">
+            <label asp-for="FinAccount.AccountCategory" class="control-label"></label>
+        </div>
+        <div class="col col-md">
+            <input type="hidden" asp-for="FinAccount.AccountCategory" />
+            <div class="text-body">@Model.CategoryAccount</div>
+        </div>
+    </div>
+    <div class="row row-gap-md-2">
+        <div class="col col-md-2">
+            <label asp-for="FinAccount.AccountOwner" class="control-label"></label>
+        </div>
+        <div class="col col-md">
+            <input type="hidden" asp-for="FinAccount.AccountOwner" />
+            <div class="text-body">@Model.NameOwner</div>
+        </div>
+    </div>
+    <hr />
+    <br />
+    @if(Model.CanEdit == 1)
+        {
+            <div class="row row-gap-2">
+            <div class="form-text" style="color:orange"><strong>This account cannot be edited as is part of a contract assigned accounts</strong></div>  
+            </div>
+        }
+        <br />
+    <hr /> 
+    <div class="row row-gap-2">
+        <div class="col col-md-2"></div>
+        <div class="col col-md justify-content-end">
+            <button type="submit" class="btn btn-light" id="btn">Save</button>
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-page="./IndexFinAccount">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded", function () {
+            const an = document.getElementById("accName");
+            const b = document.getElementById("btn");
+            let x = @Model.CanEdit;
+            if(x === 1)
+            {
+                an.disabled = true;
+                b.disabled = true;
+            }
+            
+        });
+    </script>
+}

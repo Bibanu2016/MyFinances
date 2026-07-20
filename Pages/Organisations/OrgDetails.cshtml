@@ -1,0 +1,52 @@
+﻿@page
+@model MyFinances.Pages.Organisations.DetailsModel
+
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+
+<div>
+    <h4>Organisation</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Organisation.IdCateg)
+        </dt>
+        <dd class="col-sm-10">
+            <div>@Model.NameCategory</div>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Organisation.OrganisationName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Organisation.OrganisationName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Organisation.OrganisationDetails)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Organisation.OrganisationDetails)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Organisation.NumberContracts)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Organisation.NumberContracts)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./OrgEdit" asp-route-id="@Model.Organisation.IdOrg">Edit</a> |
+    <a asp-page="./OrgIndex">Back to List</a>
+</div>
+</body>
+</html>

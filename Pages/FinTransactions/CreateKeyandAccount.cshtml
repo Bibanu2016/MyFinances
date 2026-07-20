@@ -1,0 +1,92 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.CreateKeyandAccountModel
+@{
+}
+<h2>@ViewData["Title"]</h2>
+<hr />
+<br />
+<h3>Transaction details</h3>
+<div class="row row-gap-2 mb-2">
+    <div class="col col-6">
+        <div class="mb-3">
+            <label class="form-label" asp-for="UFinTransaction.TransactionDate"></label>
+            <input type="date" asp-for="UFinTransaction.TransactionDate" disabled />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="UFinTransaction.DebitAccount"></label>
+            <input type="number" asp-for="UFinTransaction.DebitAccount" disabled />
+            @if (Model.UFinTransaction.DebitAccount != 0)
+            {
+                <p class="form-label">@Model.SourceName</p>
+            }
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="UFinTransaction.CreditAccount"></label>
+            <input type="number" asp-for="UFinTransaction.CreditAccount" disabled />
+            @if (Model.UFinTransaction.CreditAccount != 0)
+            {
+                <p class="form-label">@Model.SourceName</p>
+            }
+        </div>
+        <div class="mb-3">
+        <label class="form-label" asp-for="UFinTransaction.TransactionValue"></label>
+        <input type="number" asp-for="UFinTransaction.TransactionValue" disabled />
+    </div>
+        <div class="mb-3">
+        <label class="form-label" asp-for="UFinTransaction.TransactionDetail"></label>
+        <input type="text" asp-for="UFinTransaction.TransactionDetail" />
+    </div>
+    </div>
+</div>
+<hr />
+<br />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row row-gap-2 mb-2">
+        <div class="col col-md-4">
+            <span class="text-danger">*</span>
+            <label class="form-label" for="keytransaction">Key for transaction identification</label>
+            <input type="text" id="keytransaction" asp-for="KeyTransaction" />
+            <span class="text-danger" asp-validation-for="KeyTransaction"></span>
+        </div>
+    </div>
+    <br />
+    <div class="row row-gap-2 mb-2">
+        <div class="col col-md-4">
+            <h3>New account for the transaction</h3>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAccount.AccountCategory"></label>
+                <select class="form-select" asp-for="NewAccount.AccountCategory" asp-items="Model.AccCategList">
+                    <option selected>Select ..</option>
+                </select>
+                <span class="text-danger" asp-validation-for="NewAccount.AccountCategory"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAccount.Name"></label>
+                <input type="text" asp-for="NewAccount.Name" />
+                <span class="text-danger" asp-validation-for="NewAccount.Name"></span>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAccount.AccountOwner"></label>
+                <select class="form-select" asp-for="NewAccount.AccountOwner" asp-items="Model.UserAccountList">
+                    <option selected>Select ..</option>
+                </select>
+                <span class="text-danger" asp-validation-for="NewAccount.AccountOwner"></span>
+            </div>
+        </div>
+        <div class="mb-3" style="text-align:center">
+            <button type="submit" class="btn btn-outline-dark">Save</button>
+        </div>
+    </div>
+</form>
+<a asp-page="./UnpairedTransactions">Back</a>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

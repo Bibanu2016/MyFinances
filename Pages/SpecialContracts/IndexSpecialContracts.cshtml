@@ -1,0 +1,88 @@
+﻿@page
+@model MyFinances.Pages.SpecialContracts.IndexSpecialContractsModel
+@{
+    ViewData["Title"] = "Special Contracts List";
+}
+
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Error message!</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+            if('@TempData["SuccessMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Success</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div class="row">
+        <div class=" col col-3">
+            <div class="input-group">
+                <select class="form-select border-success-subtle" asp-for="CreateContractType" asp-items="Model.ContractTypes">
+                    <option value="0">Choose ..</option>
+                </select>
+                <button class="btn btn-success" type="submit">Create</button>
+            </div>
+            <span asp-validation-for="CreateContractType" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+
+<hr />
+<br />
+@if (Model.ContList != null && Model.ContList.Count > 0)
+{
+    <div class="container container-sm">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Contract type</th>
+                    <th>Contract name</th>
+                    <th>Contract owner</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ContList)
+                {
+                    <tr>
+                        <td>@item.ContractType</td>
+                        <td>@item.ContractName</td>
+                        <td>@item.OwnerName</td>
+                        <td>
+                            <a class="btn btn-primary" asp-page="./EditSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> |
+                            <a class="btn btn-primary" asp-page="./DetailsSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-eye" style="color:grey" alt="Details"></i></a> |
+                            <a class="btn btn-primary" asp-page="./DeleteSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-warning">No contract found.</p>
+}
+

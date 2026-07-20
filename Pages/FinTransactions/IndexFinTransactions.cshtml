@@ -1,0 +1,182 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.IndexFinTransactionsModel
+
+@{
+    ViewData["Title"] = "Recorded Transactions List";
+    ViewBag.AccList = Model.AccList;
+    int first = (Model.ItemsFilter.PageIndex - 1) * Model.ItemsFilter.PageSize + 1;
+    int last = Math.Min(Model.ItemsFilter.PageIndex * Model.ItemsFilter.PageSize, Model.TotalCount);
+}
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            const modalBody = document.getElementById("modalBody");
+            const modalContent = document.querySelector("#myModal .modal-content");
+            const modal = new bootstrap.Modal(document.getElementById("myModal"));
+            if('@TempData["SuccessMessage"]')
+            {
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                modal.show();
+            }
+            else if('@TempData["ErrorMessage"]')
+            {
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<div class="page-header">
+    <h1 class="page-title">@ViewData["Title"]</h1>
+    <h2>@Model.TotalCount total transactions</h2>
+</div>
+
+<p>
+    <a asp-page="Create" class="btn btn-outline-primary">Create New</a>
+</p>
+<hr />
+<br />
+<form method="get" class="row row-gap-3 align-items-center">
+    <div class="col col-sm-3">
+        <label class="form-label" for="startDate">From date</label>
+        <input type="date" class="form-control" id="startDate" placeholder="From date .." asp-for="ItemsFilter.FromDate" />
+    </div>
+    <div class="col col-sm-3">
+        <label class="form-label" for="endDate">To date</label>
+        <input type="date" class="form-control" id="endDate" placeholder="To date .." asp-for="ItemsFilter.ToDate" />
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label" for="finAccount">Account</label>
+        <select class="form-select" id="finAccount" asp-for="ItemsFilter.IdFilterAccount" asp-items="@ViewBag.AccList" placeholder="Select account ..">
+            <option value="-1" selected>Choose...</option>
+        </select>
+    </div>
+    <input type="hidden" asp-for="ItemsFilter.PageIndex" />
+    <div class="col-auto">
+        <a class="btn btn-close" aria-label="Close" asp-page="./IndexFinTransactions"></a>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary" >Filter</button>
+    </div>
+</form>
+<br />
+@if(Model.FinTransactionList.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].DebitAccount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].CreditAccount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionValue)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].ContractIdentifier)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FinTransactionList[0].IdSource)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.FinTransactionList)
+            {
+                <tr>
+                    <td>
+                        @item.TransactionDate.ToShortDateString()
+                    </td>
+                    <td>
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.DebitAccount.ToString())?.Text
+                    </td>
+                    <td>
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.CreditAccount.ToString())?.Text
+                    </td>
+                    <td style="text-align:right; padding-right: 20px">
+                        @Html.DisplayFor(modelItem => item.TransactionValue)
+                    </td>
+                    <td>
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.ContractIdentifier.ToString())?.Text
+                    </td>
+                    <td>
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.IdSource.ToString())?.Text
+                    </td>
+                    <td>
+                        <a asp-page="./EditFinTransaction" asp-route-id="@item.IdTransaction" asp-route-ift="@Model.ItemsFilter.ToString()">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>No transactions found</h3>
+}
+<hr />
+
+<nav aria-label="paginationIndex">
+    <span class="text-bg-info">
+        Showing @first–@last of @Model.TotalCount items
+    </span>
+    <ul class="pagination justify-content-end" id="pagination">
+        <!--Previous-->
+        @if(Model.ItemsFilter.PageIndex <= 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Previous</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" asp-page="./IndexFinTransactions" asp-all-route-data="Model.ItemsFilter.ToRouteData(Model.ItemsFilter.PageIndex - 1)">Previous</a>
+            </li>
+        }
+        <!--Page numbers-->
+        @foreach (var p in Model.PageNumbers)
+        {
+            if (p == -1)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">..</a>
+                </li>
+            }
+            else if (p == Model.ItemsFilter.PageIndex)
+            {
+                <li class="page-item active">
+                    <a class="page-link" aria-current="page">@p</a>
+                </li>
+            }
+            else
+            {
+                <a class="page-link" asp-page="./IndexFinTransactions" asp-all-route-data="Model.ItemsFilter.ToRouteData (p)">@p</a>
+            }
+        }
+        <!--Next-->
+        @if (Model.ItemsFilter.PageIndex >= Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Next</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" asp-page="./IndexFinTransactions" asp-all-route-data="Model.ItemsFilter.ToRouteData(Model.ItemsFilter.PageIndex + 1)">Next</a>
+            </li>
+        }
+    </ul>
+</nav>
+<a asp-page="../Index">Back</a>
+

@@ -1,0 +1,37 @@
+﻿<!--
+    _ToastMessage.cshtml
+    Partial view to implement page notifications.
+    Use it with the pagestatusmsg.js
+-->
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div class="toast-container position-absolute top-0 end-3 p-3">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="30000">
+        <div class="toast-header">
+            <i class="bi-0-square-fill" alt="Message"></i>
+            <strong class="me-auto">Status message</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="successMessage" class="toast-body bg-success text-white"></div>
+    </div>
+    <div id="warningToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="30000">
+        <div class="toast-header">
+            <i class="bi-0-square-fill" alt="Message"></i>
+            <strong class="me-auto">Status message</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="warningMessage" class="toast-body bg-warning text-white"></div>
+    </div>
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="20000">
+        <div class="toast-header">
+            <i class="bi-0-square-fill" alt="Message"></i>
+            <strong class="me-auto">Status message</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="errorMessage" class="toast-body bg-danger text-white"></div>
+    </div>
+</div>
+

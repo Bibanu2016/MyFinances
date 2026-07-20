@@ -1,0 +1,585 @@
+﻿@page "{handler?}"
+@model MyFinances.Pages.Contracts.ContractAddModel
+
+@{
+    ViewBag.Frequency = Model.Frequency;
+    ViewBag.EndAction = Model.EndAction;
+    ViewBag.Organisation = Model.Organisation;
+    ViewBag.Payable = Model.Payable;
+    ViewBag.Bank = Model.Bank;
+    ViewBag.Users = Model.Users;
+    ViewBag.TangibleAsset = Model.TangibleAsset;
+    ViewBag.ContractCategory = Model.ContractCategory;
+    ViewBag.SuperAccount = Model.SuperAccount;
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+<div class="container container-sm">
+    <h4><strong>Main contract data</strong></h4>
+    <div class="row pb-sm-3">
+        <div class="col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="CategoryContract" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <select class="form-select" aria-label="Select category" asp-for="CategoryContract" asp-items="@ViewBag.ContractCategory">
+                <option selected>Choose a value..</option>
+            </select>
+            <span asp-validation-for="CategoryContract" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.ContractName" class="control-label"></label>        
+        </div>
+        <div class="col col-sm">
+            <input type="text" asp-for="ContractFull.FinContract.ContractName" class="form-control" />
+            <span asp-validation-for="ContractFull.FinContract.ContractName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.ContractDetails" class="control-label"></label>           
+        </div>
+        <div class="col">
+            <input type="text" asp-for="ContractFull.FinContract.ContractDetails" class="form-control" />
+            <span asp-validation-for="ContractFull.FinContract.ContractDetails" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdOrganisation" class="control-label"></label>         
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <select class="form-select" aria-label="Select organisation" asp-for="ContractFull.FinContract.IdOrganisation" asp-items="@ViewBag.Organisation">
+                    <option selected>Choose a value..</option>
+                </select>
+                <a class="btn btn-outline-secondary" asp-page="/Organisations/OrgCreate" asp-route-fc="@true" asp-route-ct="@Convert.ToInt32(Model.SelectedContractType)"><i class="bi-plus-circle-fill"></i></a>
+            </div>
+            <span asp-validation-for="ContractFull.FinContract.IdOrganisation" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdContractor" class="control-label"></label>
+        </div>
+        <div class="col">
+            <select class="form-select" aria-label="Select contractor" asp-for="ContractFull.FinContract.IdContractor" asp-items="@ViewBag.Users">
+                <option selected>Choose a value..</option>
+            </select>
+            <span asp-validation-for="ContractFull.FinContract.IdContractor" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.StartDate" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="date" asp-for="ContractFull.FinContract.StartDate" class="form-control" value="@DateTime.Today" />
+            <span asp-validation-for="ContractFull.FinContract.StartDate" class="text-danger"></span>
+        </div>
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.EndDate" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="date" asp-for="ContractFull.FinContract.EndDate" class="form-control" value="@DateTime.Today" />
+            <span asp-validation-for="ContractFull.FinContract.EndDate" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdEndAction" class="control-label"></label>
+        </div>
+        <div class="col">
+            <select class="form-select" aria-label="Select end action" asp-for="ContractFull.FinContract.IdEndAction" asp-items="@ViewBag.EndAction">
+                <option selected>Choose an option..</option>
+            </select>
+            <span asp-validation-for="ContractFull.FinContract.IdEndAction" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.InvoiceDate" class="control-label"></label>         
+        </div>
+        <div class="col">
+            <input type="date" asp-for="ContractFull.FinContract.InvoiceDate" class="form-control" value="@DateTime.Today" />
+            <span asp-validation-for="ContractFull.FinContract.InvoiceDate" class="text-danger"></span>
+        </div>
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.InvoiceNetDays" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="number" asp-for="ContractFull.FinContract.InvoiceNetDays" class="form-control" value="0" />
+            <span asp-validation-for="ContractFull.FinContract.InvoiceNetDays" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdFrequency" class="control-label"></label>
+        </div>
+        <div class="col">
+            <select class="form-select" aria-label="Select payment cycle" asp-for="ContractFull.FinContract.IdFrequency" asp-items="@ViewBag.Frequency">
+                <option selected>Choose an option..</option>
+            </select>
+            <span asp-validation-for="ContractFull.FinContract.IdFrequency" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdPayAccount" class="control-label"></label>
+            
+        </div>
+        <div class="col">
+            <select class="form-select" aria-label="Select payment account" asp-for="ContractFull.FinContract.IdPayAccount" asp-items="@ViewBag.Payable">
+                <option value="-1" selected>Choose an option</option>
+            </select>
+            <span asp-validation-for="ContractFull.FinContract.IdPayAccount" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="ContractFull.FinContract.IdBankAccount" class="control-label"></label>
+            
+        </div>
+        <div class="col">
+            <select class="form-select" aria-label="Select bank account" asp-for="ContractFull.FinContract.IdBankAccount" asp-items="@ViewBag.Bank">
+                <option value="-1" selected>Choose an option</option>
+            </select>
+            <span asp-validation-for="ContractFull.FinContract.IdBankAccount" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col-sm-3"></div>
+        <div class="col">
+            <div class="form-text text-secondary text-wrap">
+                A bank account is required to reconcile the payment account if it is a liability.
+                NOTE: If the bank account is selected and different from the payment account all transactions from the payment account will be reconciled by the bank account.
+            </div>
+        </div> 
+    </div>
+</div>
+<div class="container container-sm">
+    <h4><strong>Specific contract data</strong></h4>
+    @switch(Model.SelectedContractType)
+    {
+        case 1:
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Deposit.DepositRate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Deposit.DepositRate" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Deposit.DepositRate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Deposit.InterestRatePerYear" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Deposit.InterestRatePerYear" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Deposit.InterestRatePerYear" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="PurchaseBalance" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="PurchaseBalance" class="form-control" value="0" />
+                    <span asp-validation-for="PurchaseBalance" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="BalanceDate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="date" asp-for="BalanceDate" class="form-control" />
+                    <span asp-validation-for="BalanceDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-sm-3"></div>
+                <div class="col">
+                    <div class="text-body-secondary">
+                        Deposit balance shall be after the last executed transaction before balance date
+                    </div>
+                </div>
+            </div>
+            break;
+        case 2:
+            <div class="row pb-sm-3">
+                <div class="col col-3"></div>
+                <div class="col">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="@true" asp-for="ContractFull.Loan.IdLoanType">
+                        <label asp-for="ContractFull.Loan.IdLoanType" class="form-check-label">Variable rate loan</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Loan.LoanAmount" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Loan.LoanAmount" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Loan.LoanAmount" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Loan.LoanInterest" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Loan.LoanInterest" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Loan.LoanInterest" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="PurchaseBalance" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="PurchaseBalance" class="form-control" value="0" />
+                    <span asp-validation-for="PurchaseBalance" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="BalanceDate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="date" asp-for="BalanceDate" class="form-control" />
+                    <span asp-validation-for="BalanceDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-sm-3"></div>
+                <div class="col">
+                    <div class="text-body-secondary">
+                        Purchase balance shall be after the last executed transaction before balance date
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <label asp-for="ContractFull.Loan.LoanSecurity" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <select class="form-select" aria-label="Select loan security" asp-for="ContractFull.Loan.LoanSecurity" asp-items="@ViewBag.TangibleAsset">
+                        <option value="@Guid.Empty" selected>Choose an option</option>
+                    </select>
+                    <span asp-validation-for="ContractFull.Loan.LoanSecurity" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Loan.ExtraPay" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Loan.ExtraPay" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Loan.ExtraPay" class="text-danger"></span>
+                </div>
+            </div>
+        break;
+        case 3:
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CreditCardLimit" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CreditCardLimit" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.CreditCardLimit" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="PurchaseBalance" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="PurchaseBalance" class="form-control" value="0" />
+                    <span asp-validation-for="PurchaseBalance" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="CashBalance" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="CashBalance" class="form-control" value="0" />
+                    <span asp-validation-for="CashBalance" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col-sm-3"></div>
+                <div class="col">
+                    <div class="text-body-secondary text-wrap">
+                        Balance greater than 0 (zero) represents a Credit balance for the account
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="BalanceDate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="date" asp-for="BalanceDate" class="form-control" value="@DateTime.Today" />
+                    <span asp-validation-for="BalanceDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CreditCardInterest" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CreditCardInterest" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.CreditCardInterest" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CashRate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CashRate" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.CashRate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CreditCardPayPercent" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CreditCardPayPercent" class="form-control" value="3" />
+                    <span asp-validation-for="ContractFull.CreditCard.CreditCardPayPercent" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col-sm-3"></div>
+                <div class="col">
+                    <div class="text-body text-secondary text-wrap">
+                        Minimum percentage of the card balance for rate payment
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CycleFee" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CycleFee" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.CycleFee" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.CreditCardInsuranceRate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.CreditCardInsuranceRate" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.CreditCardInsuranceRate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.CreditCard.ExtraPay" class="control-label"></label>
+                    
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.CreditCard.ExtraPay" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.CreditCard.ExtraPay" class="text-bg-danger"></span>
+                </div>
+            </div>
+            break;
+        case 4:
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Employment.GrossPaidCycle" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Employment.GrossPaidCycle" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Employment.GrossPaidCycle" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <label asp-for="ContractFull.Employment.TaxPaidCycle" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Employment.TaxPaidCycle" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Employment.TaxPaidCycle" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <label asp-for="ContractFull.Employment.SuperPaidCycle" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Employment.SuperPaidCycle" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Employment.SuperPaidCycle" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Employment.IdSuperAccount" class="control-label"></label>
+
+                </div>
+                <div class="col">
+                    <select class="form-select" aria-label="Select loan security" asp-for="ContractFull.Employment.IdSuperAccount" asp-items="@ViewBag.SuperAccount">
+                        <option value="-1" selected>Choose an option</option>
+                    </select>
+                    <span asp-validation-for="ContractFull.Employment.IdSuperAccount" class="text-danger"></span>
+                </div>
+            </div>
+            break;
+        case 5:
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Income.GrossPerCycle" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Income.GrossPerCycle" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Income.GrossPerCycle" class="text-danger"></span>
+                </div>
+                <div class="col col-3">
+                    <label asp-for="ContractFull.Income.TaxPaidCycle" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Income.TaxPaidCycle" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Income.TaxPaidCycle" class="text-danger"></span>
+                </div>
+            </div>
+            break;
+        case 6 or 7:
+            <div class="row pb-sm-3">
+                <div class="col col-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Bill.BillCycleRate" class="control-label"></label>
+                </div>
+                <div class="col">
+                    <input type="number" asp-for="ContractFull.Bill.BillCycleRate" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.Bill.BillCycleRate" class="text-danger"></span>
+                </div>
+            </div>
+            break;
+        case 8:
+            <div class="row pb-sm-3">
+                <div class="col col-sm-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="PurchaseBalance" class="control-label"></label>
+                </div>
+                <div class="col col-sm">
+                    <input type="number" asp-for="PurchaseBalance" class="form-control" value="0" />
+                    <span asp-validation-for="PurchaseBalance" class="text-danger"></span>
+                </div>
+                <div class="col col-sm-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="BalanceDate" class="control-label"></label>
+                </div>
+                <div class="col col-sm">
+                    <input type="date" asp-for="BalanceDate" class="form-control" />
+                    <span asp-validation-for="BalanceDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class=" col col-sm-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.InvestFund.AdminFee" class="control-label"></label>
+                </div>
+                <div class="col col-sm">
+                    <input type="number" asp-for="ContractFull.InvestFund.AdminFee" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.InvestFund.AdminFee" class="text-danger"></span>
+                </div>
+                <div class=" col col-sm-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.InvestFund.AdviserFee" class="control-label"></label>
+                </div>
+                <div class="col col-sm">
+                    <input type="number" asp-for="ContractFull.InvestFund.AdviserFee" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.InvestFund.AdviserFee" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class=" col col-sm-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.InvestFund.ManagementFee" class="control-label"></label>
+                </div>
+                <div class="col col-sm">
+                    <input type="number" asp-for="ContractFull.InvestFund.ManagementFee" class="form-control" value="0" />
+                    <span asp-validation-for="ContractFull.InvestFund.ManagementFee" class="text-danger"></span>
+                </div>
+                <div class=" col col-sm-6"></div>
+            </div>
+            <div class="row pb-sm-3">
+                <div class=" col col-sm-3">
+                </div>
+                <div class="col col-sm">
+                    <div class="text-body-secondary">
+                        NOTE: Frequency of the fees is <strong>Monthly</strong> with the date set on the <strong>1st</strong> of the month
+                    </div>
+                </div>
+            </div>
+            break;
+    }
+</div>
+<br />
+<div class="container-sm align-content-end">
+    <div class="row justify-content-end">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col col-sm-9">
+                <input type="hidden" asp-for="SelectedContractType" />
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+<div class="row">
+    <a asp-page="./ContractsList">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}

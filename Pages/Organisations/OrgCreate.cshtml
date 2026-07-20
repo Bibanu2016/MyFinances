@@ -1,0 +1,90 @@
+﻿@page "{fc:bool}/{ct:int}"
+@model MyFinances.Pages.Organisations.CreateModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Add new business organisation";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create new organisation</title>
+    
+</head>
+<body>
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <input type="hidden" asp-for="@Model.FromContract" />
+        <input type="hidden" asp-for="@Model.Ctype" />
+        <p>@Model.Ctype</p>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label class="control-label">Category</label>
+                    <select class="form-select" aria-label="Select organisation" asp-for="Organisation.IdCateg">
+                        <option >Choose a category..</option>
+                        @if (Model.OrganisationTypes.Count > 0)
+                        {
+                            @foreach (var org in Model.OrganisationTypes)
+                            {
+                                <option value="@org.Id">@org.CategoryName</option>
+                            }
+                        }
+                    </select>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label asp-for="Organisation.OrganisationName" class="control-label"></label>
+                <input asp-for="Organisation.OrganisationName" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Organisation.OrganisationName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Organisation.OrganisationDetails" class="control-label"></label>
+                <input asp-for="Organisation.OrganisationDetails" class="form-control" />
+                <span asp-validation-for="Organisation.OrganisationDetails" class="text-danger"></span>
+            </div>
+            <hr />
+            <br />
+            <div class="mb-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<hr />
+@if(Model.FromContract)
+        {
+            @if(Model.Ctype < 8)
+            {
+            <div>
+                <a asp-page="/Contracts/ContractAdd" asp-route-sct="@Model.Ctype">Back to Contract</a>
+            </div>
+            }
+            else
+            {
+            <div>
+                <a asp-page="/Contracts/InvestFundContractAdd">Back to Contract</a>
+            </div>
+            }
+           
+        }
+        else
+        {
+        <div>
+            <a asp-page="./OrgIndex">Back to List</a>
+        </div>
+        }
+        
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>
+</html>

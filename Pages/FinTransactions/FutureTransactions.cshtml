@@ -1,0 +1,303 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.FutureTransactionsModel
+
+@{
+    ViewData["Title"] = "Planned Transactions List";
+}
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Error message!</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+            if('@TempData["SuccessMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Success</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-page="AddPlanTransaction" class="btn btn-outline-primary">Create New</a>
+</p>
+<hr />
+<form method="get" class="row row-gap-3 align-items-center">
+    <div class="col col-sm-3">
+        <span>From date: </span>
+        <input type="date" asp-for="StartDate" placeholder="From date .." />
+    </div>
+    <div class="col col-sm-3">
+        <span>To date: </span>
+        <input type="date" asp-for="EndDate" placeholder="To date .." />
+    </div>
+    <div class="col-sm-3">
+        <label class="visually-hidden" for="finAccount">Account</label>
+        <select class="form-select" id="finAccount" asp-for="FilterAccount" asp-items="@Model.AccList">
+            <option value="-1" selected>Choose...</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <a class="btn btn-close" aria-label="Close" asp-page="./FutureTransactions"></a>
+    </div>
+    <div class="col col-sm-auto">
+        <button type="submit" class="btn btn-info" >Filter</button>
+    </div>
+</form>
+<hr />
+<h3 class="text-primary">Incoming payments</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].TransactionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].DebitAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].CreditAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].TransactionValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].IdSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncomingList[0].ContractIdentifier)
+            </th>
+            <th> | </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.IncomingList.Count > 0)
+        {
+            @foreach (var item in Model.IncomingList)
+            {
+                <tr>
+                    <td style="text-align:center">
+                        @item.TransactionDate.ToShortDateString()
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.DebitAccount.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.CreditAccount.ToString())?.Text
+                    </td>
+                    <td style="text-align:right; padding-right: 20px">
+                        @Html.DisplayFor(modelItem => item.TransactionValue)
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.IdSource.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.ContractIdentifier.ToString())?.Text
+                    </td>
+                    <td> | </td>
+                    <td>
+                        @if(item.ContractIdentifier > 0)
+                        {
+                            <div>
+                                <a asp-page="#"><i class="bi-pencil" style="color: lightgray"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="#" ><i class="bi-trash" style="color: lightgrey"></i></a>
+                            </div>
+                            
+                        }
+                        else
+                        {
+                            <div>
+                                <a asp-page="./EditPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-pencil"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="./DeletePlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-trash"></i></a>
+                            </div>                        
+                        }               
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr style="text-align:center">No transactions found</tr>
+        }
+
+    </tbody>
+</table>
+<h3 class="text-warning">Overdue payments</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].TransactionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].DebitAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].CreditAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].TransactionValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].IdSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OverdueList[0].ContractIdentifier)
+            </th>
+            <th> | </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.IncomingList.Count > 0)
+        {
+            @foreach (var item in Model.OverdueList)
+            {
+                <tr>
+                    <td style="text-align:center">
+                        @item.TransactionDate.ToShortDateString()
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.DebitAccount.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.CreditAccount.ToString())?.Text
+                    </td>
+                    <td style="text-align:right; padding-right:20px">
+                        @Html.DisplayFor(modelItem => item.TransactionValue)
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.IdSource.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.ContractIdentifier.ToString())?.Text
+                    </td>
+                    <td> | </td>
+                    <td>
+                        @if (item.ContractIdentifier > 0)
+                        {
+                            <div>
+                                <a asp-page="./EditPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-pencil"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="#"><i class="bi-trash" style="color: lightgrey"></i></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <a asp-page="./EditPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-pencil"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="./DeletePlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-trash"></i></a>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr style="text-align:center">No transactions found</tr>
+        }
+
+    </tbody>
+</table>
+<h3>Executed planned transactions</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].TransactionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].DebitAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].CreditAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].TransactionValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].IdSource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutedList[0].ContractIdentifier)
+            </th>
+            <th> | </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.IncomingList.Count > 0)
+        {
+            @foreach (var item in Model.ExecutedList)
+            {
+                <tr>
+                    <td style="text-align:center">
+                        @item.TransactionDate.ToShortDateString()
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.DebitAccount.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.CreditAccount.ToString())?.Text
+                    </td>
+                    <td style="text-align:right">
+                        @Html.DisplayFor(modelItem => item.TransactionValue)
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.IdSource.ToString())?.Text
+                    </td>
+                    <td style="text-wrap:auto">
+                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.ContractIdentifier.ToString())?.Text
+                    </td>
+                    <td> | </td>
+                    <td>
+                        @if (item.ContractIdentifier > 0)
+                        {
+                            <div>
+                                <a asp-page="./EditPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-pencil"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="#"><i class="bi-trash" style="color: lightgrey"></i></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <a asp-page="./EditPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-pencil"></i></a> |
+                                <a asp-page="./DetailsPlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-eye"></i></a> |
+                                <a asp-page="./DeletePlanTransaction" asp-route-id="@item.IdTransaction"><i class="bi-trash"></i></a>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr style="text-align:center">No transactions found</tr>
+        }
+
+    </tbody>
+</table>
+

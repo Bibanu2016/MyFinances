@@ -1,0 +1,157 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.AccountTransactionsModel
+@{
+    ViewBag.AccList = Model.AccountsList;
+}
+
+<h1>Account transactions</h1>
+<h2>@ViewData["Title"]</h2>
+<hr />
+<br />
+<form method="get" class="row row-gap-3 align-items-center">
+    <div class="col col-sm-3">
+        <label class="visually-hidden" for="startDate">From date</label>
+        <input type="date" class="form-control" id="startDate" placeholder="From date" asp-for="FilterStartdate" />
+    </div>
+    <div class="col col-sm-3">
+        <label class="visually-hidden" for="endDate">To date</label>
+        <input type="date" class="form-control" id="endDate" placeholder="To date" asp-for="FilterEnddate" />
+    </div>
+    <div class="col-sm-3">
+        <label class="visually-hidden" for="finAccount">Account</label>
+        <select class="form-select" id="finAccount" asp-for="FilterAccount" asp-items="@ViewBag.AccList">
+            <option value="-1" selected>Choose...</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <a class="btn btn-close" aria-label="Close" asp-page="./AccountTransactions"></a>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Generate</button>
+    </div>
+</form>
+<br />
+<hr />
+<h3>Incomning planned transactions</h3>
+<table class="table table-secondary">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.APlanned[0].DateTransaction)</th>
+            <th>@Html.DisplayNameFor(m => m.APlanned[0].AccountName)</th>
+            <th>@Html.DisplayNameFor(m => m.APlanned[0].Details)</th>
+            <th style="padding-right: 10px">@Html.DisplayNameFor(m => m.APlanned[0].Amount)</th>
+            <th>@Html.DisplayNameFor(m => m.APlanned[0].ContractName)</th>
+            <th>@Html.DisplayNameFor(m => m.APlanned[0].SourceName)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var planItem in Model.APlanned)
+        {
+            <tr>
+                <td>@planItem.DateTransaction.ToShortDateString()</td>
+                <td>@planItem.AccountName</td>
+                <td>@planItem.Details</td>
+                <td style="text-align:end; padding-right: 10px">@planItem.Amount</td>
+                <td>@planItem.ContractName</td>
+                <td>@planItem.SourceName</td>
+            </tr>
+        }
+        
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" style="font-weight:bold">Total planned</td>
+            @if (Model.categorySums[0] >= 0)
+            {
+                <td style="text-align:right; font-weight:bold">@Model.categorySums[0]</td>
+            }
+            else
+            {
+                <td style="text-align:right; font-weight:bold; color:crimson">@Model.categorySums[0]</td>
+            }
+        </tr>
+    </tfoot>
+</table>
+<hr />
+<h3 class="text-warning">Overdue planned transactions</h3>
+<table class="table table-warning">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.AOverdue[0].DateTransaction)</th>
+            <th>@Html.DisplayNameFor(m => m.AOverdue[0].AccountName)</th>
+            <th>@Html.DisplayNameFor(m => m.AOverdue[0].Details)</th>
+            <th style="padding-right: 10px">@Html.DisplayNameFor(m => m.AOverdue[0].Amount)</th>
+            <th>@Html.DisplayNameFor(m => m.AOverdue[0].ContractName)</th>
+            <th>@Html.DisplayNameFor(m => m.AOverdue[0].SourceName)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var planItem in Model.AOverdue)
+        {
+            <tr>
+                <td>@planItem.DateTransaction.ToShortDateString()</td>
+                <td>@planItem.AccountName</td>
+                <td>@planItem.Details</td>
+                <td style="text-align:end; padding-right: 10px">@planItem.Amount</td>
+                <td>@planItem.ContractName</td>
+                <td>@planItem.SourceName</td>
+            </tr>
+        }
+        
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" style="font-weight:bold">Total planned</td>
+            @if (Model.categorySums[1] >= 0)
+            {
+                <td style="text-align:right; font-weight:bold">@Model.categorySums[1]</td>
+            }
+            else
+            {
+                <td style="text-align:right; font-weight:bold; color:crimson">@Model.categorySums[1]</td>
+            }
+        </tr>
+    </tfoot>
+</table>
+<hr />
+<h3>Existing recorded transactions</h3>
+<table class="table table-primary">
+    <thead>
+    <tr>
+        <th>@Html.DisplayNameFor(m => m.ARecorded[0].DateTransaction)</th>
+        <th>@Html.DisplayNameFor(m => m.ARecorded[0].AccountName)</th>
+        <th>@Html.DisplayNameFor(m => m.ARecorded[0].Details)</th>
+        <th style="padding-right: 10px">@Html.DisplayNameFor(m => m.ARecorded[0].Amount)</th>
+        <th>@Html.DisplayNameFor(m => m.ARecorded[0].ContractName)</th>
+        <th>@Html.DisplayNameFor(m => m.ARecorded[0].SourceName)</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach (var planItem in Model.ARecorded)
+    {
+        <tr>
+            <td>@planItem.DateTransaction.ToShortDateString()</td>
+            <td>@planItem.AccountName</td>
+            <td>@planItem.Details</td>
+            <td style="text-align:end; padding-right: 10px">@planItem.Amount</td>
+            <td>@planItem.ContractName</td>
+            <td>@planItem.SourceName</td>
+        </tr>
+    }
+        
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="3" style="font-weight:bold">Total planned</td>
+        @if (Model.categorySums[0] >= 0)
+        {
+            <td style="text-align:right; font-weight:bold">@Model.categorySums[2]</td>
+        }
+        else
+        {
+            <td style="text-align:right; font-weight:bold; color:crimson">@Model.categorySums[2]</td>
+        }
+    </tr>
+</tfoot>
+</table>
+

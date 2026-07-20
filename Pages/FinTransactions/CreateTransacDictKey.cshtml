@@ -1,0 +1,68 @@
+﻿@page
+@model MyFinances.Pages.FinTransactions.CreateTransacDictKeyModel
+@{
+    ViewData["Title"] = "Create transaction ditionary key";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col col-md-5">
+        <form method="post">
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label">Select source for the dictionary entry</label>
+                <select class="form-select" asp-for="Tdictionary.IdSource">
+                    <option selected>Chosee a source...</option>
+                    @foreach (var c in Model.SourcesList)
+                    {
+                        <option value="@c.ItemID">@c.Name</option>
+                    }
+                </select>
+            </div>
+            <!-- Target finaccount for the key. If not target create another finaccount-->
+            <div class="input-group mb-3">
+                <select class="form-select" asp-for="Tdictionary.IdTarget" placeholder="Target selection" aria-label="Recipient’s username" aria-describedby="button-addon2">
+                    <option selected>Select a target ..</option>
+                    @foreach(var ti in Model.TargetList)
+                    {
+                        <option value="@ti.ItemID">@ti.Name</option>            
+                    }
+                </select>
+                <a class="btn btn-outline-secondary" id="button-addon2" asp-page="../Accounts/CreateFinAccount">Create Account</a>
+            </div>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="Tdictionary.Name"></label>
+                <input class="form-control" type="text" asp-for="Tdictionary.Name" />
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<hr />
+<br />
+<a asp-page="./TransDictIndex">Back</a>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if(@TempData["ErrorMessage"] <> null)
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+

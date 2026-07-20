@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--Includes all the fields that are validated during Create and Edit contract-->
+<root>
+	<supfield categ="1">Deposit</supfield>
+	<supfield categ="2">Loan</supfield>
+	<supfield categ="3">CreditCard</supfield>
+	<supfield categ="4">Employment</supfield>
+	<supfield categ="5">Income</supfield>
+	<supfield categ="6">Bill</supfield>
+</root>

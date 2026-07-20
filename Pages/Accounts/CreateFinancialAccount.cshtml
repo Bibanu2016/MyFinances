@@ -1,0 +1,63 @@
+﻿@page
+@model MyFinances.Pages.Accounts.CreateFinancialAccountModel
+@{
+    ViewData["Title"] = "Create Financial Account";
+    ViewBag.AccCategoryList = Model.AccCategoryList;
+    ViewBag.AccOwnerList = Model.AccOwnerList;
+}
+<h2>@ViewData["Title"]</h2>
+<hr />
+<br />
+<form method="post" class="container container-sm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="MyFinAccount.IdFinAccount" />
+    <input type="hidden" asp-for="MyFinAccount.IsLinked" value="@false" />
+    <div class="row pb-3">
+        <div class="col col-2">
+            <span class="text-danger">*</span>
+            <label asp-for="MyFinAccount.Name" class="form-label"></label>
+        </div>
+        <div class="col col-6">      
+            <input asp-for="MyFinAccount.Name" class="form-control" />
+            <span asp-validation-for="MyFinAccount.Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-3">
+        <div class="col col-2">
+            <span class="text-danger">*</span>
+            <label asp-for="MyFinAccount.AccountCategory" class="form-label"></label>
+        </div>
+        <div class="col col-6">
+            <select class="form-select" asp-for="MyFinAccount.AccountCategory" asp-items="ViewBag.AccCategoryList">
+                <option value="-1">Choose ..</option>
+            </select>
+            <span asp-validation-for="MyFinAccount.AccountCategory" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-3">
+        <div class="col col-2">
+            <span class="text-danger">*</span>
+            <label asp-for="MyFinAccount.AccountOwner" class="form-label"></label>
+        </div>
+        <div class="col col-6">
+            <select class="form-select" asp-for="MyFinAccount.AccountOwner" asp-items="ViewBag.AccOwnerList">
+                <option value="-1">Choose ..</option>
+            </select>
+            <span asp-validation-for="MyFinAccount.AccountOwner" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-6">
+            <a class="link-primary" asp-page="./IndexFinAccount">Back to list</a>
+        </div>
+        <div class="col col-2 text-end">
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

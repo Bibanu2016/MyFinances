@@ -1,0 +1,92 @@
+﻿@page
+@using System.Data
+@model MyFinances.Pages.FinTransactions.ColumnsSelectionTransImpModel
+@{
+    ViewData["Title"] = @"Selection columns for transaction data import";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row row-gap-2">
+        <input type="hidden" asp-for="@Model.AccountNumber" />
+        <table class="table table-info">
+            <thead>
+                <tr>
+                    @for (int j = 0; j < Model.ImportTable.Columns.Count; j++)
+                    {
+                        <th scope="col">@Model.ImportTable.Columns[j].ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.DisplayRows; i++)
+                {
+                    <tr>
+                        @foreach (string? item in Model.ImportTable.Rows[i].ItemArray)
+                        {
+                            <td>@(item ?? string.Empty)</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="row row-gap-2">
+        <div class="col mb-3">
+            <div class="input-group mb-3">
+                <span class="text-danger">*</span>
+                <label class="input-group-text" for="inputGroupDate">Transaction date column: </label>
+                <select class="form-select" id="inputGroupDate" asp-for="DateColumn" asp-items="Model.DateColumns">
+                    <option>Choose...</option>
+                </select>
+                <span asp-validation-for="DateColumn" class="text-danger"></span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="text-danger">*</span>
+                <label class="input-group-text" for="inputGroupAmount">Transaction amount column:</label>
+                <select class="form-select" id="inputGroupAmount" asp-for="AmountColumn" asp-items="Model.AmountColumns">
+                    <option>Choose...</option>
+                </select>
+                <span asp-validation-for="DateColumn" class="text-danger"></span>
+            </div>
+            <div class="input-group mb-3">
+                <span class="text-danger">*</span>
+                <label class="input-group-text" for="inputGroupDetails">Transaction details column:</label>
+                <select class="form-select" id="inputGroupDetails" asp-for="DetailsColumn" asp-items="Model.DetailsColumns">
+                    <option>Choose...</option>
+                </select>
+                <span asp-validation-for="DateColumn" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row row-gap-2">
+        <div class="col col-6">
+            <a class="link-info" asp-page="../Index">Cancel</a>
+        </div>
+        <div class="col col-6">
+            <button type="submit" class="btn btn-outline-success">Save</button>
+        </div>
+    </div>
+</form>
+ 
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if(@TempData["ErrorMessage"] <> null)
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
