@@ -1,0 +1,40 @@
+﻿@page
+@model MyFinances.Pages.CloseFYPages.CloseFYIndexModel
+@{
+}
+
+<h1>ViewData["Title"]</h1>
+<hr />
+<br />
+@if(Model.LastFYClosed)
+{
+    <div class="alert alert-warning">
+        The accounts for the FY @Model.EndOfFY are already closed.
+    </div>
+}
+else
+{
+    <div class="container container-sm">
+        <div class="row">
+            <p class="text-warning text-wrap">
+                The action is irreversible and all the accounts will be closed for the last financial year
+            </p>
+        </div>
+        <hr />
+        <br />
+        <!--
+        If there are outstanding transactions provide warning message and diable the close FY button in the form
+        If the last FY is closed provide warning that the FY is closed
+        Provide list with all the accounts that are required for transactions import with the latest date imported
+        Close the
+    -->
+        <div class="row">
+        </div>
+    </div>
+    <form method="post">
+    </form>
+}
+<br />
+<hr />
+<a class="link-info" asp-page="../Index">Home</a>
+<hr />

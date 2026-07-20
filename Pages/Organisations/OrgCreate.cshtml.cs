@@ -47,8 +47,7 @@ namespace MyFinances.Pages.Organisations
             {
                 return Page();
             }
-            GeneralHelper gh = new(_context, _configuration);
-            Organisation.IdOrg = await gh.GetOrganisationId(Organisation.IdCateg);
+            Organisation.IdOrg = await GetOrganisationId(Organisation.IdCateg);
             Organisation.NumberContracts = 0;
             _context.Organisations.Add(Organisation);
             await _context.SaveChangesAsync();
@@ -67,6 +66,30 @@ namespace MyFinances.Pages.Organisations
             {
                 return RedirectToPage("./OrgIndex");
             }
+        }
+
+        private async Task<int> GetOrganisationId(short categoryId)
+        {
+            int result = 0;
+            var losc = await _context.Organisations.Where(x => x.IdCateg == categoryId).OrderBy(y => y.IdOrg).AsNoTracking().ToListAsync();
+            if (losc.Count > 0)
+            {
+                int idx = categoryId * 1000;
+                for (int i = 0; i < losc.Count; i++)
+                {
+                    if (losc[i].IdOrg > (idx + 1))
+                    {
+                        result = idx + 1; break;
+                    }
+                    idx++;
+                }
+                if (result == 0) { result = categoryId * 1000 + idx; }
+            }
+            else
+            {
+                result = categoryId * 1000 + 1;
+            }
+            return result;
         }
     }
 }

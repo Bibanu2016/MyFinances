@@ -1,11 +1,16 @@
 ﻿using FinanceCalculator;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using MyFinances.Data;
 using MyFinances.Models;
+using MyFinances.Services;
 using MyFinances.ViewModels;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 
 namespace MyFinances.Controllers
 {
@@ -73,6 +78,16 @@ namespace MyFinances.Controllers
                                 partsFound[1] = true;
                                 contractFull.Bill = sc_6;
                             }
+                            break;
+                        case 21: //investment fund
+                            var sc_21 = Tracking ? await _dbContext.InvestFunds.FirstOrDefaultAsync(m => m.IdInvestFund == idc) : await _dbContext.InvestFunds.AsNoTracking().FirstOrDefaultAsync(m => m.IdInvestFund == idc);
+                            if (sc_21 != null)
+                            {
+                                partsFound[1] = true;
+                                contractFull.InvestFund = sc_21;
+                            }
+                            break;
+                        case 22: //taxation contract
                             break;
                         default:
                             break;
@@ -247,6 +262,118 @@ namespace MyFinances.Controllers
             }
             return result;
         }
+
+        public static string GetDisplayName<T>(string propertyName)
+        {
+            var prop = typeof(T).GetProperty(propertyName);
+
+            if (prop == null)
+                return propertyName; // fallback
+
+            var displayAttr = prop.GetCustomAttribute<DisplayAttribute>();
+
+            return displayAttr?.Name ?? propertyName;
+        }
+
+        public async Task<List<ItemDetail>> GetContractDetailsList(Guid idcont, IMyDetailsService detailsService)
+        {
+            List<ItemDetail> result = [];
+            ContractFull cf = await GetContractOnID(idcont);
+            if(cf is null) { return result; }
+            // ************************************
+            // Fill out the main contract details *
+            // ************************************
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.ContractType)), ItemValue = await detailsService.GetContractTypeByID(cf.FinContract.ContractType) });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.ContractName)), ItemValue = cf.FinContract.ContractName });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.ContractDetails)), ItemValue = cf.FinContract.ContractDetails });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdOrganisation)), ItemValue = await detailsService.GetOrganisationNameByID(cf.FinContract.IdOrganisation) });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdContractor)), ItemValue = await detailsService.GetUserNameByID(cf.FinContract.IdContractor) });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.StartDate)), ItemValue = cf.FinContract.StartDate.ToString("d") });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.EndDate)), ItemValue = cf.FinContract.EndDate.ToShortDateString() });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.InvoiceDate)), ItemValue = cf.FinContract.InvoiceDate.ToShortDateString() });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.InvoiceNetDays)), ItemValue = cf.FinContract.InvoiceNetDays.ToString() });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdFrequency)), ItemValue = await detailsService.GetFrequencyNameByID(cf.FinContract.IdFrequency) });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdFinAccount)), ItemValue = cf.FinContract.IdFinAccount.ToString() + " : " + await detailsService.GetAccountNameByID(cf.FinContract.IdFinAccount) });
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdPayAccount)), ItemValue = cf.FinContract.IdPayAccount + ":" +  await detailsService.GetAccountNameByID(cf.FinContract.IdPayAccount) }); //Pay Account
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdBankAccount)), ItemValue = cf.FinContract.IdBankAccount + ":" + await detailsService.GetAccountNameByID(cf.FinContract.IdBankAccount) }); //Bank Account
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IsActiveContract)), ItemValue = cf.FinContract.IsActiveContract.ToString() });
+            if (cf.FinContract.ClosedDate <= DateTime.Today)
+            {
+                result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.ClosedDate)), ItemValue = cf.FinContract.ClosedDate.ToShortDateString() });
+            }
+            else
+            {
+                result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.ClosedDate)), ItemValue = "Active contract" });
+            }
+            // ************************************
+            // Fill out the supplementary contract details *
+            // ************************************
+            switch(cf.FinContract.ContractType)
+            {
+                case 1: //deposit
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Deposit>(nameof(Deposit.DepositRate)), ItemValue = cf.Deposit.DepositRate.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Deposit>(nameof(Deposit.InterestRatePerYear)), ItemValue = cf.Deposit.InterestRatePerYear.ToString() + "%" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Deposit>(nameof(Deposit.DepositInitialBalance)), ItemValue = cf.Deposit.DepositInitialBalance.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Deposit>(nameof(Deposit.DepositRate)), ItemValue = cf.Deposit.InterestAccount.ToString() + ": " + await detailsService.GetAccountNameByID(cf.Deposit.InterestAccount) });
+                    break;
+                case 2: //loan
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.IdLoanType)), ItemValue = cf.Loan.IdLoanType ? "FIX" : "VARIABLE" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanAmount)), ItemValue = cf.Loan.LoanAmount.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanInterest)), ItemValue = cf.Loan.LoanInterest.ToString() + "%" });
+                    if(cf.Loan.LoanSecurity == Guid.Empty || cf.Loan.LoanSecurity is null)
+                    {
+                        result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanSecurity)), ItemValue = "Unsecured" });
+                    }
+                    else
+                    {
+                        Guid ls = cf.Loan.LoanSecurity ?? Guid.Empty;
+                        result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanSecurity)), ItemValue = await detailsService.GetLoanSecurityNameById(ls) });                        
+                    }
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.IdAccountInterest)), ItemValue = cf.Loan.IdAccountInterest + ":" + await detailsService.GetAccountNameByID(cf.Loan.IdAccountInterest) }); //Interest Account
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.ExtraPay)), ItemValue = cf.Loan.ExtraPay.ToString("c", default) });
+                    break;
+                case 3: //credit card
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CreditCardLimit)), ItemValue = cf.CreditCard.CreditCardLimit.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CreditCardInterest)), ItemValue = cf.CreditCard.CreditCardInterest.ToString() + "%" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CreditCardPayPercent)), ItemValue = cf.CreditCard.CreditCardPayPercent.ToString() + "%" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CycleFee)), ItemValue = cf.CreditCard.CycleFee.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CreditCardInsuranceRate)), ItemValue = cf.CreditCard.CreditCardInsuranceRate.ToString() + "%" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.CashRate)), ItemValue = cf.CreditCard.CashRate.ToString() + "%" });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.ExtraPay)), ItemValue = cf.CreditCard.ExtraPay.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.FeeAccount)), ItemValue = cf.CreditCard.FeeAccount + ":" + await detailsService.GetAccountNameByID(cf.CreditCard.FeeAccount) }); //Fee Account
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.InterestAccount)), ItemValue = cf.CreditCard.InterestAccount + ":" + await detailsService.GetAccountNameByID(cf.CreditCard.InterestAccount) }); //Interest Account
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.InterestCashOutAcc)), ItemValue = cf.CreditCard.InterestCashOutAcc + ":" + await detailsService.GetAccountNameByID(cf.CreditCard.InterestCashOutAcc) }); //Cash out Account
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<CreditCard>(nameof(CreditCard.InsuranceAccount)), ItemValue = cf.CreditCard.InsuranceAccount + ":" + await detailsService.GetAccountNameByID(cf.CreditCard.InsuranceAccount) }); //Insurance Account
+                    break;
+                case 4: //employment
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Employment>(nameof(Employment.GrossPaidCycle)), ItemValue = cf.Employment.GrossPaidCycle.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Employment>(nameof(Employment.TaxPaidCycle)), ItemValue = cf.Employment.TaxPaidCycle.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Employment>(nameof(Employment.SuperPaidCycle)), ItemValue = cf.Employment.SuperPaidCycle.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Employment>(nameof(Employment.IdSuperAccount)), ItemValue = cf.Employment.IdSuperAccount + ":" + await detailsService.GetAccountNameByID(cf.Employment.IdSuperAccount) }); //Super Account
+                    break;
+                case 5: //income
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Income>(nameof(Income.GrossPerCycle)), ItemValue = cf.Income.GrossPerCycle.ToString("c", default) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Income>(nameof(Income.TaxPaidCycle)), ItemValue = cf.Income.TaxPaidCycle.ToString("c", default) });
+                    break;
+                case 6 or 7: //bill
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<Bill>(nameof(Bill.BillCycleRate)), ItemValue = cf.Bill.BillCycleRate.ToString("c", default) });
+                    break;
+                case 21: //investment fund
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.AdviserFee)), ItemValue = cf.InvestFund.AdviserFee.ToString() });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.ManagementFee)), ItemValue = cf.InvestFund.ManagementFee.ToString() });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.AdminFee)), ItemValue = cf.InvestFund.AdminFee.ToString() });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.AccountingFee)), ItemValue = cf.InvestFund.AccountingFee.ToString() });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdCapitalGainAcc)), ItemValue = cf.InvestFund.IdCapitalGainAcc.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdCapitalGainAcc) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdAdviseAcc)), ItemValue = cf.InvestFund.IdAdviseAcc.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdAdviseAcc) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdManageAcc)), ItemValue = cf.InvestFund.IdManageAcc.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdManageAcc) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdAdminAcc)), ItemValue = cf.InvestFund.IdAdminAcc.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdAdminAcc) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdAccountingAcc)), ItemValue = cf.InvestFund.IdAccountingAcc.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdAccountingAcc) });
+                    result.Add(new ItemDetail() { ItemName = GetDisplayName<InvestFund>(nameof(InvestFund.IdTaxAccount)), ItemValue = cf.InvestFund.IdTaxAccount.ToString() + " : " + await detailsService.GetAccountNameByID(cf.InvestFund.IdTaxAccount) });
+                    break;
+            }
+            return result;
+        }
+
 
     }
 }

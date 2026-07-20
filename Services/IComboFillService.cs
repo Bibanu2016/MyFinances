@@ -12,7 +12,7 @@ namespace MyFinances.Services
         Task<SelectList> GetNTAssetAccountsList();
         Task<SelectList> GetAccountCategoryList(short contractCateg);
         Task<SelectList> GetAllAccountCategoriesList();
-        Task<SelectList> GetOrganisationsList();
+        Task<SelectList> GetOrganisationsList(short categoryOrg = 0);
         Task<SelectList> GetOrgTypesList();
         Task<SelectList> GetUsersList();
         Task<SelectList> GetPaymentFrequencyList();
@@ -25,6 +25,11 @@ namespace MyFinances.Services
 
         Task<SelectList> GetStandardContractTypes(short idThreshold);
         Task<SelectList> GetSpecialContractTypes(short idThreshold);
+        Task<SelectList> GetFinAccountListByCateg(List<short> categs = default!);
+        Task<SelectList> GetFinAccountListByRole(string[] acRoles);
 
+        Task<SelectList> GetAccountTypesList();
+
+        Task<SelectList> GetAccountClassesList();
     }
 }

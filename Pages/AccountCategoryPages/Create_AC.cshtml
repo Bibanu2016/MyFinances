@@ -1,0 +1,140 @@
+﻿@page
+@model MyFinances.Pages.AccountCategoryPages.Create_ACModel
+@{
+}
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+<br />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="NewAC.IdAccountCategory" />
+    <div class="container container-sm">
+        <div class="row row-cols-6 py-2">
+            <div class="col-2">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAC.IdAccountClass"></label>
+            </div>
+            <div class="col-4">
+                <select class="form-select" asp-for="NewAC.IdAccountClass" asp-items="@Model.AccClassesList">
+                    <option>Choose ..</option>
+                </select>
+                <span asp-validation-for="NewAC.IdAccountClass" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 py-2">
+            <div class="col-2">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAC.AccountCategoryName"></label>
+            </div>
+            <div class="col-4">
+                <input type="text" asp-for="NewAC.AccountCategoryName" />
+                <span class="text-danger" asp-validation-for="NewAC.AccountCategoryName"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6 py-2">
+            <div class="col-2">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAC.IdContractCategory"></label>
+            </div>
+            <div class="col-4">
+                <select class="form-select" asp-for="NewAC.IdContractCategory" asp-items="@Model.ContTypesList">
+                    <option>Choose ..</option>
+                </select>
+                <span class="text-danger" asp-validation-for="NewAC.IdContractCategory"></span>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2">
+                <span class="text-danger">*</span>
+                <label class="form-label" asp-for="NewAC.CategoryRoles"></label>
+                <span asp-validation-for="NewAC.CategoryRoles" class="text-danger"></span>
+            </div>
+            <div class="col-4">
+                <input type="hidden" asp-for="NewAC.CategoryRoles" />
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.PaymentAsset" id="role_0">
+                    <label class="form-check-label" for="role_0">Payment asset</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.PaymentLiability" id="role_1">
+                    <label class="form-check-label" for="role_1">Payment liability</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.ImportTransaction" id="role_2">
+                    <label class="form-check-label" for="role_2">Import transacions</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.InvestmentFund" id="role_3">
+                    <label class="form-check-label" for="role_3">Investment Management Fund</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.Tax" id="role_4">
+                    <label class="form-check-label" for="role_4">Tax</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.UserAccount" id="role_5">
+                    <label class="form-check-label" for="role_5">User accounts</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.Spare" id="role_6">
+                    <label class="form-check-label" for="role_6">Spare</label>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-6 py-4">
+            <div class="col-2"></div>
+            <div class="col-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="CRoles.Locked" id="role_7">
+                    <label class="form-check-label" for="role_7">Locked</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5"></div>
+            <div class="col-1">
+                <button type="submit" class="btn btn-success" value="Create">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <a asp-page="./Index_AC">Home</a>
+</div>

@@ -8,6 +8,7 @@ using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
 using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Utilities.Zlib;
+using System.Data.Common;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -735,12 +736,12 @@ namespace MyFinances.Controllers
                 clCash += (interestCash[i] - cashRate[i]);
                 if(clCash < 0) { clBal += clCash; clCash = 0; } // in the event that the ExtraPay brings the balance to negative, transfer the funds to purchses
                 balance[i] = clBal + clCash;
-                if (hasInsurance) 
-                { 
+                if (hasInsurance)
+                {
                     insurancePaid[i] = Decimal.Multiply((clBal + clCash), _contractFull.CreditCard.CreditCardInsuranceRate * 0.01m);
-                } 
-                else 
-                { 
+                }
+                else
+                {
                     insurancePaid[i] = 0;
                 }
             }

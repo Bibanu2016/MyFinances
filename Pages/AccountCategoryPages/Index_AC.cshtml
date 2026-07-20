@@ -1,0 +1,73 @@
+﻿@page
+@model MyFinances.Pages.AccountCategoryPages.Index_ACModel
+@{
+}
+@section Scripts {
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            if('@TempData["ErrorMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["ErrorMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#fab972"; // calm orange
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Error message!</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+            if('@TempData["SuccessMessage"]')
+            {
+                const modalBody = document.getElementById("modalBody");
+                modalBody.innerHTML = '@TempData["SuccessMessage"]';
+                const modalContent = document.querySelector("#myModal .modal-content");
+                modalContent.style.backgroundColor = "#27F5B0"; // calm green
+                const modalTitle = document.querySelector("#myModal .modal-title");
+                modalTitle.innerHTML = '<strong>Success</strong>'
+                const modal = new bootstrap.Modal(document.getElementById("myModal"));
+                modal.show();
+            }
+        });
+    </script>
+}
+
+<h1>Accounts category index</h1>
+<br />
+<hr />
+<div class="container container-sm align-content-center">
+    <div class="row">
+        <div class="col-1 d-flex justify-content-center">
+            <a class="btn btn-success" asp-page="./Create_AC">Create</a>
+        </div>
+        <div class="col"></div>
+    </div>
+    <br />
+    @if(Model.ACList.Count > 0)
+    {
+        <div class="row row-cols-auto py-2">
+            <div class="col-1"><strong>ID</strong></div>
+            <div class="col-2"><strong>Class</strong></div>
+            <div class="col-3"><strong>Name</strong></div>
+            <div class="col-1"></div>
+        </div>
+        <hr />
+        @foreach(var element in Model.ACList)
+        {
+            <div class="row row-cols-6 py-2">
+                <div class="col-1">@element.IdAC</div>
+                <div class="col col-2">@element.AccClassName</div>
+                <div class="col-3">@element.Name</div>
+                <div class="col-1">
+                    <a asp-page="./Edit_AC" asp-route-id="@element.IdAC"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> | 
+                    <a asp-page="./Details_AC" asp-route-id="@element.IdAC"><i class="bi-eye-fill" style="color:grey"></i></a> |
+                    <a asp-page="./Delete_AC" asp-route-id="@element.IdAC"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
+                </div>
+            </div>
+        }
+    }
+    <hr />
+    <br />
+    <div class="row">
+        <a class="link-opacity-75" asp-page="../Index">Home</a>
+    </div>
+</div>

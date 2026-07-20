@@ -1,0 +1,35 @@
+﻿@page "{id:int}"
+@model MyFinances.Pages.AccountCategoryPages.Details_ACModel
+@{
+
+}
+<h1 class="align-content-center">@ViewData["Title"]</h1>
+<hr />
+<br />
+<div class="container-sm col-6">
+    <table class="table table-primary">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ds in Model.ACDetails)
+            {
+                <tr>
+                    <td>@ds.ItemName</td>
+                    <td>@ds.ItemValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row row-cols-6">
+        <div class="col-5">
+            <a asp-page="./Index_AC">Back to list</a>
+        </div>
+        <div class="col-1">
+            <a asp-page="./Edit_AC" asp-route-id="@Model.IDCateg">Edit</a>
+        </div>
+    </div>
+</div>

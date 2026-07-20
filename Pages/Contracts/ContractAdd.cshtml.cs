@@ -21,6 +21,10 @@ namespace MyFinances.Pages.Contracts
         private readonly IConfiguration _configuration = configuration;
         private readonly IMemoryCache _memoryCache = memoryCache;
         private readonly IComboFillService _comboFill = comboFill;
+        private readonly string[] payableRoles = ["PaymentAsset", "PaymentCredit"];
+        private readonly string[] bankRoles = ["PaymentAsset"];
+        private readonly string[] superRoles = ["InvestmentFund"];
+        private readonly string[] taxRole = ["Tax"];
         //
         // contract type selection variable
         [BindProperty(SupportsGet =true)]
@@ -149,11 +153,12 @@ namespace MyFinances.Pages.Contracts
                 Frequency = await _comboFill.GetPaymentFrequencyList();
                 EndAction = await _comboFill.GetContractEndActionList();
                 Organisation = await _comboFill.GetOrganisationsList();
-                Payable = await _comboFill.GetPayableAccountsList();
-                Bank = await _comboFill.GetNTAssetAccountsList();
+                Payable = await _comboFill.GetFinAccountListByRole(payableRoles);
+                Bank = await _comboFill.GetFinAccountListByRole(bankRoles);
                 Users = await _comboFill.GetUsersList();
                 ContractCategory = await _comboFill.GetAccountCategoryList(SelectedContractType);
-                SuperAccount = await _comboFill.GetSuperFinAccountsList();
+                SuperAccount = await _comboFill.GetFinAccountListByRole(superRoles);
+                TangibleAsset = await _comboFill.GetTangibleAssetsList();
             }
             return;
         }
@@ -367,51 +372,34 @@ namespace MyFinances.Pages.Contracts
             // get user account id
             var uaid = await _context.UserContracts.Where(p=>p.IdUser == ContractFull.FinContract.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
             string detailOpen = _configuration.GetSection("TransactionDetail").GetValue<string>("Open") ?? "Open account ";
-            switch(SelectedContractType)
+            PlanTransaction openPt = new()
             {
                 case 1:
                     PlanTransaction fin = new()
                     {
-                        IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
-                        TransactionDate = transacDate,
+                IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
+                TransactionDate = transacDate,
                         DebitAccount = ContractFull.FinContract.IdFinAccount,
                         CreditAccount = uaid,
-                        TransactionValue = PurchaseBalance,
-                        TransactionDetail = detailOpen,
-                        ContractIdentifier = ContractFull.FinContract.IdFinAccount,
-                        ExecutedTransaction = false,
-                        IdSource = uaid
-                    };
-                    _context.PlanTransactions.Add(fin);
+                TransactionValue = PurchaseBalance,
+                TransactionDetail = detailOpen,
+                ContractIdentifier = ContractFull.FinContract.IdFinAccount,
+                ExecutedTransaction = false,
+                IdSource = uaid
+            };
+            switch(SelectedContractType)
+            {
+                case 1:
+                    openPt.DebitAccount = ContractFull.FinContract.IdFinAccount;
+                    openPt.CreditAccount = uaid;
                     break;
                 case 2:
-                    PlanTransaction loanOpen = new()
-                    {
-                        IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
-                        TransactionDate = transacDate,
-                        DebitAccount = uaid,
-                        CreditAccount = ContractFull.FinContract.IdFinAccount,
-                        TransactionValue = PurchaseBalance,
-                        TransactionDetail = detailOpen,
-                        ContractIdentifier = ContractFull.FinContract.IdFinAccount,
-                        ExecutedTransaction = false,
-                        IdSource = uaid
-                    };
-                    _context.PlanTransactions.Add(loanOpen);
+                    openPt.DebitAccount = uaid;
+                    openPt.CreditAccount = ContractFull.FinContract.IdFinAccount;
                     break;
                 case 3:
-                    PlanTransaction cardOpen = new()
-                    {
-                        IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
-                        TransactionDate = transacDate,
-                        DebitAccount = uaid,
-                        CreditAccount = ContractFull.FinContract.IdFinAccount,
-                        TransactionValue = PurchaseBalance,
-                        TransactionDetail = detailOpen,
-                        ContractIdentifier = ContractFull.FinContract.IdFinAccount,
-                        ExecutedTransaction = false,
-                        IdSource = uaid
-                    };
+                    openPt.DebitAccount = uaid;
+                    openPt.CreditAccount = ContractFull.FinContract.IdFinAccount;
                     PlanTransaction cardCashOpen = new()
                     {
                         IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
@@ -445,6 +433,7 @@ namespace MyFinances.Pages.Contracts
                 default:
                     break;
             }
+            _context.PlanTransactions.Add(openPt);
             return string.Empty ;
         }
 

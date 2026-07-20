@@ -233,7 +233,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             //get the enddate for plantransactions
             CalculatorDates cada = new(MainContract.IdFrequency);
             DateTime firstInvoice = cada.NextCycleDate(MainContract.InvoiceDate, DateTime.Today);
-            GeneralHelper gh = new(_context, _configuration);
+            GeneralHelper gh = new(_configuration);
             DateTime endDatePT = gh.EndPeriodPlanTransaction(firstInvoice, MainContract.EndDate, MainContract.IdEndAction);
             //get user tax account id
             int tnt = cada.NumberCyclesPerPeriod(firstInvoice, endDatePT);

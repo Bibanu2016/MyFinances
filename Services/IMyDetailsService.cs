@@ -22,5 +22,7 @@
 
         Task<string> GetEndActionNameByID(short idEndAction);
 
+        Task<string> GetLoanSecurityNameById(Guid loanSec);
+
     }
 }

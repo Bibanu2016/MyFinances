@@ -68,5 +68,10 @@ namespace MyFinances.Services
             return await _appDBContext.UserContracts.Where(p => p.IdUser == idUser).Select(s => s.FullName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
         }
 
+        public async Task<string> GetLoanSecurityNameById(Guid loanSec)
+        {
+            return await _appDBContext.TangibleAssets.Where(p => p.IdAsset == loanSec).Select(s => s.Name).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
+        }
+
     }
 }

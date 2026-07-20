@@ -56,7 +56,7 @@ namespace MyFinances.Pages.Contracts
                     if(idFA < 4000000)
                     {
                         var sb = await _context.FinTransactions.Where(p => p.ContractIdentifier == idFA && p.TransactionDate == etdList[0]).Select(s => s.TransactionValue).FirstOrDefaultAsync();
-                        ItemDetails.Add(new ItemDetail() { ItemName = $"Start balance at {etdList[0].ToShortDateString()}", ItemValue = sb.ToString("C", default) });
+                        ItemDetails.Add(new ItemDetail() { ItemName = $"Start balance at {etdList[0]:d}", ItemValue = sb.ToString("C", default) });
                     }
 
                 }

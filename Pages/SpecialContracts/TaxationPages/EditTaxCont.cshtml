@@ -65,12 +65,22 @@
     <div class="row pb-sm-3">
         <div class="col col-3">
             <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdFinAccount" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="text" asp-for="MainContract.IdFinAccount" class="form-control" disabled />
+            <input type="hidden" asp-for="MainContract.IdFinAccount" />
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
             <label asp-for="MainContract.StartDate" class="control-label"></label>
         </div>
         @if (Model.IsExecuted)
         {
             <div class="col">
-                <input type="text" class="form-control" value="@Model.MainContract.StartDate.ToString("yyyy-MM-dd")" disabled />
+                <input type="text" class="form-control" value="@Model.MainContract.StartDate.ToString("d")" disabled />
             </div>
         }
         else
@@ -91,7 +101,7 @@
         @if (Model.IsExecuted)
         {
             <div class="col">
-                <input type="text" class="form-control" value="@Model.MainContract.InvoiceDate.ToString("yyyy-MM-dd")" disabled />
+                <input type="text" class="form-control" value="@Model.MainContract.InvoiceDate.ToString("d")" disabled />
             </div>
         }
         else
@@ -126,6 +136,8 @@
     </div>
     <input type="hidden" asp-for="MainContract.IdPayAccount" value="0" />
     <input type="hidden" asp-for="MainContract.IdBankAccount" value="0" />
+    <input type="hidden" asp-for="MainContract.IsActiveContract" value = "1"/>
+    <input type="hidden" asp-for="MainContract.ClosedDate" />
 </div>
 <div class="container container-sm">
     <form method="post">
