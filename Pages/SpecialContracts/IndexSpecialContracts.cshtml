@@ -71,9 +71,23 @@
                         <td>@item.ContractName</td>
                         <td>@item.OwnerName</td>
                         <td>
-                            <a class="btn btn-primary" asp-page="./EditSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> |
-                            <a class="btn btn-primary" asp-page="./DetailsSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-eye" style="color:grey" alt="Details"></i></a> |
-                            <a class="btn btn-primary" asp-page="./DeleteSpecialCont" asp-route-id="@item.IdFinContract"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
+                            @if(item.ContractType.StartsWith("I"))
+                            {
+                                <div>
+                                    <a asp-page="./InvestFundPages/EditIFCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> |
+                                    <a asp-page="./InvestFundPages/DetailsIFCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-eye" style="color:grey" alt="Details"></i></a> |
+                                    <a asp-page="./InvestFundPages/DeleteIFCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div>
+                                    <a asp-page="./TaxationPages/EditTaxCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> |
+                                    <a asp-page="./TaxationPages/DetailsTaxCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-eye" style="color:grey" alt="Details"></i></a> |
+                                    <a asp-page="./TaxationPages/DeleteTaxCont" asp-route-id="@item.IdFinContract.ToString()"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
+                                </div>
+
+                            }
                         </td>
                     </tr>
                 }
@@ -85,4 +99,4 @@ else
 {
     <p class="text-warning">No contract found.</p>
 }
-
+<a asp-page="../Index">Back</a>

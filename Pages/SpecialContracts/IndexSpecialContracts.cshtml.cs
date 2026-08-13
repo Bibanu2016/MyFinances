@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MyFinances.Data;
-using MyFinances.Models;
 using MyFinances.Services;
 using MyFinances.ViewModels;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +20,7 @@ namespace MyFinances.Pages.SpecialContracts
         public SelectList ContractTypes { get; set; } = default!;
         public SelectList UsersList { get; set; } = default!;
 
-        [BindProperty, Required, Range(20,99, ErrorMessage = "A valid selection is required")]
+        [BindProperty, Required, Range(20, 99, ErrorMessage = "A valid selection is required")]
         public int CreateContractType { get; set; } = 0;
         public async Task<IActionResult> OnGet()
         {
@@ -34,7 +33,7 @@ namespace MyFinances.Pages.SpecialContracts
 
         private async Task PopulateContractList()
         {
-            var scl = await _context.FinContracts.Where(p=>p.ContractType > 10 && p.IsActiveContract).ToListAsync();
+            var scl = await _context.FinContracts.Where(p => p.ContractType > 20 && p.IsActiveContract).ToListAsync();
             if (scl.Count > 0)
             {
                 ContList = [];
@@ -43,9 +42,9 @@ namespace MyFinances.Pages.SpecialContracts
                     ContList.Add(new ContractListVM()
                     {
                         IdFinContract = contract.IdFinContract,
-                        ContractType = ContractTypes.Where(predicate=>predicate.Value == contract.ContractType.ToString()).FirstOrDefault()?.Text ?? "not found",
+                        ContractType = ContractTypes.Where(predicate => predicate.Value == contract.ContractType.ToString()).FirstOrDefault()?.Text ?? "not found",
                         ContractName = contract.ContractName,
-                        OwnerName = UsersList.Where(predicate=>predicate.Value == contract.ContractName).FirstOrDefault()?.Text ?? "not found",
+                        OwnerName = UsersList.Where(predicate => predicate.Value == contract.IdContractor.ToString()).FirstOrDefault()?.Text ?? "not found",
                         EquivMonthlyRate = 0
                     });
                 }
@@ -61,13 +60,13 @@ namespace MyFinances.Pages.SpecialContracts
                 return Page();
             }
             string pagetogo = string.Empty;
-            switch(CreateContractType)
+            switch (CreateContractType)
             {
-                case 10:
-                    pagetogo = "/SpecialContracts/InvestFundPages/InvestFundContractAdd";
+                case 21:
+                    pagetogo = "./InvestFundPages/CreateIFContract";
                     break;
-                case 11:
-                    pagetogo = "/SpecialContracts/TaxationPages/Create";
+                case 22:
+                    pagetogo = "./TaxationPages/CreateTaxContract";
                     break;
             }
             return RedirectToPage(pagetogo);

@@ -1,0 +1,151 @@
+﻿@page "{id:int}"
+@model MyFinances.Pages.SpecialContracts.TaxationPages.EditTaxContModel
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+<div class="container container-sm">
+    <h4><strong>Main contract data</strong></h4>
+    <input type="hidden" asp-for="MainContract.IdFinContract" />"
+    <input type="hidden" asp-for="MainContract.ContractType" value="8" />
+    <div class="row pb-sm-3">
+        <div class="col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.ContractName" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="text" asp-for="MainContract.ContractName" class="form-control" />
+            <span asp-validation-for="MainContract.ContractName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.ContractDetails" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="text" asp-for="MainContract.ContractDetails" class="form-control" />
+            <span asp-validation-for="MainContract.ContractDetails" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdOrganisation" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.Organisation.Where(o => o.Value == Model.MainContract.IdOrganisation.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <div class="input-group">
+                    <select class="form-select" aria-label="Select organisation" asp-for="MainContract.IdOrganisation" asp-items="@ViewBag.Organisation">
+                        <option selected>Choose a value..</option>
+                    </select>
+                </div>
+                <span asp-validation-for="MainContract.IdOrganisation" class="text-danger"></span>
+            </div>
+        }
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdContractor" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" value="@Model.Users.Where(o => o.Value == Model.MainContract.IdContractor.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.StartDate" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.MainContract.StartDate.ToString("yyyy-MM-dd")" disabled />
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <input type="date" asp-for="MainContract.StartDate" class="form-control" value="@DateTime.Today" />
+                <span asp-validation-for="MainContract.StartDate" class="text-danger"></span>
+            </div>
+        }
+        <input type="hidden" asp-for="MainContract.EndDate" value="@DateTime.MaxValue" />
+    </div>
+    <input type="hidden" asp-for="MainContract.IdEndAction" value="2" />
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.InvoiceDate" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.MainContract.InvoiceDate.ToString("yyyy-MM-dd")" disabled />
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <input type="date" asp-for="MainContract.InvoiceDate" class="form-control" value="@DateTime.Today" />
+                <span asp-validation-for="MainContract.InvoiceDate" class="text-danger"></span>
+            </div>
+        }
+        <input type="hidden" asp-for="MainContract.InvoiceNetDays" value="0" />
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdFrequency" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.Frequency.Where(o => o.Value == Model.MainContract.IdFrequency.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <select class="form-select" aria-label="Select payment cycle" asp-for="MainContract.IdFrequency" asp-items="@ViewBag.Frequency">
+                    <option selected>Choose an option..</option>
+                </select>
+                <span asp-validation-for="MainContract.IdFrequency" class="text-danger"></span>
+            </div>
+        }
+    </div>
+    <input type="hidden" asp-for="MainContract.IdPayAccount" value="0" />
+    <input type="hidden" asp-for="MainContract.IdBankAccount" value="0" />
+</div>
+<div class="container container-sm">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col col-9"></div>
+            <div class="col">
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <a asp-page="../IndexSpecialContracts">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

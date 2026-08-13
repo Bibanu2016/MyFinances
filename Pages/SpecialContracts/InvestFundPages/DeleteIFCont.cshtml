@@ -1,0 +1,148 @@
+﻿@page "{id}"
+@model MyFinances.Pages.SpecialContracts.InvestFundPages.DeleteIFContModel
+@{
+}
+
+<div class="container container-sm">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <hr />
+    <div class="row">
+        <div class="alert alert-primary">This operations is irreversible, enusure that is the correct action</div>
+    </div>
+    <br />
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Contract name</div>
+        <div class="col">@Model.MyContract.ContractName</div>
+    </div>
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Contract details</div>
+        <div class="col">@Model.MyContract.ContractDetails</div>
+    </div>
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Contract account</div>
+        <div class="col">@Model.MyContract.IdFinAccount - @Model.ContractAccountName</div>
+    </div>
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Contractor name</div>
+        <div class="col">@Model.ContractorFullName</div>
+    </div>
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Has transactions</div>
+        <div class="col">@Model.ContractHasTransactions</div>
+    </div>
+    <div class="row row-cols-6 mb-2">
+        <div class="col col-2">Used by other contracts</div>
+        <div class="col">@Model.UsedInContracts</div>
+    </div>
+    @if (Model.ContractHasTransactions)
+    {
+        <div class="row row-cols-6 mb-2">
+            <div class="col col-2">Last balance</div>
+            <div class="col">@Model.LastRealBalance</div>
+        </div>
+        <div class="row row-cols-6 mb-2">
+            <div class="col col-2">Has overdue transactions</div>
+            <div class="col">@Model.ContractWithOverdues</div>
+        </div>
+    }
+    <form method="post" id="deleteContract">
+        <input type="hidden" asp-for="IdContract" />
+        <input type="hidden" asp-for="ContractHasTransactions" />
+        <input type="hidden" asp-for="LastRealBalance" />
+        <input type="hidden" asp-for="UsedInContracts" />
+        @if(Model.UsedInContracts)
+        {
+            <div class="row alert-warning">
+                This account is used by other contracts and cannot be terminated.
+            </div>
+            <div class="row alert-warning">
+                The following accounts uses this account:
+            </div>
+            @foreach(string s in Model.CNamesWhereUsed)
+            {
+            <div class="row alert-warning">@s </div>
+            }
+            }
+        else
+        {
+            @if (Model.ContractHasTransactions)
+            {
+                @if (Model.ContractWithOverdues)
+                {
+                    <div class="row col-6">
+                        <div class="col col-5"></div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-danger" disabled>Terminate</button>
+                        </div>
+                    </div>
+                    <div class="row alert-warning">
+                        Record all transactions to date before terminating the contract.
+                    </div>
+                }
+                else
+                {
+                    <div class="row col-6">
+                        <div class="col col-5"></div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-danger" onclick="openConfirm()">Terminate</button>
+                        </div>
+                    </div>
+                    <div class="row alert-primary">
+                        The balance of @Model.LastRealBalance will be transferred to principal receivable account
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col col-9"></div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-danger" onclick="openConfirm()">Delete</button>
+                    </div>
+                </div>
+            }
+        }
+    </form>
+</div>
+<div class="modal fade" id="confirmDialog" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color:darkorange;">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure?
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Yes, proceed</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr />
+<br />
+<div class="row align-content-end">
+    <a asp-page="../IndexSpecialContracts">Back to List</a>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+
+        function openConfirm() {
+            var modal = new bootstrap.Modal(document.getElementById('confirmDialog'));
+            modal.show();
+        }
+
+        function confirmDelete() {
+            document.getElementById('deleteContract').submit();
+        }
+    </script>
+
+}

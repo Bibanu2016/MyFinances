@@ -1,0 +1,239 @@
+﻿@page "{id}"
+@model MyFinances.Pages.SpecialContracts.InvestFundPages.EditIFContModel
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<hr />
+<div class="container container-sm">
+    <h4><strong>Main contract data</strong></h4>
+    <input type="hidden" asp-for="MainContract.IdFinContract" />"
+    <input type="hidden" asp-for="MainContract.ContractType" value="8" />
+    <div class="row pb-sm-3">
+        <div class="col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.ContractName" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="text" asp-for="MainContract.ContractName" class="form-control" />
+            <span asp-validation-for="MainContract.ContractName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.ContractDetails" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="text" asp-for="MainContract.ContractDetails" class="form-control" />
+            <span asp-validation-for="MainContract.ContractDetails" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdOrganisation" class="control-label"></label>
+        </div>
+        @if(Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.Organisation.Where(o => o.Value == Model.MainContract.IdOrganisation.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+            </div>
+            <input type="hidden" asp-for="MainContract.IdOrganisation" />
+        }
+        else
+        {
+            <div class="col">
+                <div class="input-group">
+                    <select class="form-select" aria-label="Select organisation" asp-for="MainContract.IdOrganisation" asp-items="@Model.Organisation">
+                        <option selected>Choose a value..</option>
+                    </select>
+                </div>
+                <span asp-validation-for="MainContract.IdOrganisation" class="text-danger"></span>
+            </div>
+        }
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdContractor" class="control-label"></label>
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" value="@Model.Users.Where(o => o.Value == Model.MainContract.IdContractor.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.StartDate" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.MainContract.StartDate.ToString("yyyy-MM-dd")" disabled />
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <input type="date" asp-for="MainContract.StartDate" class="form-control" />
+                <span asp-validation-for="MainContract.StartDate" class="text-danger"></span>
+            </div>
+        }
+        <input type="hidden" asp-for="MainContract.EndDate" />
+    </div>
+    <input type="hidden" asp-for="MainContract.IdEndAction" />
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.InvoiceDate" class="control-label"></label>
+        </div>
+        @if (Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.MainContract.InvoiceDate.ToString("yyyy-MM-dd")" disabled />
+            </div>
+            <input type="hidden" asp-for="MainContract.InvoiceDate" />
+        }
+        else
+        {
+            <div class="col">
+                <input type="date" asp-for="MainContract.InvoiceDate" class="form-control" />
+                <span asp-validation-for="MainContract.InvoiceDate" class="text-danger"></span>
+            </div>
+        }     
+        <input type="hidden" asp-for="MainContract.InvoiceNetDays" />
+    </div>
+    <div class="row pb-sm-3">
+        <div class="col col-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MainContract.IdFrequency" class="control-label"></label>
+        </div>
+        @if(Model.IsExecuted)
+        {
+            <div class="col">
+                <input type="text" class="form-control" value="@Model.Frequency.Where(o => o.Value == Model.MainContract.IdFrequency.ToString()).Select(o => o.Text).FirstOrDefault()" disabled />
+            </div>
+            <input type="hidden" asp-for="MainContract.IdFrequency" />
+        }
+        else
+        {
+            <div class="col">
+                <select class="form-select" aria-label="Select payment cycle" asp-for="MainContract.IdFrequency" asp-items="@Model.Frequency">
+                    <option selected>Choose an option..</option>
+                </select>
+                <span asp-validation-for="MainContract.IdFrequency" class="text-danger"></span>
+            </div>
+        }      
+    </div>
+    <input type="hidden" asp-for="MainContract.IdPayAccount" />
+    <input type="hidden" asp-for="MainContract.IdBankAccount" />
+</div>
+<br />
+<div class="container container-sm">
+    <h4>Supplementary contract data</h4>
+    <hr />
+    @if(Model.IsExecuted)
+    {
+        <div class="row pb-sm-3">
+            <div class="col col-sm-3">
+                <span class="text-danger">*</span>
+                <label asp-for="PurchaseBalance" class="control-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input type="number" asp-for="PurchaseBalance" class="form-control" disabled />
+            </div>
+            <div class="col col-sm-3">
+                <span class="text-danger">*</span>
+                <label asp-for="BalanceDate" class="control-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input type="date" asp-for="BalanceDate" class="form-control" disabled />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row pb-sm-3">
+            <div class="col col-sm-3">
+                <span class="text-danger">*</span>
+                <label asp-for="PurchaseBalance" class="control-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input type="number" asp-for="PurchaseBalance" class="form-control" />
+                <span asp-validation-for="PurchaseBalance" class="text-danger"></span>
+            </div>
+            <div class="col col-sm-3">
+                <span class="text-danger">*</span>
+                <label asp-for="BalanceDate" class="control-label"></label>
+            </div>
+            <div class="col col-sm">
+                <input type="date" asp-for="BalanceDate" class="form-control" />
+                <span asp-validation-for="BalanceDate" class="text-danger"></span>
+            </div>
+        </div>
+
+    }
+    <div class="row pb-sm-3">
+        <div class=" col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MyInvestFund.AdminFee" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="number" asp-for="MyInvestFund.AdminFee" class="form-control" />
+            <span asp-validation-for="MyInvestFund.AdminFee" class="text-danger"></span>
+        </div>
+        <div class=" col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MyInvestFund.AdviserFee" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="number" asp-for="MyInvestFund.AdviserFee" class="form-control" />
+            <span asp-validation-for="MyInvestFund.AdviserFee" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class=" col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MyInvestFund.ManagementFee" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="number" asp-for="MyInvestFund.ManagementFee" class="form-control" />
+            <span asp-validation-for="MyInvestFund.ManagementFee" class="text-danger"></span>
+        </div>
+        <div class=" col col-sm-3">
+            <span class="text-danger">*</span>
+            <label asp-for="MyInvestFund.AccountingFee" class="control-label"></label>
+        </div>
+        <div class="col col-sm">
+            <input type="number" asp-for="MyInvestFund.AccountingFee" class="form-control" />
+            <span asp-validation-for="MyInvestFund.AccountingFee" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row pb-sm-3">
+        <div class="text-secondary text-wrap" style="font-style:italic">If there is variation between the frequency of payments, record values for the fees adjusted to the shortest frequency</div>
+    </div>
+</div>
+
+<div class="container container-sm">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col col-9"></div>
+            <div class="col">
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="row">
+    <a asp-page="../IndexSpecialContracts">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

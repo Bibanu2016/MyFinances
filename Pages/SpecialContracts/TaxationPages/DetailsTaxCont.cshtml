@@ -1,0 +1,38 @@
+﻿@page "{id}"
+@model MyFinances.Pages.SpecialContracts.TaxationPages.DetailsTaxContModel
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<div class="container container-sm">
+    <table class="table table-secondary">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ICDetails)
+            {
+                <tr>
+                    <td>@item.ItemName</td>
+                    <td>@item.ItemValue</td>
+                </tr>
+            }
+    </table>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col">
+            <a asp-page="../IndexSpecialContracts">Back to List</a>
+        </div>
+        <div class="col align-content-end">
+            <a asp-page="EditTaxCont" asp-route-id="@Model.ItemID">Edit</a>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+
