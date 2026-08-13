@@ -21,23 +21,11 @@ namespace MyFinances.Pages.Contracts
         private readonly IMyDetailsService _myDetailsService = detailsService;
         private readonly IConfiguration _configuration = configuration;
 
+        public List<ItemDetail> ItemDetails { private set; get; } = [];
+
+        public Guid ItemId { private set; get; } = Guid.Empty;
+
         public ContractFull Full { get; private set; } = default!;
-
-        public FinContractNames FullNames { get; private set; } = new();
-
-        public bool HasTransactions { get; private set; } = false;
-
-        public string MissingMonths { get; private set; } = string.Empty;
-
-        public decimal LastBalance { get; private set; } = 0;
-        public decimal LastCashOutBal { get; private set; } = 0;
-        public DateTime BalanceDate { get; private set;  } = DateTime.Now;
-        public decimal NextRateValue { get; private set; } = 0;
-        public DateTime NextRateDate { get; private set; } = DateTime.Now;
-        public decimal FYStartBalance { get; private set; } = 0;
-        public decimal[] CardRates123 { get; private set; } = [0,0,0];
-
-        internal List<string> MonthsName { get; private set; } = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
@@ -45,126 +33,39 @@ namespace MyFinances.Pages.Contracts
             {
                 return NotFound();
             }
+            Guid gid = id ?? Guid.Empty;
+            ItemId = gid; 
             FinContractHelper fch = new(_context, _configuration);
-            Full = await fch.GetContractOnID(id?? Guid.Empty);
-            if(Full == default) { return NotFound(); }
-            // get the names for the ids in the contract
-            ViewData["Title"] = $"Details contract {Full.FinContract.ContractName}";
-            FullNames.ContractTypeName = await _myDetailsService.GetContractTypeByID(Full.FinContract.ContractType);
-            FullNames.OrganisationName = await _myDetailsService.GetOrganisationNameByID(Full.FinContract.IdOrganisation);
-            FullNames.ContractortName = await _myDetailsService.GetUserNameByID(Full.FinContract.IdContractor);
-            FullNames.EndActionName = await _myDetailsService.GetEndActionNameByID(Full.FinContract.IdEndAction);
-            FullNames.FrequencyName = await _myDetailsService.GetFrequencyNameByID(Full.FinContract.IdFrequency);
-            FullNames.PaymentAccountName = await _myDetailsService.GetAccountNameByID(Full.FinContract.IdPayAccount);
-            FullNames.BankAccountName = await _myDetailsService.GetAccountNameByID(Full.FinContract.IdBankAccount);
-            if(Full.FinContract.ContractType == 2)
+            ItemDetails = await fch.GetContractDetailsList(gid, _myDetailsService);
+            if(ItemDetails.Count > 1)
             {
-                FullNames.LoanTypeName = Full.Loan.IdLoanType ? "VARIABLE" : "FIX";
-                FullNames.LoanSecurityName = await _myDetailsService.GetAssetNameByID(Full.Loan.LoanSecurity ?? Guid.Empty);
+                ViewData["Title"] = $"Details contract: {ItemDetails[1]?.ItemValue}";
             }
-            if(Full.FinContract.ContractType == 4)
+            ViewData["Title"] = $"Details contract: no name";
+            int idFA = await _context.FinContracts.Where(p => p.IdFinContract == gid).Select(s => s.IdFinAccount).FirstOrDefaultAsync();
+            if(idFA > 1000000) 
             {
-                FullNames.SuperAccountName = await _myDetailsService.GetAccountNameByID(Full.Employment.IdSuperAccount);
-            }
-            HasTransactions = await _context.FinTransactions.Where(p=>p.ContractIdentifier == Full.FinContract.IdFinAccount).FirstOrDefaultAsync() != null;
-            List<int> mmList = await fch.GetNoRecTransacMonths(Full.FinContract, DateTime.Now);
-            if (mmList.Count > 0)
-            {
-                int y;
-                int m;
-                StringBuilder sb = new();
-                foreach (var mm in mmList)
+                // get start FY
+                GeneralHelper gh = new(_configuration);
+                DateTime startFY = gh.StartFinancialYear(DateTime.Today);
+                // get executed transactions dates
+                var etdList = await _context.FinTransactions.Where(p => p.ContractIdentifier == idFA && p.TransactionDate <= DateTime.Today).Select(s => s.TransactionDate).Distinct().Order().ToListAsync();
+                if(etdList.Count > 0)
                 {
-                    y = mm / 100;
-                    m = mm % 100;
-                    sb.Append(MonthsName[m - 1]);
-                    sb.Append('-');
-                    sb.Append(y);
-                    sb.Append(';');
-                    sb.Append(' ');
-                }
-                MissingMonths = sb.ToString();
-            }
-            // if Deposit, Loan, or Credit Card
-            // Provide --------------
-            // Next invoice date ***
-            // Next invoice rate ***
-            // Current real balance ***
-            // Balance date ***
-            // Current plan balance
-            if(Full.FinContract.ContractType < 4) // Deposit, Loan, or Credit Card
-            {
-                LastBalance = await fch.GetContractRealBalance(Full.FinContract.IdFinAccount, DateTime.Now);
-                if(Full.FinContract.ContractType == 3) 
-                { 
-                    LastCashOutBal = await fch.GetContractRealBalance(Full.FinContract.IdFinAccount, DateTime.Now, Full.CreditCard.CashOutAccount);
-                    List<decimal> colist = CardPayOffOptions(LastBalance, Full.CreditCard.CreditCardInterest * 0.01m, Full.FinContract.IdFrequency);
-                    for(int i = 0; i<3;i++)
+                    ItemDetails.Add(new ItemDetail() { ItemName = "Last transaction date", ItemValue = etdList.Max().ToShortDateString() });
+                    if(idFA < 4000000)
                     {
-                        CardRates123[i] = colist[i];
+                        var sb = await _context.FinTransactions.Where(p => p.ContractIdentifier == idFA && p.TransactionDate == etdList[0]).Select(s => s.TransactionValue).FirstOrDefaultAsync();
+                        ItemDetails.Add(new ItemDetail() { ItemName = $"Start balance at {etdList[0].ToShortDateString()}", ItemValue = sb.ToString("C", default) });
                     }
+
                 }
-                BalanceDate = await LastRecordedTransaction(DateTime.Now, Full.FinContract);
-                FYStartBalance = await BalanceAtStartFY(Full.FinContract);
-            }
-            PlanTransaction npt = await NextPlanTransaction(DateTime.Now, Full.FinContract);
-            if(npt != null)
-            {
-                NextRateDate = npt.TransactionDate;
-                NextRateValue = npt.TransactionValue;
+                else
+                {
+                    ItemDetails.Add(new ItemDetail() { ItemName = "Has recorded transactions", ItemValue = "No recorded transactions" });
+                }
             }
             return Page();
-        }
-
-        private async Task<PlanTransaction> NextPlanTransaction(DateTime refDate, FinContract fc)
-        {
-            PlanTransaction result = default!;
-            CalculatorDates calcDate = new(fc.IdFrequency);
-            var npt = await _context.PlanTransactions.Where(p=>p.ContractIdentifier == fc.IdFinAccount && p.TransactionDate >= refDate).AsNoTracking().FirstOrDefaultAsync();
-            if (npt != null) { result = npt; }
-            return result;
-        }
-
-        private async Task<DateTime> LastRecordedTransaction(DateTime refDate, FinContract fc)
-        {
-            var temp = await _context.FinTransactions.Where(p => p.ContractIdentifier == fc.IdFinAccount && p.TransactionDate <= refDate).Select(s=>s.TransactionDate).ToListAsync();
-            if (temp.Count > 0)
-            {
-                return temp.Max();
-            }
-            else
-            {
-                return DateTime.Parse("2001-01-01");
-            }
-        }
-
-        private async Task<decimal> BalanceAtStartFY(FinContract fc)
-        {
-            decimal result = 0;
-            if(fc.ContractType < 4)
-            {
-                var uca = await _context.UserContracts.Where(p=>p.IdUser == fc.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
-                var ftf = await _context.FinTransactions.Where(p => p.ContractIdentifier == fc.IdFinAccount && (p.DebitAccount == uca || p.CreditAccount == uca)).FirstOrDefaultAsync();
-                if(ftf != null) { result = ftf.TransactionValue; }
-            }
-            return result;
-        }
-
-        private static List<decimal> CardPayOffOptions(decimal balanceValue, decimal yearInterest, int rateFrequency)
-        {
-            List<decimal> result = [0, 0, 0];
-            if(balanceValue == 0 || yearInterest == 0 || rateFrequency == 0) { return  result; }
-            CalculatorFinance calcFin = new(yearInterest, rateFrequency)
-            {
-                TotalPayments = 12,
-                InitialBalance = balanceValue
-            };
-            result[0] = calcFin.LoanFixedRate();
-            calcFin.TotalPayments = 24;
-            result[1] = calcFin.LoanFixedRate();
-            calcFin.TotalPayments = 36;
-            result[2] = calcFin.LoanFixedRate();
-            return result;
         }
     }
 }
