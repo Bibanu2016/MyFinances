@@ -12,6 +12,8 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="MyFinAccount.IdFinAccount" />
     <input type="hidden" asp-for="MyFinAccount.IsLinked" value="@false" />
+    <input type="hidden" asp-for="TID" />
+    <input type="hidden" asp-for="TIFT" />
     <div class="row pb-3">
         <div class="col col-2">
             <span class="text-danger">*</span>
@@ -46,14 +48,31 @@
             <span asp-validation-for="MyFinAccount.AccountOwner" class="text-danger"></span>
         </div>
     </div>
-    <div class="row">
-        <div class="col col-6">
-            <a class="link-primary" asp-page="./IndexFinAccount">Back to list</a>
+    @if(Model.TID > 0 && !string.IsNullOrEmpty(Model.TIFT))
+    {
+        <div class="row">
+            <div class="col col-1">
+                <a class="link-primary" asp-page="../FinTransactions/EditFinTransaction" asp-route-id="@Model.TID" asp-route-ift="@Model.TIFT">Back to list</a>
+            </div>
+            <div class="col"></div>
         </div>
-        <div class="col col-2 text-end">
-            <button type="submit" class="btn btn-primary">Create</button>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col col-1">
+                <a class="link-primary" asp-page="./IndexFinAccount">Back to list</a>
+            </div>
+            <div class="col"></div>
+        </div>
+    }
+    <div class="row">
+        <div class="col col-11"></div>
+        <div class="col align-self-end">
+            <input type="submit" value="Create" class="btn btn-primary" />
         </div>
     </div>
+    
 </form>
 
 @section Scripts {

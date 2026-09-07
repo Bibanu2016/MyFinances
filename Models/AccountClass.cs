@@ -6,8 +6,8 @@ namespace MyFinances.Models
     [Table("accountclass")]
     public class AccountClass
     {
-        [Key, Column("idaccountclass")] public sbyte IdAccountClass { get; set; } = 0;
-        [Required, Column("idaccounttype")] public sbyte IdAccountType { get; set; } = 0;
+        [Key, Column("idaccountclass")] public short IdAccountClass { get; set; } = 0;
+        [Required, Column("idaccounttype")] public short IdAccountType { get; set; } = 0;
         [Required, Column("accountclassname")] public string AccountClassName { get; set; } = "Not defined";
 
     }

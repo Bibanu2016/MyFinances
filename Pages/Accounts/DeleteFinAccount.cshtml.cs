@@ -23,7 +23,7 @@ namespace MyFinances.Pages.Accounts
         [BindProperty]
         public FinAccount FinAccount { get; set; } = default!;
         [BindProperty]
-        public bool CanDelete { get; set; } = true;
+        public bool CanDelete { get; set; } = false;
         public string NameCategory { get; set; } = string.Empty;
         public string NameOwner {  get; set; }  = string.Empty;
 
@@ -38,41 +38,11 @@ namespace MyFinances.Pages.Accounts
             await FillOutNames();
             if(FinAccount.IsLinked) {CanDelete = false; ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of a contract data"; }
             FinAccountHelper fah = new(_context, _config);
-            StringBuilder sb = new();
-            // user check
-            bool cdfa = await fah.FinAccountUsedByUSer(FinAccount.IdFinAccount);
-            if (cdfa)
+            bool isused = await fah.AccountIsUsed(FinAccount.IdFinAccount);
+            CanDelete = !isused;
+            if (isused)
             {
                 ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of a user data";
-                CanDelete = false;
-            }
-            if(CanDelete && FinAccount.AccountCategory < 2000)
-            {
-                cdfa = await fah.FinAccountUsedByTAsset(FinAccount.IdFinAccount);
-                if(!cdfa)
-                {
-                    cdfa = await fah.FinAccountUsedByShares(FinAccount.IdFinAccount);
-                    if(cdfa)
-                    {
-                        CanDelete = false;
-                        ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of shares data";
-                    }
-                }
-                else
-                {
-                    ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of tangible asset data";
-                    CanDelete = false;
-                }
-            }
-            if(CanDelete)
-            {
-                cdfa = await fah.AccountIsUsedByTransactions(FinAccount.IdFinAccount);
-                if(cdfa)
-                {
-                    CanDelete = false;
-                    ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is referenced in transactions";
-                }
-                
             }
             return Page();
         }

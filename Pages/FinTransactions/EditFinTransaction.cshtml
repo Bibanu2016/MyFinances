@@ -1,4 +1,4 @@
-﻿@page "{id, ift, accnew?}"
+﻿@page
 @model MyFinances.Pages.FinTransactions.EditFinTransactionModel
 @{
     ViewBag.FAList = Model.FAList;
@@ -14,10 +14,6 @@
         <input type="hidden" asp-for="EditingFT.IdSource" />
         <input type="hidden" asp-for="IsCreditTheSource" />
         <input type="hidden" asp-for="ReturnRoute" />
-        @if(Model.EditingFT.DebitAccount == 0 || Model.EditingFT.CreditAccount == 0) // allow to create new account if any of the Debit or Credit is zero
-            {
-            <a class="btn btn-outline-primary" asp-page="/Accounts/CreateFinAccount" asp-route-cs="@ViewBag.AccountParra">Create financial account</a>
-            }
         <hr />
         <div class="row row-gap-2 mb-2 col-9">
             <div class="input-group mb-3">
@@ -50,8 +46,9 @@
                         <select class="form-select" id="inputCredit" asp-for="EditingFT.CreditAccount" asp-items="@ViewBag.FAList">
                             <option>Choose...</option>
                         </select>
-                        <span class="text-danger" asp-validation-for="EditingFT.CreditAccount"></span>
+                        <a class="btn btn-outline-secondary" asp-page="../Accounts/CreateFinancialAccount" asp-route-id="@Model.EditingFT.IdTransaction" asp-route-ift="@Model.ReturnRoute">Create Account</a>      
                     </div>
+                    <span class="text-danger" asp-validation-for="EditingFT.CreditAccount"></span>
                         break;
                     case 1: // Credit is the IdSource
                     // alow editing of Debit
@@ -60,8 +57,9 @@
                         <select class="form-select" id="inputDebit" asp-for="EditingFT.DebitAccount" asp-items="@ViewBag.FAList">
                             <option>Choose...</option>
                         </select>
-                        <span class="text-danger" asp-validation-for="EditingFT.DebitAccount"></span>
+                        <a class="btn btn-outline-secondary" asp-page="../Accounts/CreateFinancialAccount" asp-route-id="@Model.EditingFT.IdTransaction" asp-route-ift="@Model.ReturnRoute">Create Account</a>
                     </div>
+                    <span class="text-danger" asp-validation-for="EditingFT.DebitAccount"></span>
                     <div class="input-group mb-3">
                         <label class="input-group-text" asp-for="EditingFT.CreditAccount"></label>
                         <div class="form-text">@Model.FAList.Where(predicate => predicate.Value == Model.EditingFT.CreditAccount.ToString()).FirstOrDefault()?.Text</div>
@@ -74,11 +72,22 @@
                 <input type="number" class="form-control" id="inputAmount" asp-for="EditingFT.TransactionValue" disabled/>
                 <span class="text-body">$AUD</span>
             </div>
-            <div class="input-group mb-3">
-                <label class="input-group-text" for="inputDetails" asp-for="EditingFT.TransactionDetail"></label>
-                <input class="form-control" type="text" id="inputDetails" asp-for="EditingFT.TransactionDetail" />
-                <span class="text-danger" asp-validation-for="EditingFT.TransactionDetail"></span>
-            </div>
+            @if(Model.EditingFT.IdSource > 1000000)
+            {
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="inputDetails" asp-for="EditingFT.TransactionDetail"></label>
+                    <input class="form-control" type="text" id="inputDetails" asp-for="EditingFT.TransactionDetail" disabled/>
+                    <input type="hidden" asp-for="EditingFT.TransactionDetail" />
+                </div>
+            }
+            else
+            {
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="inputDetails" asp-for="EditingFT.TransactionDetail"></label>
+                    <input class="form-control" type="text" id="inputDetails" asp-for="EditingFT.TransactionDetail" />
+                    <span class="text-danger" asp-validation-for="EditingFT.TransactionDetail"></span>
+                </div>
+            }              
             <div class="input-group mb-3">
                 <label class="input-group-text" for="inputKey">Account associated key</label>
                 <input class="form-control" type="text" id="inputKey" asp-for="AccountKey" />
@@ -90,8 +99,8 @@
                 <label class="input-group-text" for="inputContract">@Model.NameContract</label>
             </div>
             <div class="input-group mb-3">
-                <label class="input-group-text" for="inputCredit" asp-for="EditingFT.IdSource"></label>
-                <div class="form-text">@Model.FAList.Where(predicate => predicate.Value == Model.EditingFT.IdSource.ToString()).FirstOrDefault()?.Text</div>
+                <label class="input-group-text" for="inputSource" asp-for="EditingFT.IdSource"></label>
+                <div class="form-text" id="inputSource">@Model.FAList.Where(predicate => predicate.Value == Model.EditingFT.IdSource.ToString()).FirstOrDefault()?.Text</div>
             </div>
         </div>
         <hr />

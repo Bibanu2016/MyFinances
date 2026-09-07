@@ -10,5 +10,6 @@ namespace MyFinances.Models
         [Required, Column("idfinaccount")] public int IdFinAccount { get; set; } = 0;
         [Required, Column("balancedate")] public DateTime BalanceDate { get; set; } = DateTime.MinValue;
         [Required, Column("balancevalue")] public decimal BalanceValue { get; set; } = 0m;
+        [Column("cashvalue")] public decimal CashValue { get; set; } = 0m;
     }
 }

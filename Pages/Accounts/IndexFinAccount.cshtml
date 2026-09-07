@@ -3,8 +3,6 @@
 
 @{
     ViewData["Title"] = "Financial Accounts List";
-    ViewBag.ACSL = Model.ACSL;
-    ViewBag.OWSL = Model.OWSL;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -37,22 +35,34 @@
 <br />
 <form method="get">
     <div class="hstack gap-2">
-        <div class="input-group mb-3">
+        <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Account category</label>
-            <select class="form-select" id="inputGroupSelect01" asp-for="CategoryFilter" asp-items="@ViewBag.ACSL">
+            <select class="form-select" id="inputGroupSelect01" asp-for="CategoryFilter">
                 <option value="0" selected>Choose...</option>
+                @if(Model.AccCategList != null)
+                {
+                    @foreach(var item in Model.AccCategList)
+                    {
+                        <option value="@item.ItemID">@item.Name</option>
+                    }
+                }
             </select>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect02">Owner</label>
-            <select class="form-select" id="inputGroupSelect02" asp-for="OwnerFilter" asp-items="@ViewBag.OWSL">
+            <select class="form-select" id="inputGroupSelect02" asp-for="OwnerFilter">
                 <option value="0" selected>Choose...</option>
+                @if(Model.AccUserList != null)
+                {
+                    @foreach(var item in Model.AccUserList)
+                    {
+                        <option value="@item.ItemID">@item.Name</option>
+                    }
+                }
             </select>
         </div>
-        <div class="align-content-center">
-            <button type="submit" class="btn btn-info">Filter</button>
-            <a asp-page="./IndexFinAccount" class="btn btn-secondary">Reset</a>
-        </div>
+        <button type="submit" class="btn btn-info">Filter</button>
+        <a asp-page="./IndexFinAccount" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 <br />
@@ -67,54 +77,39 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FilterredFAList[0].Name)
+                Id
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FilterredFAList[0].AccountCategory)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FilterredFAList[0].AccountOwner)
+                Category
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FilterredFAList[0].IsLinked)
+                User
             </th>
             <th>Item action</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.FilterredFAList)
+        @foreach (var item in Model.FAList)
         {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @item.Id
             </td>
             <td>
-                @Model.AccountCategories.Where(m => m.IdAccountCategory == item.AccountCategory).Select(x => x.AccountCategoryName).FirstOrDefault()
+                @item.Name
             </td>
             <td>
-                @Model.UserContracts.Where(m=>m.IdUser == item.AccountOwner).Select(y=>y.FullName).FirstOrDefault()
+                @item.Category
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsLinked)
+                @item.UserName
             </td>
             <td>
-                @if(!item.IsLinked)
-                {
-                    <a asp-page="./EditFinAccount" asp-route-id="@item.IdFinAccount"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a>
-                }
-                else
-                {
-                        <i class="bi-square" style="color:grey" alt="--"></i>
-                }
-                 | 
-                @if (!item.IsLinked)
-                {
-                        <a asp-page="./DeleteFinAccount" asp-route-id="@item.IdFinAccount"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
-                }
-                else
-                {
-                    <i class="bi-square" style="color:grey" alt="--"></i>
-                }
+                <a asp-page="./EditFinAccount" asp-route-id="@item.Id"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a> |
+                <a asp-page="./DeleteFinAccount" asp-route-id="@item.Id"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
             </td>
         </tr>
 }

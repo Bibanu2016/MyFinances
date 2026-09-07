@@ -159,36 +159,6 @@ namespace MyFinances.Controllers
             return result;
         }
 
-        public async Task<string> DeleteContractBalance(DateTime referenceDate)
-        {
-            string result = string.Empty;
-            List<Balance> cbl = await _dBContext.Balances.AsQueryable().Where( b=> b.IdFinAccount == _contractFull.FinContract.IdFinAccount && b.BalanceDate >= referenceDate).ToListAsync();
-            if (cbl.Count != 0)
-            {
-                foreach(var item in cbl)
-                {
-                    _dBContext.Attach(item).State = EntityState.Deleted;
-                }
-            }
-            List<BalanceCard> ccl = await _dBContext.BalanceCards.AsQueryable().Where(c => c.IdAccount == _contractFull.FinContract.IdFinAccount && c.DateBalance >= referenceDate).ToListAsync();
-            if (ccl.Count != 0)
-            {
-                foreach(var item in ccl)
-                {
-                    _dBContext.Attach(item).State = EntityState.Deleted;
-                }
-            }
-            try
-            {
-                await _dBContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                result = ex.Message + "\n" + ex.Source;
-            }
-            return result;
-        }
-
         private void AddDepositPlanTransaction(DateTime firstInvoice, int numberPT, decimal lastBalance, DateTime startFY, int userAccount)
         {
             CalculatorFinance cf = new(_contractFull.Deposit.InterestRatePerYear * 0.01m, _contractFull.FinContract.IdFrequency)

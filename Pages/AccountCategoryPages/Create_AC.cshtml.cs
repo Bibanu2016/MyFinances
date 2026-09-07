@@ -21,6 +21,8 @@ namespace MyFinances.Pages.AccountCategoryPages
 
         public SelectList AccClassesList { private set; get; } = default!;
         public SelectList ContTypesList { private set; get; } = default!;
+        public SelectList CashFlowList { private set; get; } = default!;
+
 
         [BindProperty] public CategRole CRoles { set; get; } = new();
         public async Task OnGet()
@@ -89,6 +91,8 @@ namespace MyFinances.Pages.AccountCategoryPages
                 ContTypesList = await _cfill.GetStandardContractTypes(100);
                 _mc.Set("CCL", ContTypesList);
             }
+            //get cash flow categories list
+            CashFlowList = await _mc.GetOrCreateAsync("CFL", () => _cfill.GetCashFlowCategoriesList());
             return;
         }
 

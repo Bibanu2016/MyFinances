@@ -5,6 +5,7 @@ using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
+using System.ComponentModel;
 
 namespace MyFinances.Pages.Accounts
 {
@@ -16,8 +17,10 @@ namespace MyFinances.Pages.Accounts
 
         public SelectList AccCategoryList { get; set; } = default!;
         public SelectList AccOwnerList { get; set; } = default!;
+        [BindProperty] public long TID { set; get; } = 0;
+        [BindProperty] public string TIFT { set; get; } = "";
 
-        public async Task OnGet()
+        public async Task OnGet(long id = 0, string ift = "")
         {
             AccCategoryList = await _fillService.GetAllAccountCategoriesList();
             AccOwnerList = await _fillService.GetUsersList();
@@ -25,9 +28,14 @@ namespace MyFinances.Pages.Accounts
             {
                 IdFinAccount = 0
             };
+            if(id > 0 && !string.IsNullOrEmpty(ift))
+            {
+                TID = id;
+                TIFT = ift;
+            }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
@@ -42,9 +50,15 @@ namespace MyFinances.Pages.Accounts
             try
             {
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Financial account {MyFinAccount.Name} created successfully.";
-                return RedirectToPage("./IndexFinAccount");
-
+                if (TID > 0 && !string.IsNullOrEmpty(TIFT))
+                {
+                    return RedirectToPage("/FinTransactions/EdittFinTransaction", new { id = TID, ift = TIFT });
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = $"Financial account {MyFinAccount.Name} created successfully.";
+                    return RedirectToPage("/IndexFinAccount");
+                }
             }
             catch (Exception ex)
             {

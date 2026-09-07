@@ -24,7 +24,7 @@ namespace MyFinances.Pages.Contracts
 
         public async Task OnGetAsync()
         {
-            var clvm = await _context.FinContracts.AsQueryable().Where(x => x.IsActiveContract).Select( y => new { y.IdFinContract, y.ContractType, y.ContractName, y.IdContractor, y.EquivMonthlyRate }).OrderBy(z=>z.ContractType).ToListAsync();
+            var clvm = await _context.FinContracts.AsQueryable().Where(x => x.IsActiveContract && x.ContractType < 20).Select( y => new { y.IdFinContract, y.ContractType, y.ContractName, y.IdContractor, y.EquivMonthlyRate }).OrderBy(z=>z.ContractType).ToListAsync();
             var ux = await _context.UserContracts.AsNoTracking().ToListAsync();
             var ctypel = await _context.ContractTypes.AsNoTracking().ToListAsync();
             if (ctypel.Count > 0) {

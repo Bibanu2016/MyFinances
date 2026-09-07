@@ -6,6 +6,7 @@ using MyFinances.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using Microsoft.Extensions.Logging;
+using MyFinances.Controllers;
 
 namespace MyFinances.Pages
 {
@@ -21,7 +22,6 @@ namespace MyFinances.Pages
         {
             try
             {
-                
                 var cctl = await _dbContext.ContractTypes.OrderBy(p=>p.IdContractType).AsNoTracking().ToListAsync();
                 if (cctl.Count > 0)
                 {

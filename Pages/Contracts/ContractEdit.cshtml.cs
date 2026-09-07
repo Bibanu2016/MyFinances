@@ -79,9 +79,9 @@ namespace MyFinances.Pages.Contracts
             }
             Id = pid??Guid.Empty;
             FinContractHelper fch = new(_context, _config);
-            CFM = await fch.GetContractOnID(Id);
+            CFM = await fch.GetContractOnID(Id, true);
             if(CFM is null) { return NotFound(); }
-            CFM.FinContract.InvoiceDate = new FinanceCalculator.CalculatorDates(CFM.FinContract.IdFrequency).NextCycleDate(CFM.FinContract.InvoiceDate, DateTime.Today);
+            CFM.FinContract.InvoiceDate = new CalculatorDates(CFM.FinContract.IdFrequency).NextCycleDate(CFM.FinContract.InvoiceDate, DateTime.Today);
             OriginalContract = CFM;
             await FillUpLists();
             if(CFM.FinContract.ContractType == 2) { TangibleAsset = await _comboFill.GetContractEndActionList(); }
@@ -130,8 +130,8 @@ namespace MyFinances.Pages.Contracts
             // do not update if the loan start date is earlier than the start of the FY
             //
             FinContractHelper fch = new(_context, _config);
-            OriginalContract = await fch.GetContractOnID(Id);
-            if(OriginalContract == default) { TempData["ErrorMessage"] = $"Error in retrieving data for contract id {Id}"; return RedirectToPage("./ContractsList"); }
+            OriginalContract = await fch.GetContractOnID(CFM.FinContract.IdFinContract, false);
+            if(OriginalContract == default) { TempData["ErrorMessage"] = $"Error in retrieving data for contract id {CFM.FinContract.IdFinContract}"; return RedirectToPage("./ContractsList"); }
             //
             // update FinContract if there are changes in data
             //
@@ -139,7 +139,7 @@ namespace MyFinances.Pages.Contracts
             //
             // if name changed update FinAccount
             //
-            if(changesMade == false) { TempData["ErrorMessage"] = $"Error in updating contract data for contract id {Id} \n or no changes have been detected."; return RedirectToPage("./ContractsList"); }            
+            if(changesMade == false) { TempData["ErrorMessage"] = $"Error in updating contract data for contract id {CFM.FinContract.IdFinContract} \n or no changes have been detected."; return RedirectToPage("./ContractsList"); }            
             string errMessage = string.Empty;
             if (CFM.FinContract.ContractName != OriginalContract.FinContract.ContractName)
             {
@@ -154,7 +154,7 @@ namespace MyFinances.Pages.Contracts
              * Update forecast transactions
              * 
              */
-            bool cIsEx = await fch.GetContractExecutionState(Id);
+            bool cIsEx = await fch.GetContractExecutionState(CFM.FinContract.IdFinContract);
             string success = string.Empty;
             int ptAction = ReplaceOrUpdate(cIsEx, CFM, OriginalContract);
             DateTime fromDate = await fch.GetDateLastTransac(cIsEx, CFM.FinContract.IdFinAccount, DateTime.Now);
@@ -175,7 +175,7 @@ namespace MyFinances.Pages.Contracts
             {
                 int x = await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                TempData["SuccessMessage"] = $"Contract with id = {Id} has been successfuly updated! \n A total of {x} records affected.";
+                TempData["SuccessMessage"] = $"Contract with id = {CFM.FinContract.IdFinContract} has been successfuly updated! \n A total of {x} records affected.";
             }
             catch (DbException ex)
             {
@@ -199,7 +199,8 @@ namespace MyFinances.Pages.Contracts
                     "CFM.CreditCard",
                     "CFM.Employment",
                     "CFM.Income",
-                    "CFM.Bill"
+                    "CFM.Bill",
+                    "CFM.InvestFund"
                 ];
             switch(cc)
             {
@@ -209,6 +210,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 2:
                     ms.Remove(supClass[0]);
@@ -216,6 +218,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 3:
                     ms.Remove(supClass[0]);
@@ -223,6 +226,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 4:
                     ms.Remove(supClass[0]);
@@ -230,6 +234,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[2]);
                     ms.Remove(supClass[4]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 5:
                     ms.Remove(supClass[0]);
@@ -237,6 +242,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[2]);
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 6:
                     ms.Remove(supClass[0]);
@@ -244,6 +250,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[2]);
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
+                    ms.Remove(supClass[6]);
                     break;
                 case 7:
                     ms.Remove(supClass[0]);
@@ -251,6 +258,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[2]);
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
+                    ms.Remove(supClass[6]);
                     break;
                 default:
                     ms.Remove(supClass[0]);
@@ -259,6 +267,7 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[3]);
                     ms.Remove(supClass[4]);
                     ms.Remove(supClass[5]);
+                    ms.Remove(supClass[6]);
                     break;
             }
             

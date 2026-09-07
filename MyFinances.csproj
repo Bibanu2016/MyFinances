@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\AccountCategories\" />
     <Folder Include="Pages\AppUserSettings\" />
     <Folder Include="Pages\FinReports\" />
     <Folder Include="Pages\SpecialContracts\TaxationPages\" />
