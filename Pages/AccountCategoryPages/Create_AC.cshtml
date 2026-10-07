@@ -44,17 +44,6 @@
                 <span class="text-danger" asp-validation-for="NewAC.IdContractCategory"></span>
             </div>
         </div>
-        <div class="row row-cols-6 py-2">
-            <div class="col-2">
-                <label class="form-label" asp-for="NewAC.IdCashFlow"></label>
-            </div>
-            <div class="col-4">
-                <select class="form-select" asp-for="NewAC.IdCashFlow" asp-items="@Model.CashFlowList">
-                    <option>Choose ..</option>
-                </select>
-                <span class="text-danger" asp-validation-for="NewAC.IdCashFlow"></span>
-            </div>
-        </div>
         <div class="row row-cols-6">
             <div class="col-2">
                 <span class="text-danger">*</span>

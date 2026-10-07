@@ -21,9 +21,10 @@ namespace MyFinances.Pages.Contracts
         private readonly IConfiguration _configuration = configuration;
         private readonly IMemoryCache _memoryCache = memoryCache;
         private readonly IComboFillService _comboFill = comboFill;
-        private readonly string[] payableRoles = ["PaymentAsset", "PaymentLiability"];
+        private readonly string[] payableRoles = ["PaymentAsset", "PaymentCredit"];
         private readonly string[] bankRoles = ["PaymentAsset"];
         private readonly string[] superRoles = ["InvestmentFund"];
+        private readonly string[] taxRole = ["Tax"];
         //
         // contract type selection variable
         [BindProperty(SupportsGet =true)]
@@ -40,7 +41,7 @@ namespace MyFinances.Pages.Contracts
         public SelectList TangibleAsset { get; set; } = default!;
         public SelectList ContractCategory { get; set; } = default!;
         public SelectList SuperAccount { get; set; } = default!;
-
+        //
         // Contract data
         [BindProperty]
         public ContractFull ContractFull { get; set; } = default!;
@@ -147,20 +148,18 @@ namespace MyFinances.Pages.Contracts
         /// <returns></returns>
         private async Task FillUpLists()
         {
-            if (SelectedContractType < 1 || SelectedContractType > 7) {return; }
-            Frequency = await _memoryCache.GetOrCreateAsync("FRE", () => _comboFill.GetPaymentFrequencyList());
-            EndAction = await _memoryCache.GetOrCreateAsync("ENDA", () => _comboFill.GetContractEndActionList());
-            Organisation = await _memoryCache.GetOrCreateAsync("ORGS", () => _comboFill.GetOrganisationsList());
-            Payable = await _memoryCache.GetOrCreateAsync("PAYS", () => _comboFill.GetFinAccountListByRole(payableRoles));
-            Bank = await _memoryCache.GetOrCreateAsync("BANKS", () => _comboFill.GetFinAccountListByRole(bankRoles));
-            Users = await _memoryCache.GetOrCreateAsync("USRS", () => _comboFill.GetUsersList());
-            ContractCategory = await _memoryCache.GetOrCreateAsync("CTGY", () => _comboFill.GetAccountCategoryList(SelectedContractType));
-            if(SelectedContractType == 4 || SelectedContractType == 5) 
+            if(SelectedContractType > 0)
             {
-                SuperAccount = await _memoryCache.GetOrCreateAsync("SUPA", () => _comboFill.GetFinAccountListByRole(superRoles));
+                Frequency = await _comboFill.GetPaymentFrequencyList();
+                EndAction = await _comboFill.GetContractEndActionList();
+                Organisation = await _comboFill.GetOrganisationsList();
+                Payable = await _comboFill.GetFinAccountListByRole(payableRoles);
+                Bank = await _comboFill.GetFinAccountListByRole(bankRoles);
+                Users = await _comboFill.GetUsersList();
+                ContractCategory = await _comboFill.GetAccountCategoryList(SelectedContractType);
+                SuperAccount = await _comboFill.GetFinAccountListByRole(superRoles);
+                TangibleAsset = await _comboFill.GetTangibleAssetsList();
             }
-            SuperAccount = await _memoryCache.GetOrCreateAsync("SUPA", () => _comboFill.GetFinAccountListByRole(superRoles));
-            TangibleAsset = await _memoryCache.GetOrCreateAsync("TANG", () => _comboFill.GetTangibleAssetsList());
             return;
         }
 
@@ -191,15 +190,13 @@ namespace MyFinances.Pages.Contracts
         {
             if (SelectedContractType > 0 && SelectedContractType < 4)
             {
-                // guard against a balance date later than today
+                // balance day less than today
                 if (BalanceDate > DateTime.Today) { this.ModelState.TryAddModelError("BalanceDate", "A date earlier than or today is required"); }
-                // guard against a balance date ealier than 
+                // super value less than gross value
                 if (BalanceDate < ContractFull.FinContract.StartDate) { this.ModelState.TryAddModelError("BalanceDate", "A date later than or the contact Start Date is required"); }
                 CalculatorDates calculatorDates = new(ContractFull.FinContract.IdFrequency);
                 DateTime lastPayment = calculatorDates.LastCycleDate(ContractFull.FinContract.InvoiceDate, DateTime.Now);
                 if(BalanceDate < lastPayment) { this.ModelState.TryAddModelError("BalanceDate", $"A date later than last peyment date of {lastPayment} is required."); }
-                DateTime currentFY = new GeneralHelper(_configuration).StartFinancialYear(DateTime.Now);
-                if(BalanceDate < currentFY) { this.ModelState.TryAddModelError("BalanceDate", $"A date later than the start of the current financial year of {currentFY} is required."); }
             }
             if (SelectedContractType == 2)
             {
@@ -222,8 +219,7 @@ namespace MyFinances.Pages.Contracts
             FinAccountHelper fah = new(_context, _configuration);
             //update contract data
             ContractFull.FinContract.IdFinContract = Guid.NewGuid();
-            bool iscc = SelectedContractType == 3;
-            int[] tempids = await fah.NewIdAccountByCateg(CategoryContract, iscc);
+            int[] tempids = await fah.NewIdAccountByCateg(CategoryContract);
             ContractFull.FinContract.IdFinAccount = tempids[0];
             ContractFull.FinContract.ContractType = SelectedContractType;
             ContractFull.FinContract.IsActiveContract = true;
@@ -246,6 +242,7 @@ namespace MyFinances.Pages.Contracts
                     ContractFull.Deposit.IdDeposit = ContractFull.FinContract.IdFinContract;
                     short interestCtg = sectionCategory.GetValue<short>("InterestReceived");
                     interestCtg = (short)(interestCtg == 0? 4102 : interestCtg); // in case that there is an error reading the value, the category for Interest Received = 4102
+
                     ContractFull.Deposit.InterestAccount = (await fah.NewIdAccountByCateg(interestCtg))[0];
                     FinAccount DepInterest = new()
                     {
@@ -255,15 +252,6 @@ namespace MyFinances.Pages.Contracts
                         AccountOwner = ContractFull.FinContract.IdContractor,
                         IsLinked = true
                     };
-                    Balance dbal = new()
-                    {
-                        IdBalance = GeneratorID.Int64IDBasedOnDate(BalanceDate),
-                        IdFinAccount = ContractFull.FinContract.IdFinAccount,
-                        BalanceDate = BalanceDate,
-                        BalanceValue = PurchaseBalance,
-                        CashValue = 0
-                    };
-                    _context.Balances.Add(dbal);
                     _context.FinAccounts.Add(DepInterest);
                     _context.Deposits.Add(ContractFull.Deposit);
                     break;
@@ -280,15 +268,6 @@ namespace MyFinances.Pages.Contracts
                         AccountOwner = ContractFull.FinContract.IdContractor,
                         IsLinked = true
                     };
-                    Balance lbal = new()
-                    {
-                        IdBalance = GeneratorID.Int64IDBasedOnDate(BalanceDate),
-                        IdFinAccount = ContractFull.FinContract.IdFinAccount,
-                        BalanceDate = BalanceDate,
-                        BalanceValue = -1.00m * PurchaseBalance,
-                        CashValue = 0
-                    };
-                    _context.Balances.Add(lbal);
                     _context.FinAccounts.Add(LoanInterest);
                     _context.Loans.Add(ContractFull.Loan);
                     break;
@@ -299,7 +278,7 @@ namespace MyFinances.Pages.Contracts
                     int[] interIDs = await fah.NewIdAccountByCateg((short)cia, true);
                     ContractFull.CreditCard.InterestAccount = interIDs[0];
                     string detInterest = sectionDetail.GetValue<string>("InterestOut") ?? "Interest charge ";
-                    FinAccount CardInterest = new() //purchase interest account
+                    FinAccount CardInterest = new()
                     {
                         IdFinAccount = ContractFull.CreditCard.InterestAccount,
                         Name = string.Concat(detInterest, ContractFull.FinContract.ContractName),
@@ -309,10 +288,10 @@ namespace MyFinances.Pages.Contracts
                     };
                     _context.FinAccounts.Add(CardInterest);
                     ContractFull.CreditCard.InterestCashOutAcc = interIDs[1];
-                    FinAccount COInterest = new() // cash out interest account
+                    FinAccount COInterest = new()
                     {
-                        IdFinAccount = ContractFull.CreditCard.InterestCashOutAcc,
-                        Name = string.Concat("Interest charge cash out ", ContractFull.FinContract.ContractName),
+                        IdFinAccount = ContractFull.CreditCard.InterestCashOutAcc + 1,
+                        Name = string.Concat(detInterest, ContractFull.FinContract.ContractName),
                         AccountCategory = cia,
                         AccountOwner = ContractFull.FinContract.IdContractor,
                         IsLinked = true
@@ -345,23 +324,17 @@ namespace MyFinances.Pages.Contracts
                         IsLinked = true
                     };
                     _context.FinAccounts.Add(CardFee);
+                    short coCateg = sectionDetail.GetValue<short>("Cash");
+                    coCateg = (short)(coCateg == 0 ? 1001 : coCateg);
+                    ContractFull.CreditCard.CashOutAccount = (await fah.NewIdAccountByCateg(coCateg))[0];
                     FinAccount CardCashOut = new()
                     {
-                        IdFinAccount = tempids[1],
+                        IdFinAccount = ContractFull.CreditCard.CashOutAccount,
                         Name = "Cash out " + ContractFull.FinContract.ContractName,
-                        AccountCategory = (short)CategoryContract,
+                        AccountCategory = coCateg,
                         AccountOwner = ContractFull.FinContract.IdContractor,
                         IsLinked = true
                     };
-                    Balance cbal = new()
-                    {
-                        IdBalance = GeneratorID.Int64IDBasedOnDate(BalanceDate),
-                        IdFinAccount = ContractFull.FinContract.IdFinAccount,
-                        BalanceDate = BalanceDate,
-                        BalanceValue = -1.00m * PurchaseBalance,
-                        CashValue = -1.00m * CashBalance
-                    };
-                    _context.Balances.Add(cbal);
                     _context.FinAccounts.Add(CardCashOut);
                     _context.CreditCards.Add(ContractFull.CreditCard);
                     break;
@@ -381,6 +354,10 @@ namespace MyFinances.Pages.Contracts
                     ContractFull.Bill.IdBill = ContractFull.FinContract.IdFinContract;
                     _context.Bills.Add(ContractFull.Bill);
                     break;
+                case 8:
+                    ContractFull.InvestFund.IdInvestFund = ContractFull.FinContract.IdFinContract;
+                    _context.InvestFunds.Add(ContractFull.InvestFund);
+                    break;
                 default:
                     break;
             }
@@ -393,7 +370,6 @@ namespace MyFinances.Pages.Contracts
             // recording is done only if the InitialAmount differs from the Purchase balance + Cash balance
             // and balance date is within current financial year
             // get user account id
-            if(SelectedContractType > 3) { return string.Empty; }
             var uaid = await _context.UserContracts.Where(p=>p.IdUser == ContractFull.FinContract.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
             string detailOpen = _configuration.GetSection("TransactionDetail").GetValue<string>("Open") ?? "Open account ";
             PlanTransaction openPt = new()
@@ -411,27 +387,15 @@ namespace MyFinances.Pages.Contracts
                 ExecutedTransaction = false,
                 IdSource = uaid
             };
-            Balance oab = new()
-            {
-                IdBalance = GeneratorID.Int64IDBasedOnDate(transacDate),
-                IdFinAccount = ContractFull.FinContract.IdFinAccount,
-                BalanceDate = transacDate,
-            };
             switch(SelectedContractType)
             {
                 case 1:
                     openPt.DebitAccount = ContractFull.FinContract.IdFinAccount;
                     openPt.CreditAccount = uaid;
-                    oab.BalanceValue = PurchaseBalance;
-                    oab.CashValue = 0;
-                    _context.Balances.Add(oab);
                     break;
                 case 2:
                     openPt.DebitAccount = uaid;
                     openPt.CreditAccount = ContractFull.FinContract.IdFinAccount;
-                    oab.BalanceValue = PurchaseBalance * -1.0m;
-                    oab.CashValue = 0;
-                    _context.Balances.Add(oab);
                     break;
                 case 3:
                     openPt.DebitAccount = uaid;
@@ -450,9 +414,6 @@ namespace MyFinances.Pages.Contracts
                     };
                     _context.PlanTransactions.Add(cardOpen);
                     _context.PlanTransactions.Add(cardCashOpen);
-                    oab.BalanceValue = -1.0m * ( PurchaseBalance + CashBalance );
-                    oab.CashValue = -1.0m * CashBalance;
-                    _context.Balances.Add(oab);
                     break;
                 case 8:
                     PlanTransaction superOpen = new()

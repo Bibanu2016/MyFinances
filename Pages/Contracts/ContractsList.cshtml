@@ -44,7 +44,14 @@
         <ul class="dropdown-menu">
             @foreach (var item in Model.ContractTypes)
             {
-                <li><a class="dropdown-item" asp-page="./ContractAdd" asp-route-sct="@item.IdContractType">@item.ContractTypeName</a></li>
+                @if(item.IdContractType < 8)
+                {
+                    <li><a class="dropdown-item" asp-page="./ContractAdd" asp-route-sct="@item.IdContractType">@item.ContractTypeName</a></li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item" asp-page="./InvestFundContractAdd">@item.ContractTypeName</a></li>
+                }
             }
         </ul>
     </div>

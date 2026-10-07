@@ -22,13 +22,14 @@ namespace MyFinances.Services
         Task<SelectList> GetSourcesListForTransacKeys();
         Task<SelectList> GetMatchingTransactions(PlanTransaction planTransaction);
         Task<SelectList> GetNonSourceFinAccounts();
+
         Task<SelectList> GetStandardContractTypes(short idThreshold);
         Task<SelectList> GetSpecialContractTypes(short idThreshold);
         Task<SelectList> GetFinAccountListByCateg(List<short> categs = default!);
         Task<SelectList> GetFinAccountListByRole(string[] acRoles);
+
         Task<SelectList> GetAccountTypesList();
+
         Task<SelectList> GetAccountClassesList();
-        Task<SelectList> GetCashFlowCategoriesList();
-        Task<SelectList> GetUserTaxAccountsList(int usedID);
     }
 }

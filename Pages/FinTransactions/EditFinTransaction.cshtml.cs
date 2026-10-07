@@ -28,9 +28,8 @@ namespace MyFinances.Pages.FinTransactions
         [BindProperty]
         public string ReturnRoute {  get; set; } = string.Empty;
 
-
         public SelectList FAList { get; set; } = default!;
-        public async Task<IActionResult> OnGet(long id, string ift)
+        public async Task<IActionResult> OnGet(long id, string ift, int? accnew)
         {
             var eft = await _dbContext.FinTransactions.FindAsync(id);
             if(eft == null) return NotFound();
@@ -39,7 +38,13 @@ namespace MyFinances.Pages.FinTransactions
             {
                 ReturnRoute = ift;
             }
+            if(accnew.HasValue)
+            {
+                if(EditingFT.DebitAccount == 0) { EditingFT.DebitAccount = accnew??0; }
+                if(EditingFT.CreditAccount == 0) { EditingFT.CreditAccount = accnew??0; }
+            }
             ViewData["Title"] = $"Edit Transaction ID: {EditingFT.IdTransaction}";
+            TempData["OrigTD"] = EditingFT.TransactionDetail;
             if(EditingFT.DebitAccount == EditingFT.IdSource) { IsCreditTheSource = 0; }
             if (EditingFT.CreditAccount == EditingFT.IdSource) { IsCreditTheSource = 1; }
             FAList = await _fillService.GetFinancialAccountsList();
@@ -60,14 +65,13 @@ namespace MyFinances.Pages.FinTransactions
                 case 1:
                     if (EditingFT.DebitAccount == 0) { ModelState.TryAddModelError(nameof(EditingFT.DebitAccount), errorMessage: "A values is required"); }
                     break;
-            }          
-            if (!string.IsNullOrEmpty(AccountKey)) {
-                // guard against more than 4 words in the AccountKey
-                if (AccountKey.Trim().Split(' ').Length > 4) ModelState.TryAddModelError("AccountKey", errorMessage: "A maximum of 4 words are allowed");
-                // guard against missmatched AccountKey and TransactionDetail
-                if(!EditingFT.TransactionDetail.Contains(AccountKey))
+            }
+            if (AccountKey.Trim().Split(' ').Length > 4) ModelState.TryAddModelError("AccountKey", errorMessage: "A maximum of 4 words are allowed");
+            if (TempData["OrigTD"] != null) //guard against change in Transaction Detail if the IdSource > 1000000
+            {
+                if (TempData["OrigTD"]?.ToString() != EditingFT.TransactionDetail && EditingFT.IdSource > 1000000)
                 {
-                    ModelState.TryAddModelError("AccountKey", errorMessage: "The account key does not match the transaction detail");
+                    ModelState.TryAddModelError(nameof(EditingFT.TransactionDetail), errorMessage: "Change of transaction detail is not allowed");
                 }
             }
             if (!ModelState.IsValid) 

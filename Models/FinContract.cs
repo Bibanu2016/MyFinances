@@ -12,22 +12,22 @@ namespace MyFinances.Models
     [Table("fincontract")]
     public class FinContract: IEquatable<object>, IValidatableObject
     {
-        [Key, Column("idfincontract"), Display(Name = "ID Contract")] public required Guid IdFinContract { get; set; }
-        [Required, Column("idcontracttype"), Display(Name ="Type contract")] public short ContractType { get; set; } = 0;
+        [Key, Column("idfincontract"), Display(Name = "ID")] public required Guid IdFinContract { get; set; }
+        [Required, Column("idcontracttype"), Display(Name ="Type")] public short ContractType { get; set; } = 0;
         [Required, Column("fincontractname"), MinLength(3, ErrorMessage = "Minimum 3 characters are required!"), MaxLength(40, ErrorMessage = "Maximum 40 characters are allowed!"), Display(Name = "Name")] public string ContractName { get; set; } = string.Empty;
         [Required, Column("fincontractdetails"), MaxLength(255, ErrorMessage = "Maximum of 255 characters are allowed!"), Display(Name = "Details")] public string ContractDetails { get; set; } = string.Empty;
-        [Required, Column("idorganisation"), Display(Name = "Organisation id")] public int IdOrganisation { get; set; } = 0;
-        [Required, Column("idcontractor"), Display(Name = "Contractor id")] public short IdContractor { get; set; } = 0;
+        [Required, Column("idorganisation"), Display(Name = "Organisation ID")] public int IdOrganisation { get; set; } = 0;
+        [Required, Column("idcontractor"), Display(Name = "Contractor ID")] public short IdContractor { get; set; } = 0;
         [Required, Column("fincontractstartdate"), DataType(DataType.Date), Display(Name = "Start date")] public DateTime StartDate { get; set; } = DateTime.Parse("2001-01-01");
         [Required, Column("fincontractenddate"), DataType(DataType.Date), Display(Name = "End date")] public DateTime EndDate { get; set; } = DateTime.MaxValue;
-        [Required, Column("idendaction"), Display(Name = "End action")] public short IdEndAction { get; set; } = 0;
+        [Required, Column("idendaction"), Display(Name = "End action ID")] public short IdEndAction { get; set; } = 0;
         [Required, Column("invoicedate"), DataType(DataType.Date), Display(Name = "Invoice date")] public DateTime InvoiceDate { get; set; } = DateTime.Today;
         [Required, Column("invoicenetdays"), Display(Name = "Net days"), Range(0, 180, ErrorMessage ="A value in the range {1} to {2} is required")] public short InvoiceNetDays { get; set; } = 0;
         [Required, Column("idfrequency"), Display(Name = "Payment frequency")] public short IdFrequency { get; set; } = 0;
-        [Required, Column("idfinaccount"), Display(Name = "Contract account")] public int IdFinAccount { get; set; } = 0;
-        [Required, Column("idpayaccount"), Display(Name = "Payment account")] public int IdPayAccount { get; set; } = 0;
-        [Column("idbankaccount"), Display(Name = "Bank account")] public int IdBankAccount { get; set; } = 0;
-        [Required, Column("fincontractactive"), Display(Name = "Is contract active")] public bool IsActiveContract { get; set; } = false;
+        [Required, Column("idfinaccount"), Display(Name = "Account ID")] public int IdFinAccount { get; set; } = 0;
+        [Required, Column("idpayaccount"), Display(Name = "Payment acc.ID")] public int IdPayAccount { get; set; } = 0;
+        [Column("idbankaccount"), Display(Name = "Bank acc.ID")] public int IdBankAccount { get; set; } = 0;
+        [Required, Column("fincontractactive"), Display(Name = "Is active")] public bool IsActiveContract { get; set; } = false;
         [Required, Column("closeddate"), DataType(DataType.Date), Display(Name = "Closed date")] public DateTime ClosedDate { get; set; } = DateTime.MaxValue.AddDays(-1);
         [Required, Column("eqmonthrate"), Display(Name = "Equiv. Monthly Rate")] public int EquivMonthlyRate { get; set; } = 0;
 

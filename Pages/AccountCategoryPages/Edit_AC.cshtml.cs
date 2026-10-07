@@ -21,7 +21,6 @@ namespace MyFinances.Pages.AccountCategoryPages
         [BindProperty]
         public AccountCategory AccCategEdit { set; get; } = default!;
         public SelectList ContTypeList { private set; get; } = default!;
-        public SelectList CashFlowList { private set; get; } = default!;
         public string AccClassName { set; get; } = string.Empty;
         public string StringCategRole { set; get; } = string.Empty;
 
@@ -36,8 +35,6 @@ namespace MyFinances.Pages.AccountCategoryPages
             AccClassName = await _mc.GetOrCreateAsync("ACN", () => _details.GetAccountClassByID(AccCategEdit.IdAccountClass));
             // get list for ContractType
             ContTypeList = await _mc.GetOrCreateAsync("CTL", () => _cfill.GetStandardContractTypes(100));
-            //get cash flow categories list
-            CashFlowList = await _mc.GetOrCreateAsync("CFL", () => _cfill.GetCashFlowCategoriesList());
             // deconstruct values from CategoryRole
             CRole.PaymentAsset = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 0);
             CRole.PaymentLiability = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 1);
@@ -64,7 +61,6 @@ namespace MyFinances.Pages.AccountCategoryPages
             {
                 AccClassName = await _mc.GetOrCreateAsync("ACN", () => _details.GetAccountClassByID(AccCategEdit.IdAccountClass));
                 ContTypeList = await _mc.GetOrCreateAsync("CTL", () => _cfill.GetStandardContractTypes(100));
-                CashFlowList = await _mc.GetOrCreateAsync("CFL", () => _cfill.GetCashFlowCategoriesList());
                 return Page();
             }
             //update category roles

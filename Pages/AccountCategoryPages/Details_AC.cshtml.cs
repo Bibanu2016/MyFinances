@@ -29,9 +29,7 @@ namespace MyFinances.Pages.AccountCategoryPages
             ACDetails.Add(new ItemDetail() { ItemName = "Name", ItemValue = aca.AccountCategoryName });
             temp = await _details.GetContractTypeByID(aca.IdContractCategory);
             ACDetails.Add(new ItemDetail() { ItemName = "Contract category", ItemValue = temp });
-            temp = await _dbctxt.CashFlowCategs.Where(p => p.IdCFC == aca.IdCashFlow).Select(s=>s.Name).AsNoTracking().FirstOrDefaultAsync();
-            ACDetails.Add(new ItemDetail() { ItemName = "Cash flow category", ItemValue = temp ?? string.Empty });
-            StringBuilder sb = new();
+            StringBuilder sb = new StringBuilder();
             string[] rn = ["Paying asset", "Paying liability", "Import transactions", "Invest fund", "Tax", "User account", "Spare", "Locked for editing"];
             for(int i = 0; i<8; i++)
             {

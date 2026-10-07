@@ -28,9 +28,8 @@
             <label asp-for="FinAccount.AccountCategory" class="control-label"></label>
         </div>
         <div class="col col-md">
-           <select class="form-select" asp-for="FinAccount.AccountCategory" aria-required="true" id="accCateg" asp-items="Model.AccCategList">
-                <option value="">-- Select Category --</option>
-           </select>
+            <input type="hidden" asp-for="FinAccount.AccountCategory" />
+            <div class="text-body">@Model.CategoryAccount</div>
         </div>
     </div>
     <div class="row row-gap-md-2">
@@ -38,17 +37,16 @@
             <label asp-for="FinAccount.AccountOwner" class="control-label"></label>
         </div>
         <div class="col col-md">
-            <select class="form-select" asp-for="FinAccount.AccountOwner" aria-required="true" id="accOwner" asp-items="Model.UserList">
-                <option value="">-- Select Owner --</option>
-            </select>
+            <input type="hidden" asp-for="FinAccount.AccountOwner" />
+            <div class="text-body">@Model.NameOwner</div>
         </div>
     </div>
     <hr />
     <br />
-    @if(Model.CanEdit == 0)
+    @if(Model.CanEdit == 1)
         {
             <div class="row row-gap-2">
-            <div class="form-text" style="color:orange"><strong>This account is restricted for editing because is in use</strong></div>  
+            <div class="form-text" style="color:orange"><strong>This account cannot be edited as is part of a contract assigned accounts</strong></div>  
             </div>
         }
         <br />
@@ -69,15 +67,11 @@
     <script type="text/javascript">
         window.addEventListener("DOMContentLoaded", function () {
             const an = document.getElementById("accName");
-            const ac = document.getElementById("accCateg");
-            const ao = document.getElementById("accOwner");
             const b = document.getElementById("btn");
             let x = @Model.CanEdit;
-            if(x === 0)
+            if(x === 1)
             {
                 an.disabled = true;
-                ac.disabled = true;
-                ao.disabled = true;
                 b.disabled = true;
             }
             

@@ -278,35 +278,5 @@ namespace MyFinances.Services
             var acl = await _dbcontext.AccountClasses.ToListAsync();
             return new SelectList(acl, nameof(AccountClass.IdAccountClass), nameof(AccountClass.AccountClassName));
         }
-
-        public async Task<SelectList> GetCashFlowCategoriesList()
-        {
-            var cfcl = await _dbcontext.CashFlowCategs.AsNoTracking().ToListAsync();
-            return new SelectList(cfcl, nameof(CashFlowCateg.IdCFC), nameof(CashFlowCateg.Name));
-        }
-
-        public async Task<SelectList> GetUserTaxAccountsList(int usedID)
-        {
-            List<SelectListItem> result = [];
-            short bitOrder = _configuration.GetSection("AccCategoryRoles").GetValue<short>("Tax");
-            var listAC = await _dbcontext.AccountCategories.Select(s => new { s.IdContractCategory, s.CategoryRoles }).ToListAsync();
-            if (listAC.Count > 0)
-            {
-                List<short> crlist = [];
-                foreach (var item in listAC)
-                {
-                    if (MyBitOperations.GetBit(item.CategoryRoles[0], bitOrder)) { crlist.Add(item.IdContractCategory); }
-                }
-                if (crlist.Count > 0)
-                {
-                    foreach (var item in crlist)
-                    {
-                        var tempList = await _dbcontext.FinAccounts.Where(p => p.AccountCategory == item && p.AccountOwner == usedID).Select(s => new SelectListItem() { Value = s.IdFinAccount.ToString(), Text = s.Name }).AsNoTracking().ToListAsync();
-                        result.AddRange([.. tempList]);
-                    }
-                }
-            }
-            return new SelectList(result, "Value", "Text");
-        }
     }
 }

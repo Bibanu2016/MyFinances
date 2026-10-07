@@ -1,34 +1,30 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
-using MyFinances.Services;
 
 namespace MyFinances.Pages.Accounts
 {
-    public class EditModel(AppDBContext context, IConfiguration config, IComboFillService comboFill, IMemoryCache cache) : PageModel
+    public class EditModel(AppDBContext context, IConfiguration config) : PageModel
     {
         private readonly AppDBContext _context = context;
         private readonly IConfiguration _config = config;
-        private readonly IComboFillService _comboFill = comboFill;
-        private readonly IMemoryCache _cache = cache;
 
         [BindProperty]
         public FinAccount FinAccount { get; set; } = default!;
 
         public string CategoryAccount {  get; set; } = string.Empty;
         public string NameOwner {  get; set; } = string.Empty;
-        public SelectList AccCategList { get; set; } = default!;
-        public SelectList UserList { get; set; } = default!;
         [BindProperty]
         public short CanEdit { get; set; } = 0;
-
-        private FinAccount OriginalAccount { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -44,7 +40,7 @@ namespace MyFinances.Pages.Accounts
             FinAccount = finaccount;
             await FillCombos();
             FinAccountHelper fah = new(_context, _config);
-            bool isused = await fah.AccountIsUsed(FinAccount.IdFinAccount);
+            bool isused = await fah.AccountUsedInContract(FinAccount.IdFinAccount);
             CanEdit = isused ? (short)0 : (short)1;
             return Page();
         }
@@ -58,35 +54,10 @@ namespace MyFinances.Pages.Accounts
                 await FillCombos();
                 return Page();
             }
-            var original = await _context.FinAccounts.AsNoTracking().FirstOrDefaultAsync(m => m.IdFinAccount == FinAccount.IdFinAccount);
-            if (original != null)
-            {
-                OriginalAccount = original;
-                if (OriginalAccount.AccountCategory != FinAccount.AccountCategory)
-                {
-                    // get new account id
-                    FinAccountHelper helper = new(_context, _config);
-                    int nfa = (await helper.NewIdAccountByCateg(FinAccount.AccountCategory))[0];
-                    FinAccount NewFa = new()
-                    {
-                        IdFinAccount = nfa,
-                        Name = FinAccount.Name,
-                        AccountCategory = FinAccount.AccountCategory,
-                        AccountOwner = FinAccount.AccountOwner,
-                        IsLinked = FinAccount.IsLinked
-                    };
-                    _context.FinAccounts.Add(NewFa);
-                    _context.FinAccounts.Remove(FinAccount);
-                }
-                else
-                {
-                    _context.Attach(FinAccount).State = EntityState.Modified;
-                }
-            }
+            _context.Attach(FinAccount).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
-                _cache.Remove("FinAccountsList");
             }
             catch (DbException ex)
             {
@@ -95,11 +66,17 @@ namespace MyFinances.Pages.Accounts
             return RedirectToPage("./IndexFinAccount");
         }
 
+        private bool FinAccountExists(int id)
+        {
+            return _context.FinAccounts.Any(e => e.IdFinAccount == id);
+        }
 
         private async Task FillCombos()
         {
-            AccCategList = await _comboFill.GetAllAccountCategoriesList();
-            UserList = await _comboFill.GetUsersList();
+            var x = await _context.AccountCategories.AsNoTracking().FirstOrDefaultAsync(x => x.IdAccountCategory == FinAccount.AccountCategory);
+            var y = await _context.UserContracts.AsNoTracking().FirstOrDefaultAsync(x => x.IdUser == FinAccount.AccountOwner);
+            if (x != null) { CategoryAccount = x.AccountCategoryName; }
+            if (y != null) { NameOwner = y.FullName; }
             return;
         }
     }

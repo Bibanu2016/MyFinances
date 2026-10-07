@@ -5,8 +5,16 @@
     ViewData["Title"] = "Business organisations list";
 }
 
+<!DOCTYPE html>
 
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index business organisations</title>
+    <hr />
     <h1>@ViewData["Title"]</h1>
+</head>
+<body>
     <hr />
 <p>
     <a class="btn btn-success" role="button" asp-page="./OrgCreate" asp-route-fc="@false" asp-route-ct="0">Create New</a>
@@ -60,3 +68,5 @@
             </tbody>
     }
 </table>
+</body>
+</html>
