@@ -11,7 +11,6 @@
 <hr />
 <div class="container container-sm">
     <h4><strong>Main contract data</strong></h4>
-    <input type="hidden" asp-for="MainContract.IdFinContract" />"
     <div class="row pb-sm-3">
         <div class="col col-sm-3">
             <span class="text-danger">*</span>
@@ -49,7 +48,7 @@
                 <select class="form-select" aria-label="Select organisation" asp-for="MainContract.IdOrganisation" asp-items="@ViewBag.Organisation">
                     <option selected>Choose a value..</option>
                 </select>
-                <a class="btn btn-outline-secondary" asp-page="/Organisations/OrgCreate" asp-route-fc="@true" asp-route-ct="8"><i class="bi-plus-circle-fill"></i></a>
+                <a class="btn btn-outline-secondary" asp-page="/Organisations/OrgCreate" asp-route-fc="@true" asp-route-ct="22"><i class="bi-plus-circle-fill"></i></a>
             </div>
             <span asp-validation-for="MainContract.IdOrganisation" class="text-danger"></span>
         </div>

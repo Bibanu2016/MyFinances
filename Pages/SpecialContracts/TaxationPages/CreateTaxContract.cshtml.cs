@@ -29,12 +29,11 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
 
         public async Task OnGetAsync()
         {
-            MainContract = new FinContract() { IdFinContract = new Guid() };
             short cct = _configuration.GetSection("AccountCategoriesSettings").GetValue<short>("TaxPaid");
             if (cct == 0) { CategoryContract = 5005; } else { CategoryContract = cct; }
-            MainContract.ContractType = (short)CategoryContract;
             ViewData["Title"] = "Create Taxation Contract";
             await FillUpLists();
+
         }
 
         // --- Procedures to create the lists ---
@@ -58,8 +57,10 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
                 await FillUpLists();
                 return Page();
             }
-            _context.FinContracts.Add(MainContract);
-            
+            MainContract.IdFinContract = new Guid();
+            var ctype = _configuration.GetSection("ContractTypes").GetValue<short>("Taxation");
+            MainContract.ContractType = ctype > 0 ? ctype : (short)22;
+            _context.FinContracts.Add(MainContract);        
             try
             {
                 await _context.SaveChangesAsync();
@@ -71,5 +72,7 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
             }
             return RedirectToPage("../IndexSpecialContracts");
         }
+
+
     }
 }

@@ -17,57 +17,51 @@ namespace MyFinances.Controllers
             int[] result = [0,0];
             var cFound = await _context.AccountCategories.FindAsync(categId);
             if(cFound is null) { return result; }
-            var accList = await _context.FinAccounts.AsQueryable().Where(x => x.AccountCategory == categId).OrderBy(y => y.IdFinAccount).AsNoTracking().ToListAsync();
-            if(accList.Count >= 999) { return result; } // guard against overflow
-            if (accList.Count > 0)
+            var maxAcc = await _context.FinAccounts.AsQueryable().Where(x => x.AccountCategory == categId).CountAsync();
+            if (maxAcc > 0) 
             {
-                // search for any gaps in the sequence - if found allocate the number
-                int cx = categId * 1000;
-                bool found = false;
-                if (two)
+                // guard against overflow
+                if (maxAcc >= 999)
                 {
-                    // allocated the last number
-                    result[0] = accList[^1].IdFinAccount + 1;
-                    result[1] = accList[^1].IdFinAccount + 2;
+                    // value reached maximum for the category - check if there are any gaps in the sequence
+                    int temp = categId * 1000;
+                    var anl = await _context.FinAccounts.Select(s=>s.IdFinAccount).OrderBy(o => o).ToListAsync();
+                    int maxcount = 999 > anl.Count ? anl.Count : 999;
+                    int startiter = 1;
+                    for (int i = startiter; i <= maxcount; i++) // value asigned as the maximum for the category is 999
+                    {
+                        temp += i;
+                        if (anl[i-1] != temp) { result[0] = temp; startiter = i + 1; break; }
+                    }
+                    if(two) // start looking for the second gap after the first one was found
+                    {
+                        temp += 1;
+                        for (int i = startiter; i <= maxcount; i++) // value asigned as the maximum for the category is 999
+                        {
+                            temp += i;
+                            if (anl[i - 1] != temp) { result[1] = temp; startiter = i + 1; break; }
+                        }
+                    }
                 }
                 else
                 {
-                    for (int i = 0; i < accList.Count; i++)
-                    {
-                        if (accList[i].IdFinAccount != cx + i + 1)
-                        {
-                            found = true;
-                            result[0] = cx + i + 1;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        result[0] = accList[^1].IdFinAccount + 1;
-                    }
+                    result[0] = categId * 1000 + maxAcc + 1;
+                    if (two) { result[1] = categId * 1000 + maxAcc + 2; }
                 }
             }
             else
-            {
-                result[0] = categId * 1000 + 1;
-                result[1] = categId * 1000 + 2;
+            { 
+                result[0] = categId * 1000 + 1; 
+                if(two) { result[1] = categId * 1000 + 2; }
             }
             return result;
         }
 
         public async Task<bool> AccountIsUsedByTransactions(int accountId)
         {
-            var aFound = await _context.FinAccounts.FindAsync(accountId);
-            if (aFound != null)
-            {
-                var y = await _context.FinTransactions.Where(x=>x.DebitAccount == accountId || x.CreditAccount == accountId).AsNoTracking().FirstOrDefaultAsync();
-                var x = await _context.PlanTransactions.Where(x => (x.DebitAccount == accountId || x.CreditAccount == accountId) && x.ContractIdentifier == 0).AsNoTracking().FirstOrDefaultAsync();
-                if (y != null || x != null)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var y = await _context.FinTransactions.Where(x => x.DebitAccount == accountId || x.CreditAccount == accountId).AnyAsync();
+            var x = await _context.PlanTransactions.Where(x => x.DebitAccount == accountId || x.CreditAccount == accountId).AnyAsync();
+            return x || y;
         }
 
         public async Task<bool> FinAccountUsedByUSer(int accountId)
@@ -117,41 +111,104 @@ namespace MyFinances.Controllers
         public async Task<bool> AccountUsedInContract(int accID)
         {
             bool result = false;
-            if (accID < 1000000 || accID >= 8000000) { return result; } // guard against input errors
-            var auc = await _context.FinContracts.Where(p => p.IdFinAccount == accID || p.IdPayAccount == accID || p.IdBankAccount == accID).AsNoTracking().FirstOrDefaultAsync();
-            result = auc != null;
-            if(!result)
+            result = await _context.FinContracts.Where(p => p.IdFinAccount == accID || p.IdPayAccount == accID || p.IdBankAccount == accID).AnyAsync();
+            int accCateg = accID / 1000;
+            IConfigurationSection acs = _configuration.GetSection("AccountCategoriesSettings");
+            if (!result)
             {
-                // Deposit - Interest received
-                var dep = await _context.Deposits.AsNoTracking().FirstOrDefaultAsync(p => p.InterestAccount == accID);
-                result = dep != null;
+                
+                int card = acs.GetValue<int>("CardCategory") * 100 + 1;
+                card = card == 0 ? 2101 : card; // guard against missing configuration value
+                if (accCateg == card)
+                {
+                    result = await _context.CreditCards.Where(p => p.CashOutAccount == accID).AnyAsync();
+                }
             }
             if(!result)
             {
-                //Loan - Interest paid
-                var loan = await _context.Loans.AsNoTracking().FirstOrDefaultAsync(p => p.IdAccountInterest == accID);
-                result = loan != null;
+                int intrec = acs.GetValue<int>("InterestReceived");
+                intrec = intrec == 0 ? 4102 : intrec; // guard against missing configuration value
+                if(accCateg == intrec)
+                {
+                    result = await _context.Deposits.Where(p => p.InterestAccount == accID).AnyAsync();
+                }
+            }
+            if(!result)
+            {
+                int intpay = acs.GetValue<int>("InterestPaid");
+                intpay = intpay == 0 ? 5004 : intpay; // guard against missing configuration value
+                if (accCateg == intpay)
+                {
+                    bool x = await _context.Loans.Where(p => p.IdAccountInterest == accID).AnyAsync();
+                    bool y = await _context.CreditCards.Where(p => p.InterestAccount == accID).AnyAsync();
+                    bool z = await _context.CreditCards.Where(p => p.InterestCashOutAcc == accID).AnyAsync();
+                    result = x || y || z;
+                }
+            }
+            if(!result)
+            {
+                int fees = acs.GetValue<int>("Fees");
+                fees = fees == 0 ? 5005 : fees; // guard against missing configuration value
+                if (accCateg == fees)
+                {
+                    result = await _context.CreditCards.Where(p => p.FeeAccount == accID).AnyAsync();
+                }
+            }
+            if(!result)
+            {
+                int isur = acs.GetValue<int>("InsuranceCredit");
+                isur = isur == 0 ? 5006 : isur; // guard against missing configuration value
+                if(accCateg == isur)
+                {
+                    result = await _context.CreditCards.Where(p => p.InsuranceAccount == accID).AnyAsync();
+                }
             }
             if (!result)
             {
-                // Credit card - Interest paid, Interest paid (CO), Insurance, Cash, Fee
-                // Credit card - Interest paid, Interest paid (CO), Insurance, Cash, Fee
-                var card_1 = await _context.CreditCards.AsNoTracking().Where(p => p.InterestAccount == accID || p.InterestCashOutAcc == accID).FirstOrDefaultAsync();
-                var card_2 = await _context.CreditCards.Where(p => p.InsuranceAccount == accID || p.CashOutAccount == accID || p.FeeAccount == accID).AsNoTracking().FirstOrDefaultAsync();
-                result = card_1 != null && card_2 != null;
+                int fundcg = acs.GetValue<int>("FundCapitalGain");
+                fundcg = fundcg == 0 ? 4108 : fundcg; // guard against missing configuration value
+                if(accCateg == fundcg)
+                {
+                    result = await _context.InvestFunds.Where(p => p.IdCapitalGainAcc == accID).AnyAsync();
+                }
             }
             if (!result)
             {
-                // Employment - Superannuation
-                var employ = await _context.Employments.FirstOrDefaultAsync(p => p.IdSuperAccount == accID);
-                result= employ != null;
+                int fundmf = acs.GetValue<int>("FundManagementFee");
+                fundmf = fundmf == 0 ? 5201 : fundmf; // guard against missing configuration value
+                if(accCateg == fundmf)
+                {
+                    result = await _context.InvestFunds.Where(p => p.IdManageAcc == accID).AnyAsync();
+                }
+            }
+            if (!result)
+            {
+                int fundadmin = acs.GetValue<int>("FundAdminFee");
+                fundadmin = fundadmin == 0 ? 5202 : fundadmin; // guard against missing configuration value
+                if(accCateg == fundadmin)
+                {
+                    result = await _context.InvestFunds.Where(p => p.IdAdminAcc == accID).AnyAsync();
+                }
+            }
+            if (!result)
+            {
+                int fundadviser = acs.GetValue<int>("FundAdviserFee");
+                fundadviser = fundadviser == 0 ? 5203 : fundadviser; // guard against missing configuration value
+                if(accCateg == fundadviser)
+                {
+                    result = await _context.InvestFunds.Where(p => p.IdAdviseAcc == accID).AnyAsync();
+                }
+            }
+            if (!result)
+            {
+                int fundaccount = acs.GetValue<int>("FundAccountingFee");
+                fundaccount = fundaccount == 0 ? 5206 : fundaccount; // guard against missing configuration value
+                if(accCateg == fundaccount)
+                {
+                    result = await _context.InvestFunds.Where(p => p.IdAccountingAcc == accID).AnyAsync();
+                }
             }
             return result;
-        }
-
-        public async Task<bool> AccountIsContract(int accID)
-        {
-            return await _context.FinContracts.Where(p => p.IdFinAccount == accID).AsNoTracking().FirstOrDefaultAsync() != null;
         }
 
         public async Task<bool> AccountIsSource(int accID)
@@ -166,6 +223,32 @@ namespace MyFinances.Controllers
                 {
                     result = MyBitOperations.GetBit(acr[0], 2);
                 }
+            }
+            return result;
+        }
+
+        public async Task<bool> AccountIsUsed(int accountID)
+        {
+            bool result = await AccountIsUsedByTransactions(accountID);
+            if (!result)
+            {
+                result = await FinAccountUsedByUSer(accountID);
+            }
+            if (!result)
+            {
+                result = await FinAccountUsedByTAsset(accountID);
+            }
+            if (!result)
+            {
+                result = await FinAccountUsedByShares(accountID);
+            }
+            if (!result)
+            {
+                result = await FinAccountUsedByTransacKeys(accountID);
+            }
+            if (!result)
+            {
+                result = await AccountUsedInContract(accountID);
             }
             return result;
         }

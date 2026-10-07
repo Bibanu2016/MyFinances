@@ -57,15 +57,16 @@ namespace MyFinances.Pages.Organisations
                 {
                     return RedirectToPage("/Contracts/ContractAdd", Ctype);
                 }
-                else
+                if(Ctype == _configuration.GetSection("ContractTypes").GetValue<int>("InvestFundContract"))
                 {
-                    return RedirectToPage("/Contracts/InvestFundContractAdd");
-                }               
+                    return RedirectToPage("/SpecialContracts/CreateIFContract");
+                }
+                if (Ctype == _configuration.GetSection("ContractTypes").GetValue<int>("Taxation"))
+                {
+                    return RedirectToPage("/SpecialContracts/TaxationPages");
+                }
             }
-            else
-            {
-                return RedirectToPage("./OrgIndex");
-            }
+            return RedirectToPage("./OrgIndex");
         }
 
         private async Task<int> GetOrganisationId(short categoryId)
