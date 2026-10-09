@@ -374,13 +374,10 @@ namespace MyFinances.Pages.Contracts
             string detailOpen = _configuration.GetSection("TransactionDetail").GetValue<string>("Open") ?? "Open account ";
             PlanTransaction openPt = new()
             {
-                case 1:
-                    PlanTransaction fin = new()
-                    {
                 IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
                 TransactionDate = transacDate,
-                        DebitAccount = ContractFull.FinContract.IdFinAccount,
-                        CreditAccount = uaid,
+                DebitAccount = ContractFull.FinContract.IdFinAccount,
+                CreditAccount = uaid,
                 TransactionValue = PurchaseBalance,
                 TransactionDetail = detailOpen,
                 ContractIdentifier = ContractFull.FinContract.IdFinAccount,
