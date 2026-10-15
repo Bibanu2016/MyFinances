@@ -28,7 +28,7 @@ namespace MyFinances.Pages.FinTransactions
         public string ReturnRoute { get; set; } = string.Empty;
 
         public SelectList FAList { get; set; } = default!;
-        public async Task<IActionResult> OnGet(long id, string ift, int? accnew)
+        public async Task<IActionResult> OnGet(long id, string ift, int accnew = 0)
         {
             var eft = await _dbContext.FinTransactions.FindAsync(id);
             if (eft == null) return NotFound();
@@ -37,10 +37,10 @@ namespace MyFinances.Pages.FinTransactions
             {
                 ReturnRoute = ift;
             }
-            if (accnew.HasValue)
+            if (accnew > 0)
             {
-                if (EditingFT.DebitAccount == 0) { EditingFT.DebitAccount = accnew ?? 0; }
-                if (EditingFT.CreditAccount == 0) { EditingFT.CreditAccount = accnew ?? 0; }
+                if (EditingFT.DebitAccount == 0) { EditingFT.DebitAccount = accnew; }
+                if (EditingFT.CreditAccount == 0) { EditingFT.CreditAccount = accnew; }
             }
             ViewData["Title"] = $"Edit Transaction ID: {EditingFT.IdTransaction}";
             TempData["OrigTD"] = EditingFT.TransactionDetail;

@@ -30,5 +30,6 @@ namespace MyFinances.Services
         Task<SelectList> GetAccountTypesList();
 
         Task<SelectList> GetAccountClassesList();
+        Task<SelectList> GetAccListFromTransactions();
     }
 }

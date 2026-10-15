@@ -271,5 +271,21 @@ namespace MyFinances.Services
             var acl = await _dbcontext.AccountClasses.ToListAsync();
             return new SelectList(acl, nameof(AccountClass.IdAccountClass), nameof(AccountClass.AccountClassName));
         }
+
+        public async Task<SelectList> GetAccListFromTransactions()
+        {
+            var fal = await _dbcontext.FinTransactions.Select(p => new { p.DebitAccount, p.CreditAccount }).AsNoTracking().ToListAsync();
+            List<int> pal = [];
+            if (fal != null)
+            {
+                foreach (var item in fal)
+                {
+                    if (!pal.Contains(item.DebitAccount)) { pal.Add(item.DebitAccount); }
+                    if (!pal.Contains(item.CreditAccount)) { pal.Add(item.CreditAccount); }
+                }
+            }
+            var fal2 = await _dbcontext.FinAccounts.Where(p => pal.Contains(p.IdFinAccount)).Select(p => new { p.IdFinAccount, p.Name }).AsNoTracking().ToListAsync();
+            return new SelectList(fal2, nameof(FinAccount.IdFinAccount), nameof(FinAccount.Name));
+        }
     }
 }

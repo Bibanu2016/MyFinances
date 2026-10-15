@@ -172,7 +172,7 @@ namespace MyFinances.Pages.FinTransactions
 
         private async Task<SelectList> GetAccountLists()
         {
-            return await _fillService.GetFinancialAccountsList();
+            return await _fillService.GetAccListFromTransactions();
         }
 
 

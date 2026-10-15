@@ -16,7 +16,7 @@
         <input type="hidden" asp-for="ReturnRoute" />
         @if(Model.EditingFT.DebitAccount == 0 || Model.EditingFT.CreditAccount == 0) // allow to create new account if any of the Debit or Credit is zero
             {
-            <a class="btn btn-outline-primary" asp-page="/Accounts/CreateFinAccount" asp-route-cs="@ViewBag.AccountParra">Create financial account</a>
+            <a class="btn btn-outline-primary" asp-page="/Accounts/CreateFinancialAccount" asp-route-cs="@ViewBag.AccountParra">Create financial account</a>
             }
         <hr />
         <div class="row row-gap-2 mb-2 col-9">
