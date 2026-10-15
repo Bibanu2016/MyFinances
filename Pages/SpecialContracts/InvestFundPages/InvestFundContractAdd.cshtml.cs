@@ -1,4 +1,3 @@
-using Azure;
 using FinanceCalculator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,7 +8,6 @@ using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
-using MyFinances.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 
@@ -46,7 +44,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
 
         public async Task OnGet()
         {
-            MainContract = new FinContract() { IdFinContract = new Guid()};
+            MainContract = new FinContract() { IdFinContract = new Guid() };
             MyInvestFund = new InvestFund() { IdInvestFund = MainContract.IdFinContract };
             ViewData["Title"] = "Create Investment Fund Contract";
             await FillUpLists();
@@ -225,7 +223,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                 IdSource = uaid
             };
             _context.PlanTransactions.Add(fin);
-            return  string.Empty;
+            return string.Empty;
         }
 
         private void RecordContractPlanTransactions()

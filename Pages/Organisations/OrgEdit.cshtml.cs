@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MyFinances.Data;
 using MyFinances.Models;
 
 namespace MyFinances.Pages.Organisations
@@ -27,7 +21,7 @@ namespace MyFinances.Pages.Organisations
                 return NotFound();
             }
 
-            var organisation =  await _context.Organisations.FirstOrDefaultAsync(m => m.IdOrg == id);
+            var organisation = await _context.Organisations.FirstOrDefaultAsync(m => m.IdOrg == id);
             if (organisation == null)
             {
                 return NotFound();

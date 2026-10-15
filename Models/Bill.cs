@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MyFinances.Models
 {
     [Table("bill")]
-    public class Bill: IEquatable<object> 
+    public class Bill : IEquatable<object>
     {
         [Key, Column("idbill"), Display(Name = "ID")] public required Guid IdBill { get; set; }
-        [Required, Column("billcyclerate"), Display(Name = "Bill rate"), DataType(DataType.Currency), Range(1, 1000000000, ErrorMessage ="A value between {1} and {2} is required")] public decimal BillCycleRate { get; set; } = 0;
+        [Required, Column("billcyclerate"), Display(Name = "Bill rate"), DataType(DataType.Currency), Range(1, 1000000000, ErrorMessage = "A value between {1} and {2} is required")] public decimal BillCycleRate { get; set; } = 0;
         public override int GetHashCode()
         {
             return HashCode.Combine(BillCycleRate);

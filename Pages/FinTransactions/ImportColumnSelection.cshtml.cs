@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MyFinances.Controllers;
 using MyFinances.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -16,7 +15,7 @@ namespace MyFinances.Pages.FinTransactions
 
         public List<int> ColsIndex { get; set; } = [];
 
-        [BindProperty, Range(0,5, ErrorMessage ="A value between 0 and 5 is required")]
+        [BindProperty, Range(0, 5, ErrorMessage = "A value between 0 and 5 is required")]
         public int IndexDetail { get; set; }
         public void OnGet()
         {
@@ -29,7 +28,7 @@ namespace MyFinances.Pages.FinTransactions
                     for (int k = 0; k < ImportTable.Columns.Count; k++)
                     {
                         string colval = ImportTable.Rows[0].Field<string>(k) ?? string.Empty;
-                        if(DateTime.TryParse(colval, out _) || Double.TryParse(colval, out _)) { continue; }
+                        if (DateTime.TryParse(colval, out _) || Double.TryParse(colval, out _)) { continue; }
                         else { ColsIndex.Add(k); }
                     }
                 }
@@ -47,9 +46,9 @@ namespace MyFinances.Pages.FinTransactions
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return Page(); 
+                return Page();
             }
             return RedirectToPage("ImportedKeySelection", new { idxcol = IndexDetail });
         }

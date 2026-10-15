@@ -1,6 +1,4 @@
-﻿using Mysqlx;
-
-namespace MyFinances.Controllers
+﻿namespace MyFinances.Controllers
 {
     public static class MyBitOperations
     {
@@ -9,7 +7,7 @@ namespace MyFinances.Controllers
             // Shift the desired bit to the least significant bit (position 0)
             // and then use AND with 1 to check its value.
             // The result will be non-zero (true) if the bit is set, and zero (false) otherwise.
-            if(pos < 0 || pos > 7) { return false; }
+            if (pos < 0 || pos > 7) { return false; }
             return ((aByte >> pos) & 1) != 0;
         }
 

@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 
@@ -21,7 +12,7 @@ namespace MyFinances.Pages.Organisations
         private readonly IConfiguration _configuration = configuration;
 
         public List<OrganisationType> OrganisationTypes { get; set; } = [];
-        [BindProperty (SupportsGet = true)]
+        [BindProperty(SupportsGet = true)]
         public bool FromContract { set; get; } = false;
         public int Ctype { get; set; } = 0;
 
@@ -30,7 +21,7 @@ namespace MyFinances.Pages.Organisations
             FromContract = fc;
             Ctype = ct;
             var ots = await _context.OrganisationTypes.ToListAsync();
-            if(ots.Count > 0)
+            if (ots.Count > 0)
             {
                 OrganisationTypes = ots;
             }
@@ -51,22 +42,24 @@ namespace MyFinances.Pages.Organisations
             Organisation.NumberContracts = 0;
             _context.Organisations.Add(Organisation);
             await _context.SaveChangesAsync();
-            if(FromContract)
+            if (FromContract)
             {
-                if(Ctype < 8)
+                switch (Ctype)
                 {
-                    return RedirectToPage("/Contracts/ContractAdd", Ctype);
-                }
-                if(Ctype == _configuration.GetSection("ContractTypes").GetValue<int>("InvestFundContract"))
-                {
-                    return RedirectToPage("/SpecialContracts/CreateIFContract");
-                }
-                if (Ctype == _configuration.GetSection("ContractTypes").GetValue<int>("Taxation"))
-                {
-                    return RedirectToPage("/SpecialContracts/TaxationPages");
+                    case 1 or 2 or 3 or 4 or 5 or 6 or 7:
+                        return RedirectToPage("/Contracts/ContractAdd", Ctype);
+                    case 21:
+                        return RedirectToPage("/SpecialContracts/CreateIFContract");
+                    case 22:
+                        return RedirectToPage("/SpecialContracts/CreateTaxContract");
+                    default:
+                        return RedirectToPage("./OrgIndex");
                 }
             }
-            return RedirectToPage("./OrgIndex");
+            else
+            {
+                return RedirectToPage("./OrgIndex");
+            }
         }
 
         private async Task<int> GetOrganisationId(short categoryId)

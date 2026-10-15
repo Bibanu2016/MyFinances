@@ -35,14 +35,14 @@ namespace MyFinances.Services
             var rows = new List<Dictionary<string, string>>();
 
             List<string> keys = new List<string>();
-            for(int i = 0; i < table.Columns.Count; i++)
+            for (int i = 0; i < table.Columns.Count; i++)
             {
                 keys.Add(table.Columns[i].ColumnName);
             }
             foreach (DataRow row in table.Rows)
             {
                 var dict = new Dictionary<string, string>();
-                for(int j = 0; j < keys.Count; j++)
+                for (int j = 0; j < keys.Count; j++)
                 {
                     dict.Add(keys[j], row[j].ToString() ?? string.Empty);
                 }

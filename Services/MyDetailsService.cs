@@ -8,14 +8,14 @@ namespace MyFinances.Services
         private readonly AppDBContext _appDBContext = appDBContext;
         public async Task<string> GetAccountCategNameByID(int idCateg)
         {
-            var result = await _appDBContext.AccountCategories.Where(p=>p.IdAccountCategory == idCateg).Select(s=>s.AccountCategoryName).AsNoTracking().FirstOrDefaultAsync();
+            var result = await _appDBContext.AccountCategories.Where(p => p.IdAccountCategory == idCateg).Select(s => s.AccountCategoryName).AsNoTracking().FirstOrDefaultAsync();
             result ??= string.Empty;
             return result;
         }
 
         public async Task<string> GetAccountClassByID(int idAccClass)
         {
-            return await _appDBContext.AccountClasses.Where(p=>p.IdAccountClass == idAccClass).Select(s=>s.AccountClassName).AsNoTracking().FirstOrDefaultAsync()??string.Empty;
+            return await _appDBContext.AccountClasses.Where(p => p.IdAccountClass == idAccClass).Select(s => s.AccountClassName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
         }
 
         public async Task<string> GetAccountNameByID(int idAccount)
@@ -25,7 +25,7 @@ namespace MyFinances.Services
 
         public async Task<string> GetAccountTypeByID(int idAccType)
         {
-            return await _appDBContext.AccountTypes.Where(p=>p.IdAccountType == idAccType).Select(s=>s.AccountTypeName).AsNoTracking().FirstOrDefaultAsync()??string.Empty;
+            return await _appDBContext.AccountTypes.Where(p => p.IdAccountType == idAccType).Select(s => s.AccountTypeName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
         }
 
         public async Task<string> GetAssetNameByID(Guid idAsset)
@@ -40,12 +40,12 @@ namespace MyFinances.Services
 
         public async Task<string> GetContractTypeByID(short idContractType)
         {
-            return await _appDBContext.ContractTypes.Where(p=>p.IdContractType == idContractType).Select(s=>s.ContractTypeName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
+            return await _appDBContext.ContractTypes.Where(p => p.IdContractType == idContractType).Select(s => s.ContractTypeName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
         }
 
         public async Task<string> GetEndActionNameByID(short idEndAction)
         {
-            return await _appDBContext.ContractEndActions.Where(p=>p.ID == idEndAction).Select(s=>s.Name).FirstOrDefaultAsync() ?? string.Empty;
+            return await _appDBContext.ContractEndActions.Where(p => p.ID == idEndAction).Select(s => s.Name).FirstOrDefaultAsync() ?? string.Empty;
         }
 
         public async Task<string> GetFrequencyNameByID(int idFrequency)
@@ -60,7 +60,7 @@ namespace MyFinances.Services
 
         public async Task<string> GetOrganisationTypeByID(int idOrgType)
         {
-            return await _appDBContext.OrganisationTypes.Where(p => p.Id == idOrgType).Select(s => s.CategoryName).AsNoTracking().FirstOrDefaultAsync()??string.Empty;
+            return await _appDBContext.OrganisationTypes.Where(p => p.Id == idOrgType).Select(s => s.CategoryName).AsNoTracking().FirstOrDefaultAsync() ?? string.Empty;
         }
 
         public async Task<string> GetUserNameByID(int idUser)

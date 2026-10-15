@@ -37,31 +37,25 @@
 <br />
 <form method="get">
     <div class="hstack gap-2">
-        <div class="input-group mb-3">
+        <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Account category</label>
             <select class="form-select" id="inputGroupSelect01" asp-for="CategoryFilter" asp-items="@ViewBag.ACSL">
                 <option value="0" selected>Choose...</option>
             </select>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect02">Owner</label>
             <select class="form-select" id="inputGroupSelect02" asp-for="OwnerFilter" asp-items="@ViewBag.OWSL">
                 <option value="0" selected>Choose...</option>
             </select>
         </div>
-        <div class="align-content-center">
-            <button type="submit" class="btn btn-info">Filter</button>
-            <a asp-page="./IndexFinAccount" class="btn btn-secondary">Reset</a>
-        </div>
+        <button type="submit" class="btn btn-info px-4">Filter</button>
+        <a asp-page="./IndexFinAccount" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 <br />
 <hr />
-<div class="row pb-3">
-    <div class="col">
-        <a asp-page="./CreateFinancialAccount" class="btn btn-outline-primary">Create</a>
-    </div>
-</div>
+<a asp-page="./CreateFinancialAccount" class="btn btn-outline-primary mb-6">Create</a>
 <hr />
 <table class="table">
     <thead>
@@ -82,23 +76,23 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.FilterredFAList)
+        @foreach (var item in Model.FAList)
         {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.FAName)
             </td>
             <td>
-                @Model.AccountCategories.Where(m => m.IdAccountCategory == item.AccountCategory).Select(x => x.AccountCategoryName).FirstOrDefault()
+                @Html.DisplayFor(modelItem => item.FACategory)
             </td>
             <td>
-                @Model.UserContracts.Where(m=>m.IdUser == item.AccountOwner).Select(y=>y.FullName).FirstOrDefault()
+                @Html.DisplayFor(modelItem => item.FAUser)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsLinked)
+                @Html.DisplayFor(modelItem => item.FALinked)
             </td>
             <td>
-                @if(!item.IsLinked)
+                @if(item.FALinked == 1)
                 {
                     <a asp-page="./EditFinAccount" asp-route-id="@item.IdFinAccount"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a>
                 }
@@ -107,7 +101,7 @@
                         <i class="bi-square" style="color:grey" alt="--"></i>
                 }
                  | 
-                @if (!item.IsLinked)
+                @if (item.FALinked == 1)
                 {
                         <a asp-page="./DeleteFinAccount" asp-route-id="@item.IdFinAccount"><i class="bi-trash-fill" style="color:grey" alt="Delete"></i></a>
                 }

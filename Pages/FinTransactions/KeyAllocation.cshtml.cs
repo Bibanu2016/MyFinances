@@ -2,14 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.ViewModels;
-using NuGet.Packaging;
 using System.Data;
-using System.Numerics;
 using System.Text;
 using System.Text.Json;
 
@@ -28,14 +25,14 @@ namespace MyFinances.Pages.FinTransactions
 
         public async Task OnGet()
         {
-            
+
             await FillOutCombos();
             FillKeyList();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 FillKeyList();
                 return Page();
@@ -53,7 +50,7 @@ namespace MyFinances.Pages.FinTransactions
                 int x = await _appDBContext.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"A total of {x} keys have been recorded!";
             }
-            catch(DBConcurrencyException ex)
+            catch (DBConcurrencyException ex)
             {
                 ex.CopyToRows(ConcurencyRows);
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -106,7 +103,7 @@ namespace MyFinances.Pages.FinTransactions
                     }
                 }
             }
-            return ;
+            return;
         }
     }
 

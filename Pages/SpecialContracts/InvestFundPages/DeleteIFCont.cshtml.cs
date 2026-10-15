@@ -37,7 +37,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             {
                 return NotFound();
             }
-            if(!Guid.TryParse(id, out _)) { return NotFound(); }
+            if (!Guid.TryParse(id, out _)) { return NotFound(); }
             IdContract = Guid.Parse(id);
             var mc = await _context.FinContracts.FindAsync(IdContract);
             var imf = await _context.InvestFunds.FindAsync(IdContract);
@@ -59,7 +59,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                 ContractWithOverdues = await ContractHasOverdueTransactions(mc.IdFinAccount);
                 LastRealBalance = await fch.GetContractRealBalance(mc.IdFinAccount, DateTime.Today);
             }
-            return Page();            
+            return Page();
         }
 
         private async Task<bool> ContractHasOverdueTransactions(int idfinacc)
@@ -71,20 +71,20 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
         {
             List<string> lcu = [];
             var deposits = await _context.FinContracts.Where(p => p.IsActiveContract && (p.IdPayAccount == MyContract.IdFinAccount || p.IdBankAccount == MyContract.IdFinAccount)).Select(s => s.ContractName).ToListAsync();
-            if(deposits.Count > 0) { lcu.AddRange(deposits); }
+            if (deposits.Count > 0) { lcu.AddRange(deposits); }
             var aec = await _context.FinContracts
-                .Join(_context.Employments, fc=>fc.IdFinContract, em=>em.IdEmployment, (fc, em) => new { fc.ContractName, fc.IsActiveContract, Super = em.IdSuperAccount})
-                .Where(p=>p.IsActiveContract && p.Super == MyContract.IdFinAccount)
-                .Select(s=>s.ContractName)
+                .Join(_context.Employments, fc => fc.IdFinContract, em => em.IdEmployment, (fc, em) => new { fc.ContractName, fc.IsActiveContract, Super = em.IdSuperAccount })
+                .Where(p => p.IsActiveContract && p.Super == MyContract.IdFinAccount)
+                .Select(s => s.ContractName)
                 .ToListAsync();
-            if(aec.Count > 0) { lcu.AddRange(aec); }
+            if (aec.Count > 0) { lcu.AddRange(aec); }
             return lcu;
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             var mc = await _context.FinContracts.FindAsync(IdContract);
-            if(mc is not null)
+            if (mc is not null)
             {
                 mc.ClosedDate = DateTime.Now;
                 mc.IsActiveContract = false;
@@ -95,7 +95,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                     // get principal receivable
                     var prec = await _context.UserContracts.Where(p => p.IdUser == MyContract.IdContractor).Select(s => s.UserReceivable).FirstOrDefaultAsync();
                     PlanTransaction tbal = new()
-                    { 
+                    {
                         IdTransaction = GeneratorID.Int64IDBasedOnDate(DateTime.Now),
                         ContractIdentifier = MyContract.IdFinAccount,
                         TransactionDate = DateTime.Now,
@@ -109,7 +109,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                     _context.PlanTransactions.Add(tbal);
                     // delete all plan transactions with the state of non-executed
                     var ptlist = await _context.PlanTransactions.Where(p => p.ContractIdentifier == MyContract.IdFinAccount && !p.ExecutedTransaction).ToListAsync();
-                    if(ptlist.Count > 0)
+                    if (ptlist.Count > 0)
                     {
                         _context.PlanTransactions.RemoveRange(ptlist);
                     }
@@ -128,7 +128,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                     int x = await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = $"Contract {MyContract.ContractName} successfully terminated. \n A total of {x} transactions effected.";
                 }
-                catch(DbException dex)
+                catch (DbException dex)
                 {
                     TempData["ErrorMessage"] = $"Ooops there was an error in terminating the contract. \n {dex.Message}";
                 }

@@ -1,4 +1,3 @@
-using Elfie.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,7 +7,6 @@ using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
-using Org.BouncyCastle.Security;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyFinances.Pages.FinTransactions
@@ -26,20 +24,20 @@ namespace MyFinances.Pages.FinTransactions
         [BindProperty]
         public int IdSource { get; set; } = 0;
 
-        [BindProperty, Required(ErrorMessage ="Value is required"), MinLength(3,ErrorMessage ="A minimum 3 char is required"), MaxLength(45, ErrorMessage ="A maximum length of 45 char is allowed")]
+        [BindProperty, Required(ErrorMessage = "Value is required"), MinLength(3, ErrorMessage = "A minimum 3 char is required"), MaxLength(45, ErrorMessage = "A maximum length of 45 char is allowed")]
         public string KeyTransaction { get; set; } = string.Empty;
         [BindProperty]
         public FinAccount NewAccount { get; set; } = default!;
 
         public SelectList AccCategList { get; set; } = default!;
         public SelectList UserAccountList { get; set; } = default!;
-        public string SourceName {  get; set; } = string.Empty ;
-        
+        public string SourceName { get; set; } = string.Empty;
+
         public async Task<IActionResult> OnGet(long idTrans, int idSource)
         {
             ViewData["Title"] = $"Create new target account and transaction key for source id {idSource}";
             var uft = await _appDB.FinTransactions.FindAsync(idTrans);
-            if(uft == null) { return NotFound(); }
+            if (uft == null) { return NotFound(); }
             UFinTransaction = uft;
             IdSource = idSource;
             await FillOutData();
@@ -51,9 +49,9 @@ namespace MyFinances.Pages.FinTransactions
             ModelState.Remove("UFinTransaction");
             ModelState.Remove("TransactionDetail");
             string[] xl = KeyTransaction.Split(' ');
-            if(xl.Length > 3) { ModelState.TryAddModelError("KeyTransation", "A maximum of 3 words are allowed"); }
-            if(await KeyIsUnique(KeyTransaction) == false) { ModelState.TryAddModelError("KeyTransation", "A key or key word already exists"); }
-            if(!ModelState.IsValid)
+            if (xl.Length > 3) { ModelState.TryAddModelError("KeyTransation", "A maximum of 3 words are allowed"); }
+            if (await KeyIsUnique(KeyTransaction) == false) { ModelState.TryAddModelError("KeyTransation", "A key or key word already exists"); }
+            if (!ModelState.IsValid)
             {
                 await FillOutData();
                 return Page();
@@ -80,7 +78,7 @@ namespace MyFinances.Pages.FinTransactions
             {
                 TempData["ErrorMessage"] = $"Ooops there was en error in saving the data to database. \n {ex.Message}";
             }
-            if(result == 2)
+            if (result == 2)
             {
                 //match the unpaired transactions to key
                 var resultList = await _appDB.FinTransactions.AsQueryable().Where(p => p.DebitAccount == IdSource && p.CreditAccount == 0).ToListAsync();
@@ -88,8 +86,8 @@ namespace MyFinances.Pages.FinTransactions
                 {
                     foreach (FinTransaction t in resultList)
                     {
-                        if (t.TransactionDetail.Contains(KeyTransaction)) 
-                        { 
+                        if (t.TransactionDetail.Contains(KeyTransaction))
+                        {
                             t.CreditAccount = NewAccount.IdFinAccount;
                             _appDB.FinTransactions.Update(t);
                         }
@@ -135,12 +133,12 @@ namespace MyFinances.Pages.FinTransactions
         private async Task<bool> KeyIsUnique(string key)
         {
             if (string.IsNullOrEmpty(key)) return false;
-            if(key.Length < 3) return false;
+            if (key.Length < 3) return false;
             string[] kWords = key.Split(new char[] { ' ' });
             foreach (string word in kWords)
             {
-                var found = await _appDB.TransacDictionary.Where(p=>p.Name == word && p.IdSource == IdSource).FirstOrDefaultAsync();
-                if(found != null) return false;
+                var found = await _appDB.TransacDictionary.Where(p => p.Name == word && p.IdSource == IdSource).FirstOrDefaultAsync();
+                if (found != null) return false;
             }
             return true;
         }

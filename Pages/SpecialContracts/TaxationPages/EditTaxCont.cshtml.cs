@@ -67,7 +67,7 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
                 int i = await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"Contract {MainContract.ContractName} updated successfully \n {i} records affected.";
             }
-            catch(DbException dex)
+            catch (DbException dex)
             {
                 TempData["ErrorMessage"] = $"Ooops .. there was an error with database operations! \n {dex.Message}";
             }

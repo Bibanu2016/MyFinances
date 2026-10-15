@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MyFinances.Models;
 using MyFinances.Data;
+using MyFinances.Models;
 
 namespace MyFinances.Pages.PlanTransactionPages;
 

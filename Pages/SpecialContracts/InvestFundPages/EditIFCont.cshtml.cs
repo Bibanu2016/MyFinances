@@ -46,7 +46,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             Guid gid = Guid.Parse(id);
             var mc = await _context.FinContracts.FindAsync(gid);
             var ifc = await _context.InvestFunds.FindAsync(gid);
-            if(mc == null || ifc == null) { return NotFound(); }
+            if (mc == null || ifc == null) { return NotFound(); }
             MainContract = mc;
             MyInvestFund = ifc;
             FinContractHelper fch = new(_context, _configuration);
@@ -96,17 +96,17 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             FinContract OriginalMain = mc;
             InvestFund OriginalInvest = ifc;
             // --- update contract and financial accounts ---
-            if(!MainContract.Equals(OriginalMain))
+            if (!MainContract.Equals(OriginalMain))
             {
                 _context.FinContracts.Update(MainContract);
             }
-            if(!MyInvestFund.Equals(OriginalInvest))
+            if (!MyInvestFund.Equals(OriginalInvest))
             {
                 _context.InvestFunds.Update(MyInvestFund);
             }
             // ---determine if the transactions need to be replaced ---
             bool replaceTransactions = ReplacePlanTransactions(MainContract, OriginalMain, sFY);
-            if(replaceTransactions)
+            if (replaceTransactions)
             {
                 // delete all existing contract plan transactions
                 await DeletePlanTransactions();
@@ -120,30 +120,30 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
                 // update the initial transaction if there is a change in the balance date
                 var userFA = await _context.UserContracts.Where(p => p.IdUser == MainContract.IdContractor).Select(s => s.UserAccountID).FirstOrDefaultAsync();
                 var ipt = await GetInitialTransaction(MainContract.IdFinAccount, userFA);
-                if(ipt.Count > 0)
+                if (ipt.Count > 0)
                 {
                     if (ipt[0].TransactionDate != BalanceDate || ipt[0].TransactionValue != PurchaseBalance)
                     {
                         ipt[0].TransactionDate = BalanceDate;
                         ipt[0].TransactionValue = PurchaseBalance;
                         _context.PlanTransactions.Attach(ipt[0]).State = EntityState.Modified;
-                    }                
-                }
-                // update the transactions if there is any changes in the amounts payable as per the InvestAccount
-                if(MyInvestFund.AdviserFee != OriginalInvest.AdviserFee)
-                {
-                    var adviserPTL = await _context.PlanTransactions.Where(p => p.ContractIdentifier == MainContract.IdFinAccount && p.DebitAccount == MyInvestFund.IdAdviseAcc && p.TransactionDate >= DateTime.Today).ToListAsync();
-                    if(adviserPTL.Count > 0)
-                    {
-                        foreach(PlanTransaction pt in adviserPTL) { pt.TransactionValue = MyInvestFund.AdviserFee; _context.PlanTransactions.Update(pt); }
                     }
                 }
-                if(MyInvestFund.AdminFee != OriginalInvest.AdminFee)
+                // update the transactions if there is any changes in the amounts payable as per the InvestAccount
+                if (MyInvestFund.AdviserFee != OriginalInvest.AdviserFee)
+                {
+                    var adviserPTL = await _context.PlanTransactions.Where(p => p.ContractIdentifier == MainContract.IdFinAccount && p.DebitAccount == MyInvestFund.IdAdviseAcc && p.TransactionDate >= DateTime.Today).ToListAsync();
+                    if (adviserPTL.Count > 0)
+                    {
+                        foreach (PlanTransaction pt in adviserPTL) { pt.TransactionValue = MyInvestFund.AdviserFee; _context.PlanTransactions.Update(pt); }
+                    }
+                }
+                if (MyInvestFund.AdminFee != OriginalInvest.AdminFee)
                 {
                     var adminPTL = await _context.PlanTransactions.Where(p => p.ContractIdentifier == MainContract.IdFinAccount && p.DebitAccount == MyInvestFund.IdAdminAcc && p.TransactionDate >= DateTime.Today).ToListAsync();
-                    if(adminPTL.Count > 0)
+                    if (adminPTL.Count > 0)
                     {
-                        foreach(PlanTransaction pt in adminPTL) { pt.TransactionValue = MyInvestFund.AdminFee; _context.PlanTransactions.Update(pt); }
+                        foreach (PlanTransaction pt in adminPTL) { pt.TransactionValue = MyInvestFund.AdminFee; _context.PlanTransactions.Update(pt); }
                     }
                 }
                 if (MyInvestFund.ManagementFee != OriginalInvest.ManagementFee)
@@ -181,8 +181,8 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
 
         private async Task GetInitialBalance()
         {
-            var ufa = await _context.UserContracts.Where(p=>p.IdUser == MainContract.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
-            var fpt = await _context.PlanTransactions.Where(p=>p.DebitAccount == MainContract.IdFinAccount && p.CreditAccount == ufa).AsNoTracking().FirstOrDefaultAsync();
+            var ufa = await _context.UserContracts.Where(p => p.IdUser == MainContract.IdContractor).Select(s => s.UserAccountID).FirstOrDefaultAsync();
+            var fpt = await _context.PlanTransactions.Where(p => p.DebitAccount == MainContract.IdFinAccount && p.CreditAccount == ufa).AsNoTracking().FirstOrDefaultAsync();
             if (fpt != null)
             {
                 PurchaseBalance = fpt.TransactionValue;
@@ -205,7 +205,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             {
                 ModelState.TryAddModelError("BalanceDate", $"Balance date cannot be after {DateTime.Today:d}");
             }
-            if(MainContract.InvoiceDate < DateTime.Today)
+            if (MainContract.InvoiceDate < DateTime.Today)
             {
                 ModelState.TryAddModelError("InvoiceDate", $"Invoice date cannot be before {DateTime.Today:d}");
             }
@@ -215,7 +215,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
         private async Task DeletePlanTransactions()
         {
             var cpt = await _context.PlanTransactions.Where(p => p.ContractIdentifier == MainContract.IdFinAccount).ToListAsync();
-            foreach(PlanTransaction pt in cpt)
+            foreach (PlanTransaction pt in cpt)
             {
                 _context.PlanTransactions.Remove(pt);
             }
@@ -325,7 +325,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
 
         private async Task<List<PlanTransaction>> GetInitialTransaction(int debitAcc, int creditAcc)
         {
-            return await _context.PlanTransactions.Where(p => p.DebitAccount == debitAcc && p.CreditAccount == creditAcc).OrderBy(o=>o.TransactionDate).AsNoTracking().ToListAsync(); 
+            return await _context.PlanTransactions.Where(p => p.DebitAccount == debitAcc && p.CreditAccount == creditAcc).OrderBy(o => o.TransactionDate).AsNoTracking().ToListAsync();
         }
 
         private bool ReplacePlanTransactions(FinContract mainCont, FinContract origCont, DateTime startFinYear)
@@ -333,9 +333,9 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             CalculatorDates cda = new(origCont.IdFrequency);
             DateTime origInvoice = cda.NextCycleDate(origCont.InvoiceDate, DateTime.Today);
             int x = 1;
-            if(mainCont.IdFrequency != origCont.IdFrequency) { x = 0; }
-            if(mainCont.InvoiceDate.Date != origInvoice.Date) { x = 0; }
-            if(mainCont.StartDate > startFinYear && (mainCont.StartDate.Date != origCont.StartDate.Date))
+            if (mainCont.IdFrequency != origCont.IdFrequency) { x = 0; }
+            if (mainCont.InvoiceDate.Date != origInvoice.Date) { x = 0; }
+            if (mainCont.StartDate > startFinYear && (mainCont.StartDate.Date != origCont.StartDate.Date))
             {
                 x = 0;
             }

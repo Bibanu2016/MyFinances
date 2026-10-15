@@ -4,7 +4,7 @@ namespace MyFinances.ViewModels
 {
     public class AccountLedger
     {
-        [Display(Name ="ID")]
+        [Display(Name = "ID")]
         public long Id { get; set; } = 0;
         [Display(Name = "DATE")]
         public DateOnly DateTransaction { get; set; } = new DateOnly();
@@ -14,10 +14,10 @@ namespace MyFinances.ViewModels
         public string Details { get; set; } = string.Empty;
         [Display(Name = "AMOUNT [AUD]")]
         public decimal Amount { get; set; } = 0;
-        [Display(Name ="CONTRACT NAME")]
-        public string ContractName {  get; set; } = string.Empty;
-        [Display(Name ="SOURCE NAME")]
-        public string SourceName {  get; set; } = string.Empty;
+        [Display(Name = "CONTRACT NAME")]
+        public string ContractName { get; set; } = string.Empty;
+        [Display(Name = "SOURCE NAME")]
+        public string SourceName { get; set; } = string.Empty;
 
     }
 }

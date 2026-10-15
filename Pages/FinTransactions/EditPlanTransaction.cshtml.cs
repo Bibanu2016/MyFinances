@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
+using System.Data.Common;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -25,7 +20,7 @@ namespace MyFinances.Pages.FinTransactions
 
         public SelectList AccList { get; set; } = default!;
         [BindProperty]
-        public bool IsPastTransac {  get; set; } = false;
+        public bool IsPastTransac { get; set; } = false;
         [BindProperty]
         public int DeltaPlanRecord { get; set; } = 0;
 
@@ -40,7 +35,7 @@ namespace MyFinances.Pages.FinTransactions
             ViewData["Title"] = $"Edit planned transaction ID= {MyPlanTransaction.IdTransaction}";
             AccList = await _comboFill.GetFinancialAccountsList();
             IsPastTransac = MyPlanTransaction.TransactionDate < DateTime.Now;
-            if(IsPastTransac)
+            if (IsPastTransac)
             {
                 DeltaPlanRecord = await DeltaOnExecutedTransactions(MyPlanTransaction);
             }
@@ -61,7 +56,7 @@ namespace MyFinances.Pages.FinTransactions
             if (IsPastTransac)
             {
                 // get the original execution status
-                var oes = await _context.PlanTransactions.Where(p=>p.IdTransaction == MyPlanTransaction.IdTransaction).Select(s=>s.ExecutedTransaction).FirstOrDefaultAsync();
+                var oes = await _context.PlanTransactions.Where(p => p.IdTransaction == MyPlanTransaction.IdTransaction).Select(s => s.ExecutedTransaction).FirstOrDefaultAsync();
                 if (MyPlanTransaction.ExecutedTransaction != oes)
                 {
                     _context.PlanTransactions.Update(MyPlanTransaction);
@@ -70,16 +65,16 @@ namespace MyFinances.Pages.FinTransactions
                         await _context.SaveChangesAsync();
                         TempData["SuccessMessage"] = $"Transaction id={MyPlanTransaction.IdTransaction} execution status successfully changed";
                     }
-                    catch(DbException ex)
+                    catch (DbException ex)
                     {
                         TempData["ErrorMessage"] = $"Ooops there was an error in processing this transaction \n {ex.Message}";
                     }
-                    
+
                 }
             }
             else
             {
-                if(MyPlanTransaction.ContractIdentifier == 0)
+                if (MyPlanTransaction.ContractIdentifier == 0)
                 {
                     if (MyPlanTransaction.TransactionDate < DateTime.Today)
                     {
@@ -112,7 +107,7 @@ namespace MyFinances.Pages.FinTransactions
         private async Task<int> DeltaOnExecutedTransactions(PlanTransaction pt)
         {
             // get exect transactions to date of pt
-            int trt = await _context.FinTransactions.Where(p=>p.TransactionDate <= pt.TransactionDate && p.DebitAccount == pt.DebitAccount && p.CreditAccount == pt.CreditAccount && p.IdSource == pt.IdSource).CountAsync();
+            int trt = await _context.FinTransactions.Where(p => p.TransactionDate <= pt.TransactionDate && p.DebitAccount == pt.DebitAccount && p.CreditAccount == pt.CreditAccount && p.IdSource == pt.IdSource).CountAsync();
             // get the exec plantransactions before pt inclusive
             int tpt = await _context.PlanTransactions.Where(p => p.TransactionDate <= pt.TransactionDate && p.DebitAccount == pt.DebitAccount && p.CreditAccount == pt.CreditAccount && p.IdSource == pt.IdSource).CountAsync();
             return trt - tpt; //executed - planed

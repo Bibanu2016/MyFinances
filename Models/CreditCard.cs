@@ -16,13 +16,13 @@ namespace MyFinances.Models
         [Required, Column("interestaccount"), Display(Name = "Interest account")] public int InterestAccount { get; set; } = 0;
         [Required, Column("interestcashacc"), Display(Name = "Interest cash out acc")] public int InterestCashOutAcc { get; set; } = 0;
         [Required, Column("insuranceaccount"), Display(Name = "Insurance account")] public int InsuranceAccount { get; set; } = 0;
-        [Required, Column("cashaccount"), Display(Name ="Cash out account")] public int CashOutAccount { get; set; } = 0;
+        [Required, Column("cashaccount"), Display(Name = "Cash out account")] public int CashOutAccount { get; set; } = 0;
         [Required, Column("cashinterestrate"), Range(0, 50, ErrorMessage = "The value should be in the range 0% to 30%"), Display(Name = "Annual cash interest [%]")] public decimal CashRate { get; set; } = 0;
         [Required, Column("extrapaypercycle"), DataType(DataType.Currency), Display(Name = "Extra pay"), Range(0, 1000000, ErrorMessage = "A value between {1} and {2} is required")] public decimal ExtraPay { get; set; } = 0;
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(CreditCardLimit, 
+            return HashCode.Combine(CreditCardLimit,
                 CreditCardInterest,
                 CreditCardPayPercent,
                 CycleFee,
@@ -34,11 +34,11 @@ namespace MyFinances.Models
 
         public override bool Equals(object? obj)
         {
-            if(obj is null)
+            if (obj is null)
             {
                 return false;
             }
-            else if(obj is CreditCard other)
+            else if (obj is CreditCard other)
             {
                 int result = 1;
                 result = CreditCardLimit == other.CreditCardLimit ? result * 1 : 0;

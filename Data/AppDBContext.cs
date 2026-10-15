@@ -35,6 +35,7 @@ namespace MyFinances.Data
         public DbSet<BalanceCard> BalanceCards { get; set; }
         public DbSet<ContractListVM> ContractListVM { get; set; } = default!;
         public DbSet<TransacDictionary> TransacDictionary { get; set; } = default!;
+        public DbSet<UserAppSetting> UserAppSettings { set; get; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,8 +65,9 @@ namespace MyFinances.Data
             modelBuilder.Entity<TangibleAsset>().HasKey(x => x.IdAsset);
             modelBuilder.Entity<UserContract>().HasKey(x => x.IdUser);
             modelBuilder.Entity<BalanceCard>().HasKey(x => x.IdBalance);
-            modelBuilder.Entity<TransacDictionary>().HasKey(x=>x.IdKey);
+            modelBuilder.Entity<TransacDictionary>().HasKey(x => x.IdKey);
+            modelBuilder.Entity<UserAppSetting>().HasKey(x => x.IDUS);
         }
-        
+
     }
 }

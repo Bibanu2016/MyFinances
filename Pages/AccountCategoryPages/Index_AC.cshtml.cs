@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MyFinances.Data;
@@ -14,9 +13,9 @@ namespace MyFinances.Pages.AccountCategoryPages
         public async Task OnGet()
         {
             var acl = await _dbcontext.AccountCategories.Join(_dbcontext.AccountClasses, c => c.IdAccountClass, o => o.IdAccountClass, (c, o) => new { c.IdAccountCategory, o.AccountClassName, c.AccountCategoryName }).ToListAsync();
-            if(acl.Count > 0)
+            if (acl.Count > 0)
             {
-                foreach(var item in acl)
+                foreach (var item in acl)
                 {
                     ACList.Add(new AccCategNames() { IdAC = item.IdAccountCategory, AccClassName = item.AccountClassName, Name = item.AccountCategoryName });
                 }

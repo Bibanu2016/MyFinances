@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.ViewModels;
+using System.Text;
 
 namespace MyFinances.Pages.Contracts
 {
@@ -18,17 +13,18 @@ namespace MyFinances.Pages.Contracts
         private readonly AppDBContext _context = context;
         private readonly IConfiguration _configuration = configuration;
 
-        public List<ContractListVM> ContractListVM { get;set; } = default!;
+        public List<ContractListVM> ContractListVM { get; set; } = default!;
         public int CashFlowState { get; set; } = 0;
         public List<ContractType> ContractTypes { get; set; } = [];
 
         public async Task OnGetAsync()
         {
-            var clvm = await _context.FinContracts.AsQueryable().Where(x => x.IsActiveContract).Select( y => new { y.IdFinContract, y.ContractType, y.ContractName, y.IdContractor, y.EquivMonthlyRate }).OrderBy(z=>z.ContractType).ToListAsync();
+            var clvm = await _context.FinContracts.AsQueryable().Where(x => x.IsActiveContract).Select(y => new { y.IdFinContract, y.ContractType, y.ContractName, y.IdContractor, y.EquivMonthlyRate }).OrderBy(z => z.ContractType).ToListAsync();
             var ux = await _context.UserContracts.AsNoTracking().ToListAsync();
             var ctypel = await _context.ContractTypes.AsNoTracking().ToListAsync();
-            if (ctypel.Count > 0) {
-                foreach (var c in ctypel) 
+            if (ctypel.Count > 0)
+            {
+                foreach (var c in ctypel)
                 {
                     if (c.IdContractType > 0 && c.IdContractType < 9) { ContractTypes.Add(c); } // do not add Taxation as it is added during user creation
                 }
@@ -36,14 +32,14 @@ namespace MyFinances.Pages.Contracts
             if (ux.Count > 0 && clvm.Count > 0 && ctypel.Count > 0)
             {
                 ContractListVM = [];
-                foreach (var c in clvm) 
+                foreach (var c in clvm)
                 {
-                    ContractListVM clitem = new() 
+                    ContractListVM clitem = new()
                     {
                         IdFinContract = c.IdFinContract,
                         ContractType = ctypel.FirstOrDefault(x => x.IdContractType == c.ContractType, new Models.ContractType()).ContractTypeName,
                         ContractName = c.ContractName,
-                        OwnerName = ux.FirstOrDefault(y=>y.IdUser == c.IdContractor, new Models.UserContract()).FullName,
+                        OwnerName = ux.FirstOrDefault(y => y.IdUser == c.IdContractor, new Models.UserContract()).FullName,
                         EquivMonthlyRate = c.EquivMonthlyRate,
                     };
                     CashFlowState += c.EquivMonthlyRate;
@@ -55,10 +51,10 @@ namespace MyFinances.Pages.Contracts
 
         public async Task<IActionResult> OnPostEdit(Guid id)
         {
-            if(id == Guid.Empty) return BadRequest();
-            var fc = await _context.FinContracts.Where(p=>p.IdFinContract == id).Select(s=>s.IdFinAccount).FirstOrDefaultAsync();
+            if (id == Guid.Empty) return BadRequest();
+            var fc = await _context.FinContracts.Where(p => p.IdFinContract == id).Select(s => s.IdFinAccount).FirstOrDefaultAsync();
             if (fc < 1000000 || fc > 8000000) { return NotFound(); }
-            int net = await _context.PlanTransactions.Where(p=>p.ContractIdentifier == fc && p.ExecutedTransaction == false && p.TransactionDate < DateTime.Now).CountAsync();
+            int net = await _context.PlanTransactions.Where(p => p.ContractIdentifier == fc && p.ExecutedTransaction == false && p.TransactionDate < DateTime.Now).CountAsync();
             var fet = await _context.FinTransactions.Where(p => p.ContractIdentifier == fc).AsNoTracking().FirstOrDefaultAsync();
             if (net > 0 && fet != null) // contract has transations recorded and overdue plan transactions - no up to date
             {
@@ -78,13 +74,13 @@ namespace MyFinances.Pages.Contracts
         {
             if (id == Guid.Empty) return BadRequest();
             var fc = await _context.FinContracts.Where(p => p.IdFinContract == id).Select(s => s.IdFinAccount).FirstOrDefaultAsync();
-            if(fc < 1000000 || fc > 8000000) { return NotFound(); }
-            var fet = await _context.FinTransactions.Where(p=>p.ContractIdentifier == fc).AsNoTracking().FirstOrDefaultAsync();
+            if (fc < 1000000 || fc > 8000000) { return NotFound(); }
+            var fet = await _context.FinTransactions.Where(p => p.ContractIdentifier == fc).AsNoTracking().FirstOrDefaultAsync();
             if (fet is not null)
             {
                 // contract has recorded transactions - do not proceed if not all are executed
                 int net = await _context.PlanTransactions.Where(p => p.ContractIdentifier == fc && p.ExecutedTransaction == false && p.TransactionDate < DateTime.Now).CountAsync();
-                if(net > 0)
+                if (net > 0)
                 {
 
                     StringBuilder sb = new();

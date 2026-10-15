@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MyFinances.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 using System.Xml.Linq;
 
 namespace MyFinances.Controllers
@@ -11,7 +9,7 @@ namespace MyFinances.Controllers
         private readonly ViewModels.ContractFull _cf = contractFull;
         private readonly ModelStateDictionary _msd = valuePairs;
 
-        public void MainContractCustomValidator() 
+        public void MainContractCustomValidator()
         {
             if (_cf != null)
             {
@@ -26,20 +24,20 @@ namespace MyFinances.Controllers
                     if ((_cf.FinContract.EndDate.Date - _cf.FinContract.StartDate.Date).TotalDays < 90) { _msd.TryAddModelError(nameof(_cf.FinContract.EndDate), "End date is required to be later than 90 days from the Start Date"); }
                 }
                 // EndAction 2 - Terminate only
-                if(_cf.FinContract.ContractType == 2 && _cf.FinContract.IdEndAction != 0) { _msd.AddModelError(nameof(_cf.FinContract.IdEndAction),"Only Terminate as end action is required for a Loan"); }
+                if (_cf.FinContract.ContractType == 2 && _cf.FinContract.IdEndAction != 0) { _msd.AddModelError(nameof(_cf.FinContract.IdEndAction), "Only Terminate as end action is required for a Loan"); }
                 // InvoiceDate >= Today AND < Today + Frequency
                 FinanceCalculator.CalculatorDates calculatorDates = new(_cf.FinContract.IdFrequency);
                 DateTime ipd = calculatorDates.IncrementCycleDate(DateTime.Today);
-                if(_cf.FinContract.InvoiceDate.Date < DateTime.Today.Date) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceDate), "A date greater of equal to today is required"); }
-                else if(_cf.FinContract.InvoiceDate.Date > ipd.Date) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceDate), $"A date not greater than {ipd:d} is required"); }
+                if (_cf.FinContract.InvoiceDate.Date < DateTime.Today.Date) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceDate), "A date greater of equal to today is required"); }
+                else if (_cf.FinContract.InvoiceDate.Date > ipd.Date) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceDate), $"A date not greater than {ipd:d} is required"); }
                 // RestrictionON - InvoiceDate <= NextInvoiceDate
                 // Netdays 1, 2, 4 = 0; 3,6,7 < 30 days, 5 < 90 days
                 switch (_cf.FinContract.ContractType)
                 {
                     case 1:
-                        if(_cf.FinContract.InvoiceNetDays != 0) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceNetDays), "A net days payment of zero is required"); }
+                        if (_cf.FinContract.InvoiceNetDays != 0) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceNetDays), "A net days payment of zero is required"); }
                         break;
-                        case 2:
+                    case 2:
                         if (_cf.FinContract.InvoiceNetDays != 0) { _msd.AddModelError(nameof(_cf.FinContract.InvoiceNetDays), "A net days payment of zero is required"); }
                         break;
                     case 3:
@@ -79,14 +77,14 @@ namespace MyFinances.Controllers
             return;
         }
 
-        public static void IncomeCustomValidator(Income income, ModelStateDictionary ms) 
+        public static void IncomeCustomValidator(Income income, ModelStateDictionary ms)
         {
-            if (income != null) 
+            if (income != null)
             {
                 // tax value less than gross value
                 if (income.TaxPaidCycle >= income.GrossPerCycle) { ms.TryAddModelError(nameof(income.TaxPaidCycle), "Tax paid value shall be less than Gross pay value"); }
             }
-            return ;
+            return;
         }
 
 

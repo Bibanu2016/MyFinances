@@ -12,6 +12,6 @@ namespace MyFinances.Models
         [Required, Column("finaccountname"), DisplayName("Account name"), MaxLength(50)] public string Name { get; set; } = "Not defined";
         [Required, Column("idaccountcategory"), DisplayName("Account category")] public short AccountCategory { set; get; } = 0;
         [Required, Column("idaccountowner"), DisplayName("Account owner(s)")] public short AccountOwner { set; get; } = 0;
-        [Required, Column("islinked"), DisplayName("Is linked")] public bool IsLinked {  get; set; } = false;
+        [Required, Column("islinked"), DisplayName("Is linked")] public bool IsLinked { get; set; } = false;
     }
 }

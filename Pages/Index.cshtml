@@ -1,35 +1,96 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "My finances";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <hr />
-    <br />
+<div class="d-flex justify-content-centre" style="width:800px">
     <div class="container container-sm">
+        <h1 class="text-center mb-3">@ViewData["Title"]</h1>
+        <hr />
+        <div class="d-flex justify-content-center">@Model.MHPg.UserName</div>
+        <hr />
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Financial year: </div>
+            <div class="p-2">@Model.MHPg.FY</div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Days left this FY: </div>
+            <div class="p-2">@Model.MHPg.DaysLeftFY</div>
+        </div>
         <br />
-        <br />
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Name contract type</th>
-                    <th scope="col">Number active</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (var i = 0; i < Model.ContTypesList.Count; i++)
-                {
-                    <tr>
-                        <td>@Model.ContTypesList[i]</td>
-                        <td>@Model.NrContractPerCateg[i]</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <h4 class="text-center mb-3"  style="color:coral">Contracts</h4>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Active contracts: </div>
+            <div class="p-2">@Model.MHPg.ActiveContracts</div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Closed contracts this FY: </div>
+            <div class="p-2">@Model.MHPg.ClosedContracts</div>
+        </div>
+        <hr />
+        <h4 class="text-center mb-3" style="color:coral">Transactions</h4>
+        <h5 class="text-center mb-3">Planned for next 7 days</h5>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Planned inflows: </div>
+            <div class="p-2">@Model.MHPg.F7InCash</div>
+            <div class="p-2">Planned outflows: </div>
+            <div class="p-2">@Model.MHPg.ClosedContracts</div>
+        </div>
+        <h5 class="text-center mb-3">Outstanding planned transactions</h5>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Outstanding: </div>
+            <div class="p-2">@Model.MHPg.NoDueTransac</div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Outstanding accounts: </div>
+            <div class="p-2">@Model.MHPg.DueAccounts</div>
+        </div>
+        <h5 class="text-center mb-3">Recorded transactions last 7 days</h5>
+        <div class="d-flex justify-content-center">
+            <div class="p-2">Executed: </div>
+            <div class="p-2">@Model.MHPg.Exec7days</div>
+        </div>
+        <h5 class="text-center mb-3">Transactions import status</h5>
+        @if(Model.LastImpAccList.Count > 0)
+        {
+            <div class="d-flex justify-content-center">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th>Last date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.LastImpAccList)
+                        {
+                            <tr>
+                                <td>@item.ItemName</td>
+                                <td>@item.ItemValue</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No transaction import data is available</p>
+        }
+        <h4 class="text-center" style="color:coral">Users settings status</h4>
+        @if(Model.MHPg.USHealth)
+        {
+            <p class="text-center">Users' settings ok'</p>
+        }
+        else
+        {
+            <p class="text-center">Application or user settings incomplete</p>
+            <p class="text-center">Update users settings before continuing</p>
+        }
     </div>
 </div>
+
 
 @section Scripts {
     <script>

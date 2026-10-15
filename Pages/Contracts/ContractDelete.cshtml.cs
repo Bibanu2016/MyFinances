@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MyFinances.Controllers;
@@ -12,6 +6,7 @@ using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
 using MyFinances.ViewModels;
+using System.Data.Common;
 
 namespace MyFinances.Pages.Contracts
 {
@@ -23,7 +18,7 @@ namespace MyFinances.Pages.Contracts
 
         public ContractFull ContractFull { get; set; } = default!;
 
-        public FinContract Contract {  get; set; } = default!;
+        public FinContract Contract { get; set; } = default!;
         [BindProperty]
         public decimal LastBalance { get; set; } = 0;
         [BindProperty]
@@ -47,16 +42,16 @@ namespace MyFinances.Pages.Contracts
             }
             IdContract = pid.Value;
             Contract = await _context.FinContracts.FindAsync(IdContract) ?? default!;
-            if(Contract == default) { return NotFound(); }
+            if (Contract == default) { return NotFound(); }
             ViewData["Title"] = $"Delete contract {Contract.ContractName}";
             FinContractHelper helper = new(_context, _configuration);
             HasTransactions = await helper.GetContractExecutionState(IdContract);
             ViewData["Confirmation"] = HasTransactions ? "Are you sure want to close this contract?" : "Are you sure want to delete this contract";
             await GetContractNames();
             LastBalance = await helper.GetContractRealBalance(Contract.IdFinAccount, DateTime.Now);
-            if(Contract.ContractType == 3) 
-            { 
-                int cashAcc = await _context.CreditCards.Where(p=>p.IdCreditCard == IdContract).Select(s=>s.CashOutAccount).FirstOrDefaultAsync();
+            if (Contract.ContractType == 3)
+            {
+                int cashAcc = await _context.CreditCards.Where(p => p.IdCreditCard == IdContract).Select(s => s.CashOutAccount).FirstOrDefaultAsync();
                 LastBalance += await helper.GetContractRealBalance(Contract.IdFinAccount, DateTime.Now, cashAcc);
             }
             BalanceDate = await helper.GetDateLastTransac(HasTransactions, Contract.IdFinAccount, DateTime.Now);
@@ -102,7 +97,7 @@ namespace MyFinances.Pages.Contracts
                     omsg += "\n Error in retrieving contract accounts";
                 }
             }
-            if(omsg.Length > 0)
+            if (omsg.Length > 0)
             {
                 TempData["ErrorMessage"] = omsg;
                 return RedirectToAction("Get", new { pid = IdContract });
@@ -128,7 +123,7 @@ namespace MyFinances.Pages.Contracts
             var contract = await _context.FinContracts.FindAsync(IdContract);
             if (contract is null) { return $"Error in retrieving contract id {IdContract}"; }
             bool found = false;
-            switch(contract.ContractType)
+            switch (contract.ContractType)
             {
                 case 1:
                     var sc_1 = await _context.Deposits.FindAsync(IdContract);
@@ -184,7 +179,7 @@ namespace MyFinances.Pages.Contracts
                     }
                     break;
             }
-            if(found == false) { return $"Error in retrieving supplement for contract id {IdContract}"; }
+            if (found == false) { return $"Error in retrieving supplement for contract id {IdContract}"; }
             _context.Remove(contract);
             return result;
         }
@@ -206,9 +201,9 @@ namespace MyFinances.Pages.Contracts
                 _context.PlanTransactions.RemoveRange(ptList);
             }
             // if has a balance to transfer, transfer it to user's payable or receivable account with the BalanceDate
-            if(LastBalance > 0)
+            if (LastBalance > 0)
             {
-                int urecAcc = await _context.UserContracts.Where(p=>p.IdUser == fc.IdContractor).Select(s=>s.UserReceivable).FirstOrDefaultAsync();
+                int urecAcc = await _context.UserContracts.Where(p => p.IdUser == fc.IdContractor).Select(s => s.UserReceivable).FirstOrDefaultAsync();
                 PlanTransaction toRec = new()
                 {
                     IdTransaction = GeneratorID.Int64IDBasedOnDate(BalanceDate),
@@ -222,7 +217,7 @@ namespace MyFinances.Pages.Contracts
                 };
                 _context.PlanTransactions.Add(toRec);
             }
-            if(LastBalance < 0)
+            if (LastBalance < 0)
             {
                 int urecAcc = await _context.UserContracts.Where(p => p.IdUser == fc.IdContractor).Select(s => s.UserPayable).FirstOrDefaultAsync();
                 PlanTransaction toPay = new()

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
@@ -10,7 +9,7 @@ namespace MyFinances.Pages
     public class ErrorModel : PageModel
     {
         public string? RequestId { get; set; }
-        public string LogContent { get; set; } = string.Empty;
+        public string LogContent { get; set; } = "Not implemented";
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
@@ -18,16 +17,7 @@ namespace MyFinances.Pages
         public void OnGet()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "app.log");
-
-            if (System.IO.File.Exists(logPath))
-            {
-                LogContent = System.IO.File.ReadAllText(logPath);
-            }
-            else
-            {
-                LogContent = "No log file found.";
-            }
+            LogContent = Request.Path.Value ?? "Path not available";
         }
 
     }

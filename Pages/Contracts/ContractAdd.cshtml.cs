@@ -27,7 +27,7 @@ namespace MyFinances.Pages.Contracts
         private readonly string[] taxRole = ["Tax"];
         //
         // contract type selection variable
-        [BindProperty(SupportsGet =true)]
+        [BindProperty(SupportsGet = true)]
         public short SelectedContractType { get; set; } = 0;
 
 
@@ -40,15 +40,16 @@ namespace MyFinances.Pages.Contracts
         public SelectList Users { get; set; } = default!;
         public SelectList TangibleAsset { get; set; } = default!;
         public SelectList ContractCategory { get; set; } = default!;
-        public SelectList SuperAccount { get; set; } = default!;
+        public SelectList SuperAccountList { get; set; } = default!;
+        public SelectList TaxAccountList { get; set; } = default!;
         //
         // Contract data
         [BindProperty]
         public ContractFull ContractFull { get; set; } = default!;
 
-        [BindProperty, Display(Name ="Contract category"), Range(1000, 9999, ErrorMessage ="Value {0} shall be between {1} and {2}")]
+        [BindProperty, Display(Name = "Contract category"), Range(1000, 9999, ErrorMessage = "Value {0} shall be between {1} and {2}")]
         public int CategoryContract { get; set; } = 0;
-        [BindProperty, DataType(DataType.Currency), Range(0, 1000000000, ErrorMessage ="Value {0} is required in the range {1} to {2}"), Display(Name ="Current balance")]
+        [BindProperty, DataType(DataType.Currency), Range(0, 1000000000, ErrorMessage = "Value {0} is required in the range {1} to {2}"), Display(Name = "Current balance")]
         public decimal PurchaseBalance { get; set; } = 0;
         [BindProperty, DataType(DataType.Currency), Range(0, 1000000000, ErrorMessage = "Value {0} is required in the range {1} to {2}"), Display(Name = "Cash balance card")]
         public decimal CashBalance { get; set; } = 0;
@@ -83,7 +84,7 @@ namespace MyFinances.Pages.Contracts
                     ViewData["Title"] = "No contract type selected!";
                 }
             }
-            await FillUpLists();            
+            await FillUpLists();
             return Page();
         }
         //
@@ -93,7 +94,7 @@ namespace MyFinances.Pages.Contracts
         {
             // --- model validation start ---
             TailorBindingProperties();
-            CustomValidatorContract();            
+            CustomValidatorContract();
             if (!ModelState.IsValid)
             {
                 await FillUpLists();
@@ -148,7 +149,7 @@ namespace MyFinances.Pages.Contracts
         /// <returns></returns>
         private async Task FillUpLists()
         {
-            if(SelectedContractType > 0)
+            if (SelectedContractType > 0)
             {
                 Frequency = await _comboFill.GetPaymentFrequencyList();
                 EndAction = await _comboFill.GetContractEndActionList();
@@ -157,8 +158,12 @@ namespace MyFinances.Pages.Contracts
                 Bank = await _comboFill.GetFinAccountListByRole(bankRoles);
                 Users = await _comboFill.GetUsersList();
                 ContractCategory = await _comboFill.GetAccountCategoryList(SelectedContractType);
-                SuperAccount = await _comboFill.GetFinAccountListByRole(superRoles);
+                SuperAccountList = await _comboFill.GetFinAccountListByRole(superRoles);
                 TangibleAsset = await _comboFill.GetTangibleAssetsList();
+                if (SelectedContractType == 4 || SelectedContractType == 5)
+                {
+                    TaxAccountList = await _comboFill.GetFinAccountListByRole(taxRole);
+                }
             }
             return;
         }
@@ -166,18 +171,18 @@ namespace MyFinances.Pages.Contracts
         private void TailorBindingProperties()
         {
             //remove unwanted fields - use xml file
-            var csf = XDocument.Load("./Data/ContractSuplFields.xml").Descendants("supfield").Select(x => new{ctg = x.Attribute("categ"), val = x.Value });
+            var csf = XDocument.Load("./Data/ContractSuplFields.xml").Descendants("supfield").Select(x => new { ctg = x.Attribute("categ"), val = x.Value });
             if (csf != null)
             {
                 foreach (var c in csf)
                 {
-                    if(c.ctg != null && c.val != null)
+                    if (c.ctg != null && c.val != null)
                     {
-                        if((short)(int)c.ctg != SelectedContractType) { this.ModelState.Remove("ContractFull." + (string)c.val); }
+                        if ((short)(int)c.ctg != SelectedContractType) { this.ModelState.Remove("ContractFull." + (string)c.val); }
                     }
                 }
             }
-            if(SelectedContractType > 3)
+            if (SelectedContractType > 3)
             {
                 this.ModelState.Remove("BalanceDate");
                 this.ModelState.Remove("PurchaseBalance");
@@ -196,19 +201,19 @@ namespace MyFinances.Pages.Contracts
                 if (BalanceDate < ContractFull.FinContract.StartDate) { this.ModelState.TryAddModelError("BalanceDate", "A date later than or the contact Start Date is required"); }
                 CalculatorDates calculatorDates = new(ContractFull.FinContract.IdFrequency);
                 DateTime lastPayment = calculatorDates.LastCycleDate(ContractFull.FinContract.InvoiceDate, DateTime.Now);
-                if(BalanceDate < lastPayment) { this.ModelState.TryAddModelError("BalanceDate", $"A date later than last peyment date of {lastPayment} is required."); }
+                if (BalanceDate < lastPayment) { this.ModelState.TryAddModelError("BalanceDate", $"A date later than last peyment date of {lastPayment} is required."); }
             }
             if (SelectedContractType == 2)
             {
                 // balance at date less than the initial amount
-                if(PurchaseBalance > ContractFull.Loan.LoanAmount) { this.ModelState.TryAddModelError("PurchaseBalance", "A value less or equal to Initial Loan Amount is required"); }
+                if (PurchaseBalance > ContractFull.Loan.LoanAmount) { this.ModelState.TryAddModelError("PurchaseBalance", "A value less or equal to Initial Loan Amount is required"); }
             }
             if (SelectedContractType == 3)
             {
                 // purchase balance less than the credit card limit
                 if (PurchaseBalance > ContractFull.CreditCard.CreditCardLimit) { this.ModelState.TryAddModelError("PurchaseBalance", "A value less or equal to Card Limit is required"); }
                 //cash balance less than credit limit minus purchase balance
-                if(CashBalance > Math.Abs(ContractFull.CreditCard.CreditCardLimit - PurchaseBalance)) { this.ModelState.TryAddModelError("CashBalance", "A value less or equal to Card Limit minus Purchase Balance is required"); }
+                if (CashBalance > Math.Abs(ContractFull.CreditCard.CreditCardLimit - PurchaseBalance)) { this.ModelState.TryAddModelError("CashBalance", "A value less or equal to Card Limit minus Purchase Balance is required"); }
             }
             return;
         }
@@ -241,13 +246,13 @@ namespace MyFinances.Pages.Contracts
                 case 1:
                     ContractFull.Deposit.IdDeposit = ContractFull.FinContract.IdFinContract;
                     short interestCtg = sectionCategory.GetValue<short>("InterestReceived");
-                    interestCtg = (short)(interestCtg == 0? 4102 : interestCtg); // in case that there is an error reading the value, the category for Interest Received = 4102
+                    interestCtg = (short)(interestCtg == 0 ? 4102 : interestCtg); // in case that there is an error reading the value, the category for Interest Received = 4102
 
                     ContractFull.Deposit.InterestAccount = (await fah.NewIdAccountByCateg(interestCtg))[0];
                     FinAccount DepInterest = new()
                     {
                         IdFinAccount = ContractFull.Deposit.InterestAccount,
-                        Name = string.Concat(sectionDetail.GetValue<string>("InterestIn") ??"Interest received ", ContractFull.FinContract.ContractName),
+                        Name = string.Concat(sectionDetail.GetValue<string>("InterestIn") ?? "Interest received ", ContractFull.FinContract.ContractName),
                         AccountCategory = interestCtg,
                         AccountOwner = ContractFull.FinContract.IdContractor,
                         IsLinked = true
@@ -258,7 +263,7 @@ namespace MyFinances.Pages.Contracts
                 case 2:
                     ContractFull.Loan.IdLoan = ContractFull.FinContract.IdFinContract;
                     short lia = sectionCategory.GetValue<short>("InterestPaid");
-                    lia = (short)(lia == 0? 5004 : lia); // in case that there is an error reading the value, the category for Interest Paid = 5004
+                    lia = (short)(lia == 0 ? 5004 : lia); // in case that there is an error reading the value, the category for Interest Paid = 5004
                     ContractFull.Loan.IdAccountInterest = (await fah.NewIdAccountByCateg(lia))[0];
                     FinAccount LoanInterest = new()
                     {
@@ -370,10 +375,11 @@ namespace MyFinances.Pages.Contracts
             // recording is done only if the InitialAmount differs from the Purchase balance + Cash balance
             // and balance date is within current financial year
             // get user account id
-            var uaid = await _context.UserContracts.Where(p=>p.IdUser == ContractFull.FinContract.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
+            var uaid = await _context.UserContracts.Where(p => p.IdUser == ContractFull.FinContract.IdContractor).Select(s => s.UserAccountID).FirstOrDefaultAsync();
             string detailOpen = _configuration.GetSection("TransactionDetail").GetValue<string>("Open") ?? "Open account ";
             PlanTransaction openPt = new()
             {
+
                 IdTransaction = GeneratorID.Int64IDBasedOnDate(transacDate),
                 TransactionDate = transacDate,
                 DebitAccount = ContractFull.FinContract.IdFinAccount,
@@ -384,7 +390,7 @@ namespace MyFinances.Pages.Contracts
                 ExecutedTransaction = false,
                 IdSource = uaid
             };
-            switch(SelectedContractType)
+            switch (SelectedContractType)
             {
                 case 1:
                     openPt.DebitAccount = ContractFull.FinContract.IdFinAccount;
@@ -409,7 +415,6 @@ namespace MyFinances.Pages.Contracts
                         ExecutedTransaction = false,
                         IdSource = uaid
                     };
-                    _context.PlanTransactions.Add(cardOpen);
                     _context.PlanTransactions.Add(cardCashOpen);
                     break;
                 case 8:
@@ -431,7 +436,7 @@ namespace MyFinances.Pages.Contracts
                     break;
             }
             _context.PlanTransactions.Add(openPt);
-            return string.Empty ;
+            return string.Empty;
         }
 
     }

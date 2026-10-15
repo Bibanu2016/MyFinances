@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
-using MyFinances.ViewModels;
 
 namespace MyFinances.Services
 {
@@ -60,7 +58,7 @@ namespace MyFinances.Services
             IEnumerable<object> orgl = [];
             if (categoryOrg > 0)
             {
-                orgl = await _dbcontext.Organisations.Where(p=>p.IdCateg == categoryOrg).Select(p => new { p.IdOrg, p.OrganisationName }).AsNoTracking().ToListAsync();
+                orgl = await _dbcontext.Organisations.Where(p => p.IdCateg == categoryOrg).Select(p => new { p.IdOrg, p.OrganisationName }).AsNoTracking().ToListAsync();
             }
             else
             {
@@ -77,7 +75,7 @@ namespace MyFinances.Services
 
         public async Task<SelectList> GetPayableAccountsList()
         {
-            var qr = await _dbcontext.AccountCategories.Where(q => q.IdAccountClass < 30 && q.IdAccountClass > 0).Select(p => new { p.IdAccountCategory, p.CategoryRoles }).OrderBy(o=>o.IdAccountCategory).AsNoTracking().ToListAsync();
+            var qr = await _dbcontext.AccountCategories.Where(q => q.IdAccountClass < 30 && q.IdAccountClass > 0).Select(p => new { p.IdAccountCategory, p.CategoryRoles }).OrderBy(o => o.IdAccountCategory).AsNoTracking().ToListAsync();
             IEnumerable<int> temp = [];
             if (qr != null)
             {
@@ -88,7 +86,7 @@ namespace MyFinances.Services
             }
             int minVal = temp.Min();
             int maxVal = temp.Max();
-            var fal = await _dbcontext.FinAccounts.Where(p => p.AccountCategory <= maxVal && p.AccountCategory >= minVal).OrderBy(o=>o.IdFinAccount).AsNoTracking().ToListAsync();
+            var fal = await _dbcontext.FinAccounts.Where(p => p.AccountCategory <= maxVal && p.AccountCategory >= minVal).OrderBy(o => o.IdFinAccount).AsNoTracking().ToListAsync();
             List<FinAccount> pal = [];
             if (fal != null)
             {
@@ -217,18 +215,13 @@ namespace MyFinances.Services
             var query = _dbcontext.FinAccounts.AsQueryable();
             if (categs is not null)
             {
-                if(categs.Count > 0)
+                if (categs.Count > 0)
                 {
-                    //remove any values less than 1000 and greater than 7000
-                    for(int i = categs.Count - 1; i >= 0; i--)
+                    foreach (int item in categs)
                     {
-                        if (categs[i] > 7000 || categs[i] < 1000) { categs.RemoveAt(i); }
+                        query = query.Where(p => p.AccountCategory == item);
                     }
-                    foreach(int item in categs)
-                    {
-                        query = query.Where(p => p.AccountCategory == item);                   
-                    }
-                    
+
                 }
             }
             var x = await query.Select(s => new { s.IdFinAccount, s.Name }).AsNoTracking().ToListAsync();
@@ -255,7 +248,7 @@ namespace MyFinances.Services
                     if (listAC.Count > 0)
                     {
                         List<short> crlist = [];
-                        foreach(var item in listAC)
+                        foreach (var item in listAC)
                         {
                             if (MyBitOperations.GetBit(item.CategoryRoles[0], bitOrder)) { crlist.Add(item.IdContractCategory); }
                         }

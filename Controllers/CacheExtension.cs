@@ -17,7 +17,7 @@ namespace MyFinances.Controllers
             }
             else
             {
-                if(value == null)
+                if (value == null)
                 {
                     value = await factory();
                     cache.Set(key, value, TimeSpan.FromMinutes(minutes));
@@ -39,7 +39,7 @@ namespace MyFinances.Controllers
             }
             else
             {
-                if(value == null)
+                if (value == null)
                 {
                     value = factory();
                     cache.Set(key, value, TimeSpan.FromMinutes(minutes));

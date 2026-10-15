@@ -1,23 +1,16 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.CompilerServices;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -61,18 +54,18 @@ namespace MyFinances.Pages.FinTransactions
                 {
                     string result = Encoding.UTF8.GetString(data);
                     ImportTable = _myCsvService.CsvToDataTable(result);
-                    if(ImportTable.Rows.Count < 5) { DisplayRows = ImportTable.Rows.Count; }
+                    if (ImportTable.Rows.Count < 5) { DisplayRows = ImportTable.Rows.Count; }
                     DataRow row = ImportTable.Rows[0];
                     if (row != null)
                     {
                         for (int j = 0; j < ImportTable.Columns.Count; j++)
                         {
                             if (DateTime.TryParse(row[j].ToString(), out _)) { datesCols.Add(new SelectListItem() { Text = ImportTable.Columns[j].ColumnName, Value = j.ToString() }); }
-                            else if(Decimal.TryParse(row[j].ToString(), out _)) { amountCols.Add(new SelectListItem() { Text = ImportTable.Columns[j].ColumnName, Value = j.ToString() }); }
-                            else {  detailsCols.Add(new SelectListItem() { Text = ImportTable.Columns[j].ColumnName, Value = j.ToString() }); }
+                            else if (Decimal.TryParse(row[j].ToString(), out _)) { amountCols.Add(new SelectListItem() { Text = ImportTable.Columns[j].ColumnName, Value = j.ToString() }); }
+                            else { detailsCols.Add(new SelectListItem() { Text = ImportTable.Columns[j].ColumnName, Value = j.ToString() }); }
                         }
                         DateColumns = new SelectList(datesCols, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
-                        DetailsColumns =  new SelectList(detailsCols, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
+                        DetailsColumns = new SelectList(detailsCols, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
                         AmountColumns = new SelectList(amountCols, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
                     }
                 }
@@ -85,7 +78,7 @@ namespace MyFinances.Pages.FinTransactions
             {
                 TempData["ErrorMessage"] = "No data has been received";
             }
-           
+
             //create Dictionary - column number and value from selected list
             // fill out dictionary based on evaluation of the types for each column
             // if only one type per table - set all disable
@@ -95,7 +88,7 @@ namespace MyFinances.Pages.FinTransactions
         public async Task<IActionResult> OnPostAsync()
         {
             // validate
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return Page();
             }
@@ -152,7 +145,7 @@ namespace MyFinances.Pages.FinTransactions
                     {
                         earliestDate = converted;
                     }
-                    if(latestDate < converted)
+                    if (latestDate < converted)
                     {
                         latestDate = converted;
                     }
@@ -162,16 +155,16 @@ namespace MyFinances.Pages.FinTransactions
             var tlwdr = await _dbContext.FinTransactions.Where(p => (p.TransactionDate >= earliestDate && p.TransactionDate <= latestDate) && (p.DebitAccount == AccountNumber || p.CreditAccount == AccountNumber)).AsNoTracking().ToListAsync();
             if (tlwdr.Count > 0)
             {
-                FinTransaction temp = new() { IdTransaction = 0};
+                FinTransaction temp = new() { IdTransaction = 0 };
                 //remove from ImportTable duplicate by date, amount, transaction detail - limit 64
-                foreach(FinTransaction ft in tlwdr)
+                foreach (FinTransaction ft in tlwdr)
                 {
                     int signAmount = ft.DebitAccount == AccountNumber ? 1 : -1;
-                    foreach(DataRow row in ImportTable.Rows)
+                    foreach (DataRow row in ImportTable.Rows)
                     {
                         temp.TransactionDate = DateTime.Parse(row[0].ToString() ?? "2001-01-01");
                         // check only for date and value as it is unlikely to have the exact value for the same date with the same value
-                        if(row.Field<string>(idxDate) == ft.TransactionDate.ToShortDateString() && row.Field<string>(idxAmount) == (signAmount * ft.TransactionValue).ToString())
+                        if (row.Field<string>(idxDate) == ft.TransactionDate.ToShortDateString() && row.Field<string>(idxAmount) == (signAmount * ft.TransactionValue).ToString())
                         {
                             ImportTable.Rows.Remove(row);
                             break;
@@ -189,7 +182,7 @@ namespace MyFinances.Pages.FinTransactions
             int idxAmount = int.Parse(AmountColumn);
             int idxDetails = int.Parse(DetailsColumn);
             // get the contract number
-            var contract = await _dbContext.FinContracts.AsQueryable().Where(p=>p.IdFinAccount == AccountNumber).AsNoTracking().FirstOrDefaultAsync();
+            var contract = await _dbContext.FinContracts.AsQueryable().Where(p => p.IdFinAccount == AccountNumber).AsNoTracking().FirstOrDefaultAsync();
             int idContract = 0;
             if (contract != null) { idContract = contract.IdFinAccount; }
             Dictionary<int, string> keysT = await GetKeysForDictionary(AccountNumber);
@@ -227,20 +220,20 @@ namespace MyFinances.Pages.FinTransactions
             }
             foreach (DataRow row in ImportTable.Rows)
             {
-                
-                if(row.Field<string>(idxDate) != null && row.Field<string>(idxAmount) != null && row.Field<string>(idxDetails) != null)
+
+                if (row.Field<string>(idxDate) != null && row.Field<string>(idxAmount) != null && row.Field<string>(idxDetails) != null)
                 {
                     DateTime date = DateTime.Parse(row.Field<string>(idxDate) ?? "01/01/2001");
                     decimal tValue = Decimal.Parse(row.Field<string>(idxAmount) ?? "0");
                     string tDetails = row.Field<string>(idxDetails) ?? string.Empty;
-                    if(tDetails.Length > 64) tDetails = tDetails[..64];
+                    if (tDetails.Length > 64) tDetails = tDetails[..64];
                     //get the target account from the dictionary
                     int targetAccount = 0;
                     foreach (var di in keysT)
                     {
                         if (tDetails.Contains(di.Value))
                         {
-                            targetAccount = di.Key; 
+                            targetAccount = di.Key;
                             break;
                         }
                     }
@@ -259,7 +252,7 @@ namespace MyFinances.Pages.FinTransactions
                     ftList.Add(newft);
                 }
             }
-            
+
             //update Overdue transactions
             if (ftList.Count > 0)
             {
@@ -268,10 +261,10 @@ namespace MyFinances.Pages.FinTransactions
                 DateTime toDate = ftList[^1].TransactionDate;
                 for (int i = 1; i < ftList.Count - 1; i++)
                 {
-                    if (ftList[i].TransactionDate < fromDate) {fromDate = ftList[i].TransactionDate;}
-                    if (ftList[i].TransactionDate > toDate) { toDate = ftList[i].TransactionDate;}
+                    if (ftList[i].TransactionDate < fromDate) { fromDate = ftList[i].TransactionDate; }
+                    if (ftList[i].TransactionDate > toDate) { toDate = ftList[i].TransactionDate; }
                 }
-                var ptl = await _dbContext.PlanTransactions.AsQueryable().Where(p=>p.TransactionDate >= fromDate && p.TransactionDate <= toDate && (p.DebitAccount == AccountNumber || p.CreditAccount == AccountNumber)).ToListAsync();
+                var ptl = await _dbContext.PlanTransactions.AsQueryable().Where(p => p.TransactionDate >= fromDate && p.TransactionDate <= toDate && (p.DebitAccount == AccountNumber || p.CreditAccount == AccountNumber)).ToListAsync();
                 if (ptl.Count > 0)
                 {
                     decimal difAmount = 0;
@@ -281,16 +274,16 @@ namespace MyFinances.Pages.FinTransactions
                     {
                         foreach (var ft in ftList)
                         {
-                            if(pt.DebitAccount == ft.DebitAccount && pt.CreditAccount == ft.CreditAccount)
+                            if (pt.DebitAccount == ft.DebitAccount && pt.CreditAccount == ft.CreditAccount)
                             {
                                 difAmount = Math.Abs(pt.TransactionValue - ft.TransactionValue);
                                 difDate = Math.Abs((pt.TransactionDate - ft.TransactionDate).Days);
                                 refValue = ft.TransactionValue * 0.1m;
-                                if((difAmount <= refValue) && difDate <= 2) 
-                                { 
+                                if ((difAmount <= refValue) && difDate <= 2)
+                                {
                                     pt.ExecutedTransaction = true;
                                     _dbContext.PlanTransactions.Update(pt);
-                                    break; 
+                                    break;
                                 }
                             }
                         }
@@ -319,13 +312,13 @@ namespace MyFinances.Pages.FinTransactions
             {
                 foreach (var kvp in extract)
                 {
-                    if(kvp.IdTarget != 0 && !result.ContainsKey(kvp.IdTarget)) result.Add(kvp.IdTarget, kvp.Name);
+                    if (kvp.IdTarget != 0 && !result.ContainsKey(kvp.IdTarget)) result.Add(kvp.IdTarget, kvp.Name);
                 }
             }
             return result;
         }
 
-        
+
 
 
 

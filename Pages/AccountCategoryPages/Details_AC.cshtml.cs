@@ -21,7 +21,7 @@ namespace MyFinances.Pages.AccountCategoryPages
         public async Task<IActionResult> OnGet(int id)
         {
             var aca = await _dbctxt.AccountCategories.FindAsync(id);
-            if(aca is null) { return NotFound(); }
+            if (aca is null) { return NotFound(); }
             IDCateg = id;
             //fill out items details
             var temp = await _details.GetAccountClassByID(aca.IdAccountClass);
@@ -31,9 +31,9 @@ namespace MyFinances.Pages.AccountCategoryPages
             ACDetails.Add(new ItemDetail() { ItemName = "Contract category", ItemValue = temp });
             StringBuilder sb = new StringBuilder();
             string[] rn = ["Paying asset", "Paying liability", "Import transactions", "Invest fund", "Tax", "User account", "Spare", "Locked for editing"];
-            for(int i = 0; i<8; i++)
+            for (int i = 0; i < 8; i++)
             {
-                if(MyBitOperations.GetBit(aca.CategoryRoles[0],i))
+                if (MyBitOperations.GetBit(aca.CategoryRoles[0], i))
                 {
                     sb.Append(rn[i]);
                     sb.Append(", ");

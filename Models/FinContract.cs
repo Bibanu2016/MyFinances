@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
 
 namespace MyFinances.Models
 {
     [Table("fincontract")]
-    public class FinContract: IEquatable<object>, IValidatableObject
+    public class FinContract : IEquatable<object>, IValidatableObject
     {
         [Key, Column("idfincontract"), Display(Name = "ID")] public required Guid IdFinContract { get; set; }
-        [Required, Column("idcontracttype"), Display(Name ="Type")] public short ContractType { get; set; } = 0;
+        [Required, Column("idcontracttype"), Display(Name = "Type")] public short ContractType { get; set; } = 0;
         [Required, Column("fincontractname"), MinLength(3, ErrorMessage = "Minimum 3 characters are required!"), MaxLength(40, ErrorMessage = "Maximum 40 characters are allowed!"), Display(Name = "Name")] public string ContractName { get; set; } = string.Empty;
         [Required, Column("fincontractdetails"), MaxLength(255, ErrorMessage = "Maximum of 255 characters are allowed!"), Display(Name = "Details")] public string ContractDetails { get; set; } = string.Empty;
         [Required, Column("idorganisation"), Display(Name = "Organisation ID")] public int IdOrganisation { get; set; } = 0;
@@ -22,7 +16,7 @@ namespace MyFinances.Models
         [Required, Column("fincontractenddate"), DataType(DataType.Date), Display(Name = "End date")] public DateTime EndDate { get; set; } = DateTime.MaxValue;
         [Required, Column("idendaction"), Display(Name = "End action ID")] public short IdEndAction { get; set; } = 0;
         [Required, Column("invoicedate"), DataType(DataType.Date), Display(Name = "Invoice date")] public DateTime InvoiceDate { get; set; } = DateTime.Today;
-        [Required, Column("invoicenetdays"), Display(Name = "Net days"), Range(0, 180, ErrorMessage ="A value in the range {1} to {2} is required")] public short InvoiceNetDays { get; set; } = 0;
+        [Required, Column("invoicenetdays"), Display(Name = "Net days"), Range(0, 180, ErrorMessage = "A value in the range {1} to {2} is required")] public short InvoiceNetDays { get; set; } = 0;
         [Required, Column("idfrequency"), Display(Name = "Payment frequency")] public short IdFrequency { get; set; } = 0;
         [Required, Column("idfinaccount"), Display(Name = "Account ID")] public int IdFinAccount { get; set; } = 0;
         [Required, Column("idpayaccount"), Display(Name = "Payment acc.ID")] public int IdPayAccount { get; set; } = 0;
@@ -53,7 +47,7 @@ namespace MyFinances.Models
             result *= IsActiveContract == other.IsActiveContract ? 1 : 0;
             result *= ClosedDate.Date == other.ClosedDate.Date ? 1 : 0;
             return result == 1;
-            
+
         }
 
         public override int GetHashCode()
@@ -83,8 +77,8 @@ namespace MyFinances.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if(StartDate.Date > DateTime.Today.Date) { yield return new ValidationResult("A start date ealier than today is required", [nameof(StartDate)]); }
-            if(EndDate.Date < DateTime.Today.Date) { yield return new ValidationResult("An end date later than or equal to today is required", [nameof(EndDate)]); }
+            if (StartDate.Date > DateTime.Today.Date) { yield return new ValidationResult("A start date ealier than today is required", [nameof(StartDate)]); }
+            if (EndDate.Date < DateTime.Today.Date) { yield return new ValidationResult("An end date later than or equal to today is required", [nameof(EndDate)]); }
             if (InvoiceDate.Date < DateTime.Today.Date) { yield return new ValidationResult("An invoice date later than or equal to today is required", [nameof(InvoiceDate)]); }
             else
             {
@@ -92,8 +86,8 @@ namespace MyFinances.Models
                 DateTime ipd = calculatorDates.IncrementCycleDate(DateTime.Today);
                 if (InvoiceDate.Date > ipd) { yield return new ValidationResult($"An invoice date less than {ipd:d} is required", [nameof(InvoiceDate)]); }
             }
-            if(ContractType == 2 && IdEndAction != 0) { yield return new ValidationResult("Only Terminate is required for a loan", [nameof(IdEndAction)]); }
-            if(IdPayAccount.ToString().StartsWith('2') && IdBankAccount == 0) { yield return new ValidationResult("A bank account is required", [nameof(IdBankAccount)]); }
+            if (ContractType == 2 && IdEndAction != 0) { yield return new ValidationResult("Only Terminate is required for a loan", [nameof(IdEndAction)]); }
+            if (IdPayAccount.ToString().StartsWith('2') && IdBankAccount == 0) { yield return new ValidationResult("A bank account is required", [nameof(IdBankAccount)]); }
         }
 
     }

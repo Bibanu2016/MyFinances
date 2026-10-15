@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MyFinances.Controllers;
 using MyFinances.Data;
-using Org.BouncyCastle.Crypto.Digests;
 
 namespace MyFinances.Pages.CloseFYPages
 {
-    public class CloseFYIndexModel(AppDBContext dBContext, IConfiguration myconfig ) : PageModel
+    public class CloseFYIndexModel(AppDBContext dBContext, IConfiguration myconfig) : PageModel
     {
         private readonly AppDBContext _dbContext = dBContext;
         private readonly IConfiguration _config = myconfig;

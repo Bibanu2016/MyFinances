@@ -3,18 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.VisualBasic;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
-using NuGet.Packaging;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -69,7 +61,7 @@ namespace MyFinances.Pages.FinTransactions
         private readonly IComboFillService _fillService = fillService;
         private readonly IMemoryCache _cache = cache;
 
-        public List<FinTransaction> FinTransactionList { get;set; } = [];
+        public List<FinTransaction> FinTransactionList { get; set; } = [];
 
         [BindProperty(SupportsGet = true)]
         public TransactionsFilter ItemsFilter { get; set; } = new();
@@ -87,12 +79,12 @@ namespace MyFinances.Pages.FinTransactions
             AccList = await _cache.GetOrCreateAsync("AList", () => GetAccountLists());
             bool checkReturn = false;
             TransactionsFilter temp = new();
-            if(!string.IsNullOrEmpty(rfe))
+            if (!string.IsNullOrEmpty(rfe))
             {
                 string[] ifd = rfe.Split(',');
-                if(ifd.Length == 5)
+                if (ifd.Length == 5)
                 {
-                    if(DateTime.TryParse(ifd[0], out DateTime fd))
+                    if (DateTime.TryParse(ifd[0], out DateTime fd))
                     {
                         checkReturn = true;
                         temp.FromDate = fd;
@@ -107,7 +99,7 @@ namespace MyFinances.Pages.FinTransactions
                         checkReturn = checkReturn && true;
                         temp.IdFilterAccount = fa;
                     }
-                    if(int.TryParse(ifd[3], out int pidx))
+                    if (int.TryParse(ifd[3], out int pidx))
                     {
                         checkReturn = checkReturn && true;
                         temp.PageIndex = pidx;
@@ -119,14 +111,14 @@ namespace MyFinances.Pages.FinTransactions
                     }
                 }
             }
-            if(checkReturn) {ItemsFilter = temp; _cache.Remove("OIF"); }
+            if (checkReturn) { ItemsFilter = temp; _cache.Remove("OIF"); }
             // ── Guard page size
             if (!sourceArray.Contains(ItemsFilter.PageSize)) ItemsFilter.PageSize = 20;
             if (ItemsFilter.PageIndex < 1) ItemsFilter.PageIndex = 1;
             // -- Count and paginate
-            if(_cache.TryGetValue<TransactionsFilter>("OIF", out TransactionsFilter? oif))
+            if (_cache.TryGetValue<TransactionsFilter>("OIF", out TransactionsFilter? oif))
             {
-                if(!ItemsFilter.Equals(oif))
+                if (!ItemsFilter.Equals(oif))
                 {
                     _cache.Remove("TCount");
                     _cache.Remove("OIF");

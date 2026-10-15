@@ -8,7 +8,7 @@ namespace MyFinances.Models
     {
         [Key, Column("idfrequency")]
         public short Id { get; set; }
-        [Required, Column("frequencyname"), Display(Name ="Payment frequency")]
+        [Required, Column("frequencyname"), Display(Name = "Payment frequency")]
         public string Name { get; set; } = string.Empty;
         [Required, Column("frequencyfactor")] public decimal MonthlyFactor { get; set; } = 0;
         [Required, Column("frequencyinterestx")] public decimal InterestFactor { get; set; } = 0;

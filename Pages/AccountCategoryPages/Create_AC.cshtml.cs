@@ -82,7 +82,7 @@ namespace MyFinances.Pages.AccountCategoryPages
             }
             if (_mc.TryGetValue("CCL", out SelectList? ccl))
             {
-                if(ccl is not null) { ContTypesList = ccl; }
+                if (ccl is not null) { ContTypesList = ccl; }
             }
             else
             {
@@ -107,7 +107,7 @@ namespace MyFinances.Pages.AccountCategoryPages
         private async Task<int> GetACID(short classID)
         {
             var acl = await _dbctxt.AccountCategories.Where(p => p.IdAccountClass == classID).Select(s => s.IdAccountCategory).Order().ToListAsync();
-            if(acl.Count > 0)
+            if (acl.Count > 0)
             {
                 return acl.Max() + 1;
             }

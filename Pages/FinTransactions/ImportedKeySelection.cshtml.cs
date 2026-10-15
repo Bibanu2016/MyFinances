@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MyFinances.Controllers;
 using MyFinances.Services;
 using System.Data;
 using System.Text;
@@ -20,10 +19,10 @@ namespace MyFinances.Pages.FinTransactions
 
         [BindProperty]
         public List<string> KeyList { get; set; } = [];
-       
+
         public void OnGet(int? idxcol)
         {
-            if(idxcol.HasValue)
+            if (idxcol.HasValue)
             {
                 IdxCol = idxcol.Value;
                 if (HttpContext.Session.TryGetValue("CsvImport", out byte[]? data))
@@ -44,7 +43,7 @@ namespace MyFinances.Pages.FinTransactions
                         IEnumerable<string> ol = detlist.Order();
                         var unique = ol.Distinct().ToList();
                         ImportList.AddRange(unique);
-                        foreach(string _ in ImportList)
+                        foreach (string _ in ImportList)
                         {
                             KeyList.Add(string.Empty);
                         }
@@ -62,15 +61,15 @@ namespace MyFinances.Pages.FinTransactions
             List<string> Keys = [];
             foreach (var key in KeyList)
             {
-                if(key != null) 
+                if (key != null)
                 {
-                    if(key.Length > 2 && key.Length < 45)
+                    if (key.Length > 2 && key.Length < 45)
                     {
                         Keys.Add(key.Trim());
                     }
                 }
             }
-            if(Keys.Count > 0)
+            if (Keys.Count > 0)
             {
                 var uniqueList = Keys.Distinct().ToList();
                 JsonSerializerOptions jsonser = new()

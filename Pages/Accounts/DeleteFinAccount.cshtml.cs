@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MyFinances.Controllers;
-using MyFinances.Data;
 using MyFinances.Models;
+using System.Data.Common;
+using System.Text;
 
 namespace MyFinances.Pages.Accounts
 {
@@ -25,7 +20,7 @@ namespace MyFinances.Pages.Accounts
         [BindProperty]
         public bool CanDelete { get; set; } = true;
         public string NameCategory { get; set; } = string.Empty;
-        public string NameOwner {  get; set; }  = string.Empty;
+        public string NameOwner { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -34,9 +29,9 @@ namespace MyFinances.Pages.Accounts
                 return NotFound();
             }
             FinAccount = await _context.FinAccounts.FirstOrDefaultAsync(m => m.IdFinAccount == id) ?? default!;
-            if(FinAccount == default) { return NotFound(); }
+            if (FinAccount == default) { return NotFound(); }
             await FillOutNames();
-            if(FinAccount.IsLinked) {CanDelete = false; ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of a contract data"; }
+            if (FinAccount.IsLinked) { CanDelete = false; ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of a contract data"; }
             FinAccountHelper fah = new(_context, _config);
             StringBuilder sb = new();
             // user check
@@ -46,13 +41,13 @@ namespace MyFinances.Pages.Accounts
                 ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of a user data";
                 CanDelete = false;
             }
-            if(CanDelete && FinAccount.AccountCategory < 2000)
+            if (CanDelete && FinAccount.AccountCategory < 2000)
             {
                 cdfa = await fah.FinAccountUsedByTAsset(FinAccount.IdFinAccount);
-                if(!cdfa)
+                if (!cdfa)
                 {
                     cdfa = await fah.FinAccountUsedByShares(FinAccount.IdFinAccount);
-                    if(cdfa)
+                    if (cdfa)
                     {
                         CanDelete = false;
                         ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is part of shares data";
@@ -64,15 +59,15 @@ namespace MyFinances.Pages.Accounts
                     CanDelete = false;
                 }
             }
-            if(CanDelete)
+            if (CanDelete)
             {
                 cdfa = await fah.AccountIsUsedByTransactions(FinAccount.IdFinAccount);
-                if(cdfa)
+                if (cdfa)
                 {
                     CanDelete = false;
                     ViewData["DelMessage"] = $"Account {FinAccount.Name} cannot be deleted as is referenced in transactions";
                 }
-                
+
             }
             return Page();
         }
@@ -86,7 +81,7 @@ namespace MyFinances.Pages.Accounts
                 TempData["SuccessMessage"] = $"Account {FinAccount.Name} is deleted! \n {x} item deleted";
                 _cache.Remove("FinAccountsList");
             }
-            catch(DbException ex)
+            catch (DbException ex)
             {
                 TempData["ErrorMessage"] = $"Ooops there was an error deleting {FinAccount.Name} \n {ex.Message}";
             }
@@ -95,8 +90,8 @@ namespace MyFinances.Pages.Accounts
 
         private async Task FillOutNames()
         {
-            NameCategory = await _context.AccountCategories.AsNoTracking().Where(p=>p.IdAccountCategory == FinAccount.AccountCategory).Select(s=>s.AccountCategoryName).FirstOrDefaultAsync() ?? FinAccount.AccountCategory.ToString();
-            NameOwner = await _context.UserContracts.AsNoTracking().Where(x => x.IdUser == FinAccount.AccountOwner).Select(s=>s.FullName).FirstOrDefaultAsync() ?? FinAccount.AccountOwner.ToString();
+            NameCategory = await _context.AccountCategories.AsNoTracking().Where(p => p.IdAccountCategory == FinAccount.AccountCategory).Select(s => s.AccountCategoryName).FirstOrDefaultAsync() ?? FinAccount.AccountCategory.ToString();
+            NameOwner = await _context.UserContracts.AsNoTracking().Where(x => x.IdUser == FinAccount.AccountOwner).Select(s => s.FullName).FirstOrDefaultAsync() ?? FinAccount.AccountOwner.ToString();
 
         }
     }

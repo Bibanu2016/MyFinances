@@ -1,21 +1,12 @@
-using CsvHelper;
-using CsvHelper.Configuration;
-using Elfie.Serialization;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MyFinances.Controllers;
 using MyFinances.Data;
-using MyFinances.Models;
 using MyFinances.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -27,7 +18,7 @@ namespace MyFinances.Pages.FinTransactions
         private readonly IDataTableJsonService _tableJsonService = tableJsonService;
         [BindProperty]
         public IFormFile? Upload { get; set; } = default!;
-        [BindProperty, Required, Range(1000000, 3000000, ErrorMessage =$"A selection is required")]
+        [BindProperty, Required, Range(1000000, 3000000, ErrorMessage = $"A selection is required")]
         public int ImportSourceID { get; set; } = 0;
 
         public IList<ViewModels.ComboIntStrLVM> AccountsList { get; set; } = [];
@@ -50,7 +41,7 @@ namespace MyFinances.Pages.FinTransactions
             if (Upload == null || Upload.Length == 0)
             {
                 ModelState.AddModelError("Upload", "Please select a file.");
-                
+
             }
             else
             {
@@ -68,7 +59,7 @@ namespace MyFinances.Pages.FinTransactions
                 }
                 using Stream stream1 = Upload.OpenReadStream();
                 bool validFile = _csvService.CsvFileIsValid(stream1);
-                if(!validFile)
+                if (!validFile)
                 {
                     ModelState.TryAddModelError("Upload", "The file content appear invalid. \n Numbers of columns between 3 to 5, a Date and Number field are required.");
                 }

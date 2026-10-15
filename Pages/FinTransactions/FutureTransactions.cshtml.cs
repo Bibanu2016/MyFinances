@@ -7,10 +7,6 @@ using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
 using NuGet.Packaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -19,7 +15,7 @@ namespace MyFinances.Pages.FinTransactions
         private readonly AppDBContext _context = context;
         private readonly IMemoryCache _memory = memory;
         private readonly IComboFillService _fillService = fillService;
-        public IList<PlanTransaction> PlanTransaction { get;set; } = [];
+        public IList<PlanTransaction> PlanTransaction { get; set; } = [];
 
         public IList<PlanTransaction> IncomingList { get; set; } = [];
         public IList<PlanTransaction> OverdueList { get; set; } = [];
@@ -27,7 +23,7 @@ namespace MyFinances.Pages.FinTransactions
         public IList<PlanTransaction> ExecutedList { get; set; } = [];
         [BindProperty(SupportsGet = true)]
         public DateTime StartDate { get; set; } = DateTime.Today.AddDays(-7);
-        [BindProperty(SupportsGet =true)]
+        [BindProperty(SupportsGet = true)]
         public DateTime EndDate { get; set; } = DateTime.Today.AddDays(7);
         [BindProperty(SupportsGet = true)]
         public int FilterAccount { get; set; } = 0;
@@ -36,8 +32,8 @@ namespace MyFinances.Pages.FinTransactions
 
         public async Task OnGetAsync()
         {
-            if(EndDate < DateTime.Today) { EndDate = DateTime.Today.AddDays(7); } // guard against an EndDate less than a week from today
-            if(StartDate > DateTime.Today) { StartDate = DateTime.Today; }
+            if (EndDate < DateTime.Today) { EndDate = DateTime.Today.AddDays(7); } // guard against an EndDate less than a week from today
+            if (StartDate > DateTime.Today) { StartDate = DateTime.Today; }
             PlanTransaction = await ApplyFilters(_context.PlanTransactions).ToListAsync() ?? [];
             if (PlanTransaction.Count > 0)
             {
@@ -50,7 +46,7 @@ namespace MyFinances.Pages.FinTransactions
 
         private IQueryable<PlanTransaction> ApplyFilters(IQueryable<PlanTransaction> query)
         {
-            if(FilterAccount > 0)
+            if (FilterAccount > 0)
             {
                 query = query.Where(p => p.TransactionDate >= StartDate && p.TransactionDate < EndDate && (p.DebitAccount == FilterAccount || p.CreditAccount == FilterAccount)).OrderByDescending(y => y.TransactionDate).AsNoTracking();
             }
@@ -58,7 +54,7 @@ namespace MyFinances.Pages.FinTransactions
             {
                 query = query.Where(p => p.TransactionDate >= StartDate && p.TransactionDate < EndDate).OrderByDescending(y => y.TransactionDate).AsNoTracking();
             }
-            
+
             return query;
         }
 

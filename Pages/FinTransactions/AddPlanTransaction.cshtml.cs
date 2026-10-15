@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
@@ -7,6 +6,7 @@ using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
+using System.Data.Common;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -32,7 +32,7 @@ namespace MyFinances.Pages.FinTransactions
         {
             // check if any of the debit or credit are source of import data
             FinAccountHelper fah = new(_context, default!);
-            if(PlanTransaction.DebitAccount > 1000000 && PlanTransaction.CreditAccount > 1000000)
+            if (PlanTransaction.DebitAccount > 1000000 && PlanTransaction.CreditAccount > 1000000)
             {
                 bool debitSource = await fah.AccountIsSource(PlanTransaction.DebitAccount);
                 bool creditSource = await fah.AccountIsSource(PlanTransaction.CreditAccount);
@@ -55,15 +55,15 @@ namespace MyFinances.Pages.FinTransactions
                 {
                     if (PlanTransaction.IdSource != PlanTransaction.CreditAccount)
                     {
-                        setErrorSource= true;
+                        setErrorSource = true;
                     }
                 }
-                if(setErrorSource)
+                if (setErrorSource)
                 {
                     ModelState.TryAddModelError("PlanTransaction.IdSource", "A valid source is required");
                 }
             }
-            if(PlanTransaction.TransactionDate < DateTime.Today)
+            if (PlanTransaction.TransactionDate < DateTime.Today)
             {
                 ModelState.TryAddModelError("PlanTransaction.TransactionDate", "A date later or today is required");
             }
@@ -79,7 +79,7 @@ namespace MyFinances.Pages.FinTransactions
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"Plan transaction with ID: {PlanTransaction.IdTransaction} successfully recorded!";
             }
-            catch(DbException ex)
+            catch (DbException ex)
             {
                 TempData["ErrorMessage"] = $"Ooops there was en error recording the data. \n {ex.Message}";
             }

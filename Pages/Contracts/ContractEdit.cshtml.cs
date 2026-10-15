@@ -49,10 +49,10 @@ namespace MyFinances.Pages.Contracts
         [BindProperty]
         public bool BalanceUpdateOK { get; set; } = false;
         [BindProperty]
-        
-        public short RestrictionsOn {  get; set; } = 0;
 
-        public ContractFull OriginalContract {  get; set; } = default!;
+        public short RestrictionsOn { get; set; } = 0;
+
+        public ContractFull OriginalContract { get; set; } = default!;
 
         #region COMBO_LISTS
         //combo lists
@@ -69,7 +69,7 @@ namespace MyFinances.Pages.Contracts
         #endregion COMBO_LISTS
 
 
-        public string FrequencyName {  get; set; } = string.Empty;
+        public string FrequencyName { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync(Guid? pid)
         {
@@ -77,22 +77,22 @@ namespace MyFinances.Pages.Contracts
             {
                 return NotFound();
             }
-            Id = pid??Guid.Empty;
+            Id = pid ?? Guid.Empty;
             FinContractHelper fch = new(_context, _config);
             CFM = await fch.GetContractOnID(Id);
-            if(CFM is null) { return NotFound(); }
+            if (CFM is null) { return NotFound(); }
             CFM.FinContract.InvoiceDate = new FinanceCalculator.CalculatorDates(CFM.FinContract.IdFrequency).NextCycleDate(CFM.FinContract.InvoiceDate, DateTime.Today);
             OriginalContract = CFM;
             await FillUpLists();
-            if(CFM.FinContract.ContractType == 2) { TangibleAsset = await _comboFill.GetContractEndActionList(); }
-            if(CFM.FinContract.ContractType == 4) { SuperAccount = await _comboFill.GetSuperFinAccountsList(); }
+            if (CFM.FinContract.ContractType == 2) { TangibleAsset = await _comboFill.GetContractEndActionList(); }
+            if (CFM.FinContract.ContractType == 4) { SuperAccount = await _comboFill.GetSuperFinAccountsList(); }
             // get contract balance - apply only for Deposit, Loan, and CreditCard
-            if(CFM.FinContract.ContractType < 3)
+            if (CFM.FinContract.ContractType < 3)
             {
                 RealBalance = await fch.GetContractRealBalance(CFM.FinContract.IdFinAccount, DateTime.Now);
                 ForecastBalance = await fch.GetContractPlannedBalance(CFM.FinContract.IdFinAccount, DateTime.Now);
                 OriginalForeBalance = ForecastBalance;
-                if(CFM.FinContract.ContractType == 3)
+                if (CFM.FinContract.ContractType == 3)
                 {
                     CardCashRealBalance = await fch.GetContractRealBalance(CFM.FinContract.IdFinAccount, DateTime.Now, CFM.CreditCard.CashOutAccount);
                     CardCashPlanBalance = await fch.GetContractPlannedBalance(CFM.FinContract.IdFinAccount, DateTime.Now, CFM.CreditCard.CashOutAccount);
@@ -131,7 +131,7 @@ namespace MyFinances.Pages.Contracts
             //
             FinContractHelper fch = new(_context, _config);
             OriginalContract = await fch.GetContractOnID(Id);
-            if(OriginalContract == default) { TempData["ErrorMessage"] = $"Error in retrieving data for contract id {Id}"; return RedirectToPage("./ContractsList"); }
+            if (OriginalContract == default) { TempData["ErrorMessage"] = $"Error in retrieving data for contract id {Id}"; return RedirectToPage("./ContractsList"); }
             //
             // update FinContract if there are changes in data
             //
@@ -139,13 +139,13 @@ namespace MyFinances.Pages.Contracts
             //
             // if name changed update FinAccount
             //
-            if(changesMade == false) { TempData["ErrorMessage"] = $"Error in updating contract data for contract id {Id} \n or no changes have been detected."; return RedirectToPage("./ContractsList"); }            
+            if (changesMade == false) { TempData["ErrorMessage"] = $"Error in updating contract data for contract id {Id} \n or no changes have been detected."; return RedirectToPage("./ContractsList"); }
             string errMessage = string.Empty;
             if (CFM.FinContract.ContractName != OriginalContract.FinContract.ContractName)
             {
                 errMessage = await UpdateAccountsName(OriginalContract.FinContract.ContractName, CFM.FinContract.ContractName);
             }
-            if(errMessage.Length > 0)
+            if (errMessage.Length > 0)
             {
                 TempData["ErrorMessage"] = errMessage;
                 return RedirectToPage("./ContractsList");
@@ -158,8 +158,8 @@ namespace MyFinances.Pages.Contracts
             string success = string.Empty;
             int ptAction = ReplaceOrUpdate(cIsEx, CFM, OriginalContract);
             DateTime fromDate = await fch.GetDateLastTransac(cIsEx, CFM.FinContract.IdFinAccount, DateTime.Now);
-            if(ptAction == 1) { success = await ReplacePlanTransactions(fromDate); }
-            if(ptAction == -1) {  success = await UpdateContractPlanTransactions(fromDate); }
+            if (ptAction == 1) { success = await ReplacePlanTransactions(fromDate); }
+            if (ptAction == -1) { success = await UpdateContractPlanTransactions(fromDate); }
             // update contract equivalent monthly rate
             CFM.FinContract.EquivMonthlyRate = EquivMonthRate;
             _context.FinContracts.Update(CFM.FinContract);
@@ -201,7 +201,7 @@ namespace MyFinances.Pages.Contracts
                     "CFM.Income",
                     "CFM.Bill"
                 ];
-            switch(cc)
+            switch (cc)
             {
                 case 1:
                     ms.Remove(supClass[1]);
@@ -261,9 +261,9 @@ namespace MyFinances.Pages.Contracts
                     ms.Remove(supClass[5]);
                     break;
             }
-            
+
         }
-    #region updateprocedures
+        #region updateprocedures
 
         private static int ReplaceOrUpdate(bool isContractExecuted, ContractFull modCont, ContractFull origCont)
         {
@@ -273,41 +273,41 @@ namespace MyFinances.Pages.Contracts
             int uC = 0;
             if (isContractExecuted)
             {
-                if(modCont.FinContract.InvoiceDate.Date != origCont.FinContract.InvoiceDate.Date) { rC++; }
-                if(modCont.FinContract.InvoiceNetDays !=  origCont.FinContract.InvoiceNetDays) { rC++; }
-                if(modCont.FinContract.IdPayAccount != origCont.FinContract.IdPayAccount) { uC++; }
-                if(modCont.FinContract.IdBankAccount != origCont.FinContract.IdBankAccount) { uC++; }
+                if (modCont.FinContract.InvoiceDate.Date != origCont.FinContract.InvoiceDate.Date) { rC++; }
+                if (modCont.FinContract.InvoiceNetDays != origCont.FinContract.InvoiceNetDays) { rC++; }
+                if (modCont.FinContract.IdPayAccount != origCont.FinContract.IdPayAccount) { uC++; }
+                if (modCont.FinContract.IdBankAccount != origCont.FinContract.IdBankAccount) { uC++; }
                 switch (modCont.FinContract.ContractType)
                 {
                     case 1:
-                        if(modCont.Deposit.DepositRate != origCont.Deposit.DepositRate) { uC++; }
-                        if(modCont.Deposit.InterestRatePerYear != origCont.Deposit.InterestRatePerYear) { uC++; }
+                        if (modCont.Deposit.DepositRate != origCont.Deposit.DepositRate) { uC++; }
+                        if (modCont.Deposit.InterestRatePerYear != origCont.Deposit.InterestRatePerYear) { uC++; }
                         break;
                     case 2:
-                        if(modCont.Loan.LoanInterest != origCont.Loan.LoanInterest) { uC++; }
-                        if(modCont.Loan.ExtraPay != origCont.Loan.ExtraPay) { uC++; }
-                        if(modCont.Loan.LoanAmount != origCont.Loan.LoanAmount) { rC++; }
+                        if (modCont.Loan.LoanInterest != origCont.Loan.LoanInterest) { uC++; }
+                        if (modCont.Loan.ExtraPay != origCont.Loan.ExtraPay) { uC++; }
+                        if (modCont.Loan.LoanAmount != origCont.Loan.LoanAmount) { rC++; }
                         break;
                     case 3:
-                        if(modCont.CreditCard.CreditCardPayPercent != origCont.CreditCard.CreditCardPayPercent) { uC++; }
-                        if(modCont.CreditCard.CreditCardInterest !=  origCont.CreditCard.CreditCardInterest) { uC++; }
-                        if(modCont.CreditCard.CashRate != origCont.CreditCard.CashRate) { uC++; }
-                        if(modCont.CreditCard.CycleFee != origCont.CreditCard.CycleFee) { uC++; }
-                        if(modCont.CreditCard.CreditCardInsuranceRate != origCont.CreditCard.CreditCardInsuranceRate) { uC++; }
-                        if(modCont.CreditCard.ExtraPay != origCont.CreditCard.ExtraPay) {  uC++; }
+                        if (modCont.CreditCard.CreditCardPayPercent != origCont.CreditCard.CreditCardPayPercent) { uC++; }
+                        if (modCont.CreditCard.CreditCardInterest != origCont.CreditCard.CreditCardInterest) { uC++; }
+                        if (modCont.CreditCard.CashRate != origCont.CreditCard.CashRate) { uC++; }
+                        if (modCont.CreditCard.CycleFee != origCont.CreditCard.CycleFee) { uC++; }
+                        if (modCont.CreditCard.CreditCardInsuranceRate != origCont.CreditCard.CreditCardInsuranceRate) { uC++; }
+                        if (modCont.CreditCard.ExtraPay != origCont.CreditCard.ExtraPay) { uC++; }
                         break;
                     case 4:
-                        if(modCont.Employment.GrossPaidCycle != origCont.Employment.GrossPaidCycle) { uC++; }
-                        if(modCont.Employment.TaxPaidCycle != origCont.Employment.TaxPaidCycle) { uC++; }
-                        if(modCont.Employment.SuperPaidCycle != origCont.Employment.SuperPaidCycle) { uC++; }
-                        if(modCont.Employment.IdSuperAccount != origCont.Employment.IdSuperAccount) {  uC++; }
+                        if (modCont.Employment.GrossPaidCycle != origCont.Employment.GrossPaidCycle) { uC++; }
+                        if (modCont.Employment.TaxPaidCycle != origCont.Employment.TaxPaidCycle) { uC++; }
+                        if (modCont.Employment.SuperPaidCycle != origCont.Employment.SuperPaidCycle) { uC++; }
+                        if (modCont.Employment.IdSuperAccount != origCont.Employment.IdSuperAccount) { uC++; }
                         break;
                     case 5:
-                        if(modCont.Income.GrossPerCycle != origCont.Income.GrossPerCycle) { uC++; }
-                        if(modCont.Income.TaxPaidCycle != origCont.Income.TaxPaidCycle) { uC++; }
+                        if (modCont.Income.GrossPerCycle != origCont.Income.GrossPerCycle) { uC++; }
+                        if (modCont.Income.TaxPaidCycle != origCont.Income.TaxPaidCycle) { uC++; }
                         break;
                     case 6:
-                        if(modCont.Bill.BillCycleRate != origCont.Bill.BillCycleRate) { uC++; }
+                        if (modCont.Bill.BillCycleRate != origCont.Bill.BillCycleRate) { uC++; }
                         break;
                     case 7:
                         if (modCont.Bill.BillCycleRate != origCont.Bill.BillCycleRate) { uC++; }
@@ -372,9 +372,9 @@ namespace MyFinances.Pages.Contracts
         private bool UpdateContractData(ContractFull original)
         {
             bool result = false;
-            if(original is null) { return result; }
+            if (original is null) { return result; }
             if (!CFM.FinContract.Equals(original.FinContract)) { _context.FinContracts.Update(CFM.FinContract); result = true; }
-            switch(CFM.FinContract.ContractType)
+            switch (CFM.FinContract.ContractType)
             {
                 case 1:
                     if (!CFM.Deposit.Equals(original.Deposit))
@@ -428,7 +428,7 @@ namespace MyFinances.Pages.Contracts
         {
             string result = string.Empty;
             var mainAccount = await _context.FinAccounts.FirstOrDefaultAsync(x => x.IdFinAccount == CFM.FinContract.IdFinAccount);
-            if (mainAccount == null) 
+            if (mainAccount == null)
             {
                 return $"Error in retrieving account data for contract {oldName}";
             }
@@ -437,7 +437,7 @@ namespace MyFinances.Pages.Contracts
             {
                 case 1:
                     var depositInterest = await _context.FinAccounts.FirstOrDefaultAsync(x => x.IdFinAccount == CFM.Deposit.InterestAccount);
-                    if(depositInterest is null) { return $"Error in retrieving account data for contract {oldName}"; }
+                    if (depositInterest is null) { return $"Error in retrieving account data for contract {oldName}"; }
                     depositInterest.Name = depositInterest.Name.Replace(oldName, newName);
                     _context.FinAccounts.Update(depositInterest);
                     break;
@@ -478,9 +478,9 @@ namespace MyFinances.Pages.Contracts
             if (clpt.Count > 0)
             {
                 decimal lbv = ForecastBalance;
-                if(RestrictionsOn == 1) {BalanceUpdateOK = true; } // for Executed contracts the update is done automatically
-                if(BalanceUpdateOK) { lbv = RealBalance; }
-                List<PlanTransaction> incomeRateList = [.. clpt.Where(p=>p.DebitAccount == CFM.FinContract.IdFinAccount && p.CreditAccount == OriginalContract.FinContract.IdPayAccount && p.IdSource == CFM.FinContract.IdFinAccount)];
+                if (RestrictionsOn == 1) { BalanceUpdateOK = true; } // for Executed contracts the update is done automatically
+                if (BalanceUpdateOK) { lbv = RealBalance; }
+                List<PlanTransaction> incomeRateList = [.. clpt.Where(p => p.DebitAccount == CFM.FinContract.IdFinAccount && p.CreditAccount == OriginalContract.FinContract.IdPayAccount && p.IdSource == CFM.FinContract.IdFinAccount)];
                 List<PlanTransaction> interestList = [.. clpt.Where(p => p.DebitAccount == CFM.Deposit.InterestAccount && p.CreditAccount == CFM.FinContract.IdFinAccount)];
                 List<PlanTransaction> paymentRateList = [.. clpt.Where(p => p.DebitAccount == CFM.FinContract.IdFinAccount && p.CreditAccount == OriginalContract.FinContract.IdPayAccount && p.IdSource == OriginalContract.FinContract.IdPayAccount)];
                 // update payment account if changed
@@ -490,7 +490,7 @@ namespace MyFinances.Pages.Contracts
                     {
                         transaction.CreditAccount = CFM.FinContract.IdPayAccount;
                     }
-                    foreach(PlanTransaction payment in paymentRateList)
+                    foreach (PlanTransaction payment in paymentRateList)
                     {
                         payment.CreditAccount = CFM.FinContract.IdPayAccount;
                         payment.IdSource = CFM.FinContract.IdPayAccount;
@@ -513,7 +513,7 @@ namespace MyFinances.Pages.Contracts
                     lbv += CFM.Deposit.DepositRate + interestList[i].TransactionValue;
                 }
                 // update value for the contract EMR
-                FrequencyConversion fc = new(CFM.FinContract.IdFrequency);        
+                FrequencyConversion fc = new(CFM.FinContract.IdFrequency);
                 if (rateChange) { EquivMonthRate = -1 * fc.CycletoMonthConversion(CFM.Deposit.DepositRate); }
                 return string.Empty;
             }
@@ -531,9 +531,9 @@ namespace MyFinances.Pages.Contracts
             if (clpt.Count == 0) { return $"No plan transactions could be retrieved"; }
             List<PlanTransaction> pTrans = [.. clpt];
             decimal lbv = ForecastBalance;
-            if (RestrictionsOn == 1) 
-            { 
-                lbv = RealBalance; 
+            if (RestrictionsOn == 1)
+            {
+                lbv = RealBalance;
             }
             else
             {
@@ -546,13 +546,13 @@ namespace MyFinances.Pages.Contracts
             List<PlanTransaction> paymentRateList = [.. clpt.Where(p => p.DebitAccount == CFM.FinContract.IdFinAccount && p.CreditAccount == OriginalContract.FinContract.IdPayAccount && p.IdSource == OriginalContract.FinContract.IdPayAccount)];
             List<PlanTransaction> coverRateList = [.. clpt.Where(p => p.DebitAccount == OriginalContract.FinContract.IdPayAccount && p.CreditAccount == OriginalContract.FinContract.IdBankAccount && p.IdSource == OriginalContract.FinContract.IdBankAccount)];
             // update of the PayAccount
-            if(CFM.FinContract.IdPayAccount != OriginalContract.FinContract.IdPayAccount)
+            if (CFM.FinContract.IdPayAccount != OriginalContract.FinContract.IdPayAccount)
             {
-                foreach(PlanTransaction pt in incomeRateList)
+                foreach (PlanTransaction pt in incomeRateList)
                 {
                     pt.CreditAccount = CFM.FinContract.IdPayAccount;
                 }
-                foreach(PlanTransaction pt in paymentRateList)
+                foreach (PlanTransaction pt in paymentRateList)
                 {
                     pt.CreditAccount = CFM.FinContract.IdPayAccount;
                     pt.IdSource = CFM.FinContract.IdPayAccount;
@@ -574,7 +574,7 @@ namespace MyFinances.Pages.Contracts
             bool changePayAccounts = (CFM.FinContract.IdPayAccount == OriginalContract.FinContract.IdPayAccount) || (CFM.FinContract.IdBankAccount == OriginalContract.FinContract.IdBankAccount);
             bool needCover = CFM.FinContract.IdPayAccount != CFM.FinContract.IdBankAccount;
             // remove all cover payments if change in payment accounts
-            if(changePayAccounts && coverRateList.Count > 0)
+            if (changePayAccounts && coverRateList.Count > 0)
             {
                 _context.PlanTransactions.RemoveRange(coverRateList);
             }
@@ -600,7 +600,7 @@ namespace MyFinances.Pages.Contracts
                     //
                     // cover payments
                     //
-                    if(needCover)
+                    if (needCover)
                     {
                         PlanTransaction ptCover = new()
                         {
@@ -625,7 +625,7 @@ namespace MyFinances.Pages.Contracts
                 decimal newRate = interestHasChanged ? calfin.LoanFixedRate() : incomeRateList[0].TransactionValue; // change rate only if there was a change in interest
                 for (int i = 0; i < totalIter; i++)
                 {
-                    if(lbv <=0) { newRate = 0; } // cover when the balance is going negative
+                    if (lbv <= 0) { newRate = 0; } // cover when the balance is going negative
                     incomeRateList[i].TransactionValue = newRate;
                     incomeRateList[i].CreditAccount = CFM.FinContract.IdPayAccount; // in case there is a change in the payment account
                     paymentRateList[i].TransactionValue = incomeRateList[i].TransactionValue;
@@ -661,17 +661,17 @@ namespace MyFinances.Pages.Contracts
             FrequencyConversion fc = new(CFM.FinContract.IdFrequency);
             EquivMonthRate = -1 * fc.CycletoMonthConversion(paymentRateList[0].TransactionValue);
             // add transaction to adjust the balance if a balance update for a non-executed loan
-            if(RestrictionsOn == 0 && BalanceUpdateOK)
+            if (RestrictionsOn == 0 && BalanceUpdateOK)
             {
                 decimal delta = OriginalForeBalance - ForecastBalance;
                 if (delta != 0)
                 {
                     var uc = await _context.UserContracts.FindAsync(CFM.FinContract.IdContractor);
                     int receivable = uc != null ? uc.UserReceivable : 0;
-                    int payable = uc != null ? uc.UserPayable: 0;
+                    int payable = uc != null ? uc.UserPayable : 0;
                     int debitAcc = 0;
                     int creditACC = 0;
-                    if(delta < 0)
+                    if (delta < 0)
                     {
                         debitAcc = CFM.FinContract.IdFinAccount;
                         creditACC = payable;
@@ -709,11 +709,11 @@ namespace MyFinances.Pages.Contracts
             decimal purchBal = ForecastBalance;
             decimal cashBal = CardCashPlanBalance;
 
-            if(RestrictionsOn == 1) { BalanceUpdateOK = true; }
-            if (BalanceUpdateOK) 
+            if (RestrictionsOn == 1) { BalanceUpdateOK = true; }
+            if (BalanceUpdateOK)
             {
-               purchBal = RealBalance;
-               cashBal = CardCashRealBalance; 
+                purchBal = RealBalance;
+                cashBal = CardCashRealBalance;
             }
             // set the lists for incomeRate, payRate, interest, fee, insurance, and cover
             List<PlanTransaction> incomeRateList = [.. clpt.Where(p => p.DebitAccount == CFM.FinContract.IdFinAccount && p.CreditAccount == OriginalContract.FinContract.IdPayAccount && p.IdSource == CFM.FinContract.IdFinAccount)];
@@ -746,10 +746,10 @@ namespace MyFinances.Pages.Contracts
             int temp_2 = Math.Min(Math.Min(cashRateList.Count, interestList.Count), Math.Min(feeList.Count, insuranceList.Count));
             int totalPT = Math.Min(temp_1, temp_2);
             // remove all coverList elements
-            if(coverRateList.Count > 0)
+            if (coverRateList.Count > 0)
             {
                 _context.PlanTransactions.RemoveRange(coverRateList);
-            }     
+            }
             // initialize the Finance calculator class
             CalculatorFinance calfin = new(CFM.CreditCard.CreditCardInterest * 0.01m, CFM.FinContract.IdFrequency)
             {
@@ -760,7 +760,7 @@ namespace MyFinances.Pages.Contracts
             // update fees
             if (CFM.CreditCard.CycleFee != OriginalContract.CreditCard.CycleFee)
             {
-                foreach(PlanTransaction fee in feeList)
+                foreach (PlanTransaction fee in feeList)
                 {
                     fee.TransactionValue = CFM.CreditCard.CycleFee;
                 }
@@ -770,7 +770,7 @@ namespace MyFinances.Pages.Contracts
             decimal poffLimit = _config.GetSection("MySettings").GetValue<decimal>("CardPayOffLimit");
             if (poffLimit == 0) { poffLimit = 100; }
             decimal insurDec = CFM.CreditCard.CreditCardInsuranceRate * 0.01m; // value is listed in percent and transformed to decimal
-            for (int i = 0; i<totalPT; i++)
+            for (int i = 0; i < totalPT; i++)
             {
                 incomeRateList[i].TransactionValue = calfin.CardRateOnBalance(purchBal, (decimal)CFM.CreditCard.CreditCardPayPercent, poffLimit);
                 cashRateList[i].TransactionValue = calfin.CardRateOnBalance(cashBal, (decimal)CFM.CreditCard.CreditCardPayPercent, poffLimit, CFM.CreditCard.CashRate);
@@ -838,11 +838,11 @@ namespace MyFinances.Pages.Contracts
             if (clpt.Count == 0) return $"No plan transactions identified";
             List<PlanTransaction> netIncomeList = [.. clpt.Where(p => p.CreditAccount == CFM.FinContract.IdFinAccount)];
             List<PlanTransaction> superList = [.. clpt.Where(p => p.DebitAccount == CFM.Employment.IdSuperAccount)];
-            int idTaxAccount = await _context.UserContracts.Where(p=>p.IdUser == CFM.FinContract.IdContractor).Select(s=>s.UserTaxAccount).FirstOrDefaultAsync();
+            int idTaxAccount = await _context.UserContracts.Where(p => p.IdUser == CFM.FinContract.IdContractor).Select(s => s.UserTaxAccount).FirstOrDefaultAsync();
             List<PlanTransaction> taxList = [.. clpt.Where(p => p.DebitAccount == idTaxAccount)];
             // calculate total number of iterations
             int totalIteration = netIncomeList.Count;
-            if(superList.Count > 0) { totalIteration = Math.Min(superList.Count, totalIteration); }
+            if (superList.Count > 0) { totalIteration = Math.Min(superList.Count, totalIteration); }
             if (taxList.Count > 0) { totalIteration = Math.Min(taxList.Count, totalIteration); }
             //update Pay Account if changed
             if (CFM.FinContract.IdPayAccount != OriginalContract.FinContract.IdPayAccount)
@@ -854,17 +854,17 @@ namespace MyFinances.Pages.Contracts
                 }
             }
             // update Super account if changed
-            if(CFM.Employment.IdSuperAccount != OriginalContract.Employment.IdSuperAccount)
+            if (CFM.Employment.IdSuperAccount != OriginalContract.Employment.IdSuperAccount)
             {
-                foreach(PlanTransaction pt in superList)
+                foreach (PlanTransaction pt in superList)
                 {
                     pt.DebitAccount = CFM.Employment.IdSuperAccount;
                 }
             }
             // update rates
-            if(CFM.Employment.GrossPaidCycle != OriginalContract.Employment.GrossPaidCycle)
+            if (CFM.Employment.GrossPaidCycle != OriginalContract.Employment.GrossPaidCycle)
             {
-                foreach(PlanTransaction net in netIncomeList)
+                foreach (PlanTransaction net in netIncomeList)
                 {
                     net.TransactionValue = CFM.Employment.GrossPaidCycle - CFM.Employment.TaxPaidCycle;
                 }
@@ -876,7 +876,7 @@ namespace MyFinances.Pages.Contracts
                 if (taxList.Count > 0)
                 {
                     // existing tax values
-                    foreach(PlanTransaction tt in taxList)
+                    foreach (PlanTransaction tt in taxList)
                     {
                         tt.TransactionValue = CFM.Employment.TaxPaidCycle; // leave tax PTs even if value is zero for further updates
                     }
@@ -898,7 +898,7 @@ namespace MyFinances.Pages.Contracts
                             TransactionDetail = detailedTax,
                             ExecutedTransaction = false,
                             ContractIdentifier = CFM.FinContract.IdFinAccount,
-                            IdSource = CFM.FinContract.IdFinAccount               
+                            IdSource = CFM.FinContract.IdFinAccount
                         };
                         _context.PlanTransactions.Add(tax);
                     }
@@ -910,10 +910,10 @@ namespace MyFinances.Pages.Contracts
                 if (superList.Count > 0)
                 {
                     //update value
-                    if(CFM.Employment.SuperPaidCycle > 0)
+                    if (CFM.Employment.SuperPaidCycle > 0)
                     {
                         //update value
-                        foreach(PlanTransaction pt in superList)
+                        foreach (PlanTransaction pt in superList)
                         {
                             pt.TransactionValue = CFM.Employment.SuperPaidCycle;
                         }
@@ -1023,7 +1023,7 @@ namespace MyFinances.Pages.Contracts
             EquivMonthRate = fc.CycletoMonthConversion(CFM.Income.GrossPerCycle - CFM.Income.TaxPaidCycle);
             return result;
         }
-        
+
         private async Task<string> UpdateBill(DateTime startDate, IConfiguration section)
         {
             string result = string.Empty;
@@ -1032,18 +1032,18 @@ namespace MyFinances.Pages.Contracts
             var clpt = await _context.PlanTransactions.AsQueryable().Where(c => c.ContractIdentifier == CFM.FinContract.IdFinAccount && c.TransactionDate >= startDate).OrderBy(d => d.TransactionDate).ToListAsync();
             if (clpt.Count == 0) return $"No plan transactions identified for the bill {CFM.FinContract.ContractName}";
             string detailBill = section.GetValue<string>("Rate") ?? "Payment to ";
-            List<PlanTransaction> ratesList = [.. clpt.Where(p=>p.DebitAccount == CFM.FinContract.IdFinAccount)];
+            List<PlanTransaction> ratesList = [.. clpt.Where(p => p.DebitAccount == CFM.FinContract.IdFinAccount)];
             List<PlanTransaction> coverList_P = [.. clpt.Where(p => p.DebitAccount == OriginalContract.FinContract.IdPayAccount && p.CreditAccount == OriginalContract.FinContract.IdBankAccount && p.IdSource == OriginalContract.FinContract.IdPayAccount)]; // here are both sources idpayaccount and idbankaccount
             List<PlanTransaction> coverList_B = [.. clpt.Where(p => p.DebitAccount == OriginalContract.FinContract.IdPayAccount && p.CreditAccount == OriginalContract.FinContract.IdBankAccount && p.IdSource == OriginalContract.FinContract.IdBankAccount)]; // here are both sources idpayaccount and idbankaccount
             bool bhc_P = coverList_P.Count > 0;
             bool bhc_B = coverList_B.Count > 0;
             // remove cover if there is a variation in the number of elements between the two lists
-            if(coverList_P.Count != coverList_B.Count)
+            if (coverList_P.Count != coverList_B.Count)
             {
                 coverList_P.Clear();
                 coverList_B.Clear();
                 if (bhc_P) { _context.PlanTransactions.RemoveRange(coverList_P); }
-                if(bhc_B) { _context.PlanTransactions.RemoveRange(coverList_B); }
+                if (bhc_B) { _context.PlanTransactions.RemoveRange(coverList_B); }
                 bhc_P = false;
                 bhc_B = false;
             }
@@ -1063,18 +1063,18 @@ namespace MyFinances.Pages.Contracts
                         pt.IdSource = CFM.FinContract.IdPayAccount;
                     }
                 }
-                if(bhc_B)
+                if (bhc_B)
                 {
                     foreach (PlanTransaction pt in coverList_B)
                     {
                         pt.DebitAccount = CFM.FinContract.IdPayAccount;
                     }
-                }            
+                }
             }
             // update bank account if changed
-            if(CFM.FinContract.IdBankAccount !=  OriginalContract.FinContract.IdBankAccount)
+            if (CFM.FinContract.IdBankAccount != OriginalContract.FinContract.IdBankAccount)
             {
-                if(bhc_P && bhc_B)
+                if (bhc_P && bhc_B)
                 {
                     foreach (PlanTransaction pt in coverList_P)
                     {
@@ -1086,10 +1086,10 @@ namespace MyFinances.Pages.Contracts
                         pt.IdSource = CFM.FinContract.IdBankAccount;
                     }
                 }
-                
+
             }
             // update rate if changed
-            if(CFM.Bill.BillCycleRate != OriginalContract.Bill.BillCycleRate)
+            if (CFM.Bill.BillCycleRate != OriginalContract.Bill.BillCycleRate)
             {
                 foreach (PlanTransaction rate in ratesList)
                 {
@@ -1099,19 +1099,19 @@ namespace MyFinances.Pages.Contracts
             }
             // update payment account cover transactions if required
             bool payFromLiability = CFM.FinContract.IdPayAccount.ToString().StartsWith('2');
-            if((CFM.FinContract.IdPayAccount != CFM.FinContract.IdBankAccount) || payFromLiability)
+            if ((CFM.FinContract.IdPayAccount != CFM.FinContract.IdBankAccount) || payFromLiability)
             {
                 // bill cover payments are required
                 string detailReceive = section.GetValue<string>("Income") ?? "Payment from ";
                 string detailPay = section.GetValue<string>("Rate") ?? "Payment to ";
-                if(bhc_P && bhc_B)
+                if (bhc_P && bhc_B)
                 {
                     // update existing cover plan transactions
-                    foreach(PlanTransaction pt in coverList_P)
+                    foreach (PlanTransaction pt in coverList_P)
                     {
                         pt.TransactionValue = CFM.Bill.BillCycleRate;
                     }
-                    foreach(PlanTransaction rate in coverList_B)
+                    foreach (PlanTransaction rate in coverList_B)
                     {
                         rate.TransactionValue = CFM.Bill.BillCycleRate;
                     }
@@ -1155,12 +1155,12 @@ namespace MyFinances.Pages.Contracts
             EquivMonthRate = -1 * fc.CycletoMonthConversion(ratesList[0].TransactionValue);
             return result;
         }
-             
+
         private async Task<string> UpdateContractPlanTransactions(DateTime fromDate)
         {
             IConfiguration _section = _config.GetSection("TransactionDetail");
             string result = string.Empty;
-            if(OriginalContract is null) { return $"Ooops an error was enountered retrieving the original data for contract {CFM.FinContract.ContractName}"; }
+            if (OriginalContract is null) { return $"Ooops an error was enountered retrieving the original data for contract {CFM.FinContract.ContractName}"; }
             switch (CFM.FinContract.ContractType)
             {
                 case 1:
@@ -1185,7 +1185,7 @@ namespace MyFinances.Pages.Contracts
                     result = await UpdateBill(fromDate, _section);
                     break;
             }
-            if(result != string.Empty) { return result; }
+            if (result != string.Empty) { return result; }
             try
             {
                 await _context.SaveChangesAsync();
@@ -1202,7 +1202,7 @@ namespace MyFinances.Pages.Contracts
             // Delete all plan transactions from startDate
             TransactionHelper thel = new(_context, CFM, _config);
             string result = await thel.DeletePlanTransactions(startDate);
-            if(result.Length > 0) { return result; }
+            if (result.Length > 0) { return result; }
             if (RestrictionsOn == 1)
             {
                 BalanceUpdateOK = true;
@@ -1218,7 +1218,7 @@ namespace MyFinances.Pages.Contracts
             EquivMonthRate = thel.EMR;
             return result;
         }
-    #endregion updateprocedures
+        #endregion updateprocedures
 
     }
 }

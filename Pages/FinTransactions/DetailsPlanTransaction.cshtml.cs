@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MyFinances.Data;
@@ -16,12 +12,12 @@ namespace MyFinances.Pages.FinTransactions
 
         public PlanTransaction PlanTransaction { get; set; } = default!;
         public string ContractName { get; set; } = string.Empty;
-        public string DebitName {  get; set; }  = string.Empty;
-        public string CreditName {  get; set; } = string.Empty;
+        public string DebitName { get; set; } = string.Empty;
+        public string CreditName { get; set; } = string.Empty;
 
-        public string SourceName {  get; set; } = string.Empty;
+        public string SourceName { get; set; } = string.Empty;
 
-        public string DetailTransaction {  get; set; } = string.Empty;
+        public string DetailTransaction { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync(long? id)
         {
@@ -46,7 +42,7 @@ namespace MyFinances.Pages.FinTransactions
                 DebitName = await _context.FinAccounts.Where(p => p.IdFinAccount == PlanTransaction.DebitAccount).Select(v => v.Name).FirstOrDefaultAsync() ?? string.Empty;
                 CreditName = await _context.FinAccounts.Where(p => p.IdFinAccount == PlanTransaction.CreditAccount).Select(v => v.Name).FirstOrDefaultAsync() ?? string.Empty;
                 DetailTransaction = PlanTransaction.TransactionDetail + " " + ContractName;
-                if(PlanTransaction.IdSource > 0)
+                if (PlanTransaction.IdSource > 0)
                 {
                     SourceName = await _context.FinAccounts.Where(p => p.IdFinAccount == PlanTransaction.IdSource).Select(v => v.Name).FirstOrDefaultAsync() ?? string.Empty;
                 }

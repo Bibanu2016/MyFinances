@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace MyFinances.Controllers
+﻿namespace MyFinances.Controllers
 {
     public static class GeneratorID
     {

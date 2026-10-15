@@ -1,15 +1,10 @@
 ﻿using FinanceCalculator;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
 using MyFinances.ViewModels;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 using System.Reflection;
 
 namespace MyFinances.Controllers
@@ -18,61 +13,61 @@ namespace MyFinances.Controllers
     {
         private readonly AppDBContext _dbContext = dBContext;
         private readonly IConfiguration _configuration = configuration;
-        public async Task<ContractFull> GetContractOnID(Guid idc)
+        public async Task<ContractFull> GetContractOnID(Guid idc, bool Tracking = false)
         {
             ContractFull contractFull = new();
-            if(Guid.TryParse(idc.ToString(), out Guid gc))
+            if (Guid.TryParse(idc.ToString(), out Guid gc))
             {
                 bool[] partsFound = [false, false];
-                var fincontract = await _dbContext.FinContracts.FirstOrDefaultAsync(m => m.IdFinContract == idc);
+                var fincontract = Tracking ? await _dbContext.FinContracts.FirstOrDefaultAsync(m => m.IdFinContract == idc) : await _dbContext.FinContracts.AsNoTracking().FirstOrDefaultAsync(m => m.IdFinContract == idc);
                 if (fincontract != null)
                 {
                     partsFound[0] = true;
                     contractFull.FinContract = fincontract;
                     switch (fincontract.ContractType)
                     {
-                        case 1:
-                            var sc_1 = await _dbContext.Deposits.FirstOrDefaultAsync(m => m.IdDeposit == idc);
+                        case 1://deposit
+                            var sc_1 = Tracking ? await _dbContext.Deposits.FirstOrDefaultAsync(m => m.IdDeposit == idc) : await _dbContext.Deposits.AsNoTracking().FirstOrDefaultAsync(m => m.IdDeposit == idc);
                             if (sc_1 != null)
                             {
                                 partsFound[1] = true;
                                 contractFull.Deposit = sc_1;
                             }
                             break;
-                        case 2:
-                            var sc_2 = await _dbContext.Loans.FirstOrDefaultAsync(m => m.IdLoan == idc);
+                        case 2://loans
+                            var sc_2 = Tracking ? await _dbContext.Loans.FirstOrDefaultAsync(m => m.IdLoan == idc) : await _dbContext.Loans.AsNoTracking().FirstOrDefaultAsync(m => m.IdLoan == idc);
                             if (sc_2 != null)
                             {
                                 partsFound[1] = true;
                                 contractFull.Loan = sc_2;
                             }
                             break;
-                        case 3:
-                            var sc_3 = await _dbContext.CreditCards.FirstOrDefaultAsync(m => m.IdCreditCard == idc);
+                        case 3: //credit card
+                            var sc_3 = Tracking ? await _dbContext.CreditCards.FirstOrDefaultAsync(m => m.IdCreditCard == idc) : await _dbContext.CreditCards.AsNoTracking().FirstOrDefaultAsync(m => m.IdCreditCard == idc);
                             if (sc_3 != null)
                             {
                                 partsFound[1] = true;
                                 contractFull.CreditCard = sc_3;
                             }
                             break;
-                        case 4:
-                            var sc_4 = await _dbContext.Employments.FirstOrDefaultAsync(m => m.IdEmployment == idc);
+                        case 4: //employment
+                            var sc_4 = Tracking ? await _dbContext.Employments.FirstOrDefaultAsync(m => m.IdEmployment == idc) : await _dbContext.Employments.AsNoTracking().FirstOrDefaultAsync(m => m.IdEmployment == idc);
                             if (sc_4 != null)
                             {
                                 partsFound[1] = true;
                                 contractFull.Employment = sc_4;
                             }
                             break;
-                        case 5:
-                            var sc_5 = await _dbContext.Incomes.FirstOrDefaultAsync(m => m.IdIncome == idc);
+                        case 5: // income
+                            var sc_5 = Tracking ? await _dbContext.Incomes.FirstOrDefaultAsync(m => m.IdIncome == idc) : await _dbContext.Incomes.AsNoTracking().FirstOrDefaultAsync(m => m.IdIncome == idc);
                             if (sc_5 != null)
                             {
                                 partsFound[1] = true;
                                 contractFull.Income = sc_5;
                             }
                             break;
-                        case 6 or 7:
-                            var sc_6 = await _dbContext.Bills.FirstOrDefaultAsync(m => m.IdBill == idc);
+                        case 6 or 7: //bill
+                            var sc_6 = Tracking ? await _dbContext.Bills.FirstOrDefaultAsync(m => m.IdBill == idc) : await _dbContext.Bills.AsNoTracking().FirstOrDefaultAsync(m => m.IdBill == idc);
                             if (sc_6 != null)
                             {
                                 partsFound[1] = true;
@@ -88,6 +83,7 @@ namespace MyFinances.Controllers
                             }
                             break;
                         case 22: //taxation contract
+                            partsFound[1] = true;
                             break;
                         default:
                             break;
@@ -100,8 +96,8 @@ namespace MyFinances.Controllers
 
         public async Task<decimal> GetContractRealBalance(int idAccount, DateTime referenceDate, int cardCashAccount = 0)
         {
-            if(idAccount < 1000000) { return 0; }
-            if(referenceDate > DateTime.Now) { referenceDate = DateTime.Now; }
+            if (idAccount < 1000000) { return 0; }
+            if (referenceDate > DateTime.Now) { referenceDate = DateTime.Now; }
             int accountBalance = cardCashAccount > 0 ? cardCashAccount : idAccount;
             decimal debit = await _dbContext.FinTransactions.Where(p => p.DebitAccount == accountBalance && p.TransactionDate < referenceDate && p.IdSource == idAccount).SumAsync(s => s.TransactionValue);
             decimal credit = await _dbContext.FinTransactions.Where(p => p.CreditAccount == accountBalance && p.TransactionDate < referenceDate && p.IdSource == idAccount).SumAsync(s => s.TransactionValue);
@@ -119,10 +115,9 @@ namespace MyFinances.Controllers
 
         public async Task<bool> GetContractExecutionState(Guid idContract)
         {
-            var cfa = await _dbContext.FinContracts.Where(p => p.IdFinContract == idContract).Select(s=>s.IdFinAccount).FirstOrDefaultAsync();
+            var cfa = await _dbContext.FinContracts.Where(p => p.IdFinContract == idContract).Select(s => s.IdFinAccount).FirstOrDefaultAsync();
             if (cfa == 0) { return false; }
-            var tet = await _dbContext.FinTransactions.Where(p=>p.ContractIdentifier == cfa).FirstOrDefaultAsync();
-            return tet != null;
+            return await GetContractExecutionState(cfa);
         }
 
         public async Task<bool> GetContractExecutionState(int idAccount)
@@ -148,29 +143,29 @@ namespace MyFinances.Controllers
             }
             else
             {
-                return refDate;
+                return DateTime.MinValue;
             }
         }
 
         public async Task<List<int>> GetContractAccounts(Guid idContract)
         {
             List<int> result = [];
-            var idfa = await _dbContext.FinContracts.Where(p=>p.IdFinContract == idContract).Select(s=>s.IdFinAccount).FirstOrDefaultAsync();
+            var idfa = await _dbContext.FinContracts.Where(p => p.IdFinContract == idContract).Select(s => s.IdFinAccount).FirstOrDefaultAsync();
             result.Add(idfa);
-            var ctype = await _dbContext.FinContracts.Where(p => p.IdFinContract == idContract).Select(s=>s.ContractType).FirstOrDefaultAsync();
-            switch(ctype)
+            var ctype = await _dbContext.FinContracts.Where(p => p.IdFinContract == idContract).Select(s => s.ContractType).FirstOrDefaultAsync();
+            switch (ctype)
             {
                 case 1:
                     var depInterAcc = await _dbContext.Deposits.Where(p => p.IdDeposit == idContract).Select(s => s.InterestAccount).FirstOrDefaultAsync();
                     result.Add(depInterAcc);
                     break;
                 case 2:
-                    var loanInterAcc = await _dbContext.Loans.Where(p=>p.IdLoan == idContract).Select(s=> s.IdAccountInterest).FirstOrDefaultAsync();
+                    var loanInterAcc = await _dbContext.Loans.Where(p => p.IdLoan == idContract).Select(s => s.IdAccountInterest).FirstOrDefaultAsync();
                     result.Add(loanInterAcc);
                     break;
                 case 3:
-                    var cardAcc = await _dbContext.CreditCards.Where(p => p.IdCreditCard == idContract).Select(s => new { s.InterestAccount, s.CashOutAccount, s.FeeAccount, s.InsuranceAccount}).FirstOrDefaultAsync();
-                    if(cardAcc != null)
+                    var cardAcc = await _dbContext.CreditCards.Where(p => p.IdCreditCard == idContract).Select(s => new { s.InterestAccount, s.CashOutAccount, s.FeeAccount, s.InsuranceAccount }).FirstOrDefaultAsync();
+                    if (cardAcc != null)
                     {
                         result.Add(cardAcc.InterestAccount);
                         result.Add(cardAcc.CashOutAccount);
@@ -185,16 +180,16 @@ namespace MyFinances.Controllers
         public async Task<List<int>> GetNoRecTransacMonths(Guid idContract, DateTime refDate)
         {
             List<int> result = [];
-            GeneralHelper gh = new(_dbContext, _configuration);
+            GeneralHelper gh = new(_configuration);
             DateTime startFY = gh.StartFinancialYear(refDate);
-            
+
             //get contract
             var cont = await _dbContext.FinContracts.FindAsync(idContract);
             if (cont != null)
             {
                 List<int> monthsRecorded = [];
                 // get months list where the transactions are recorded
-                var mtrans = await _dbContext.FinTransactions.Where(p=>p.IdSource == cont.IdFinAccount && p.TransactionDate <= refDate).Select(p => p.TransactionDate.Year * 100 + p.TransactionDate.Month).Distinct().ToListAsync();
+                var mtrans = await _dbContext.FinTransactions.Where(p => p.IdSource == cont.IdFinAccount && p.TransactionDate <= refDate).Select(p => p.TransactionDate.Year * 100 + p.TransactionDate.Month).Distinct().ToListAsync();
                 if (mtrans.Count > 0)
                 {
                     var x = mtrans.Order();
@@ -214,7 +209,7 @@ namespace MyFinances.Controllers
                 // add to results monthRequired not found in the monthsRecorded
                 foreach (int k in monthsRequired)
                 {
-                    if(!monthsRecorded.Contains(k))
+                    if (!monthsRecorded.Contains(k))
                     {
                         result.Add(k);
                     }
@@ -226,7 +221,7 @@ namespace MyFinances.Controllers
         public async Task<List<int>> GetNoRecTransacMonths(FinContract refContract, DateTime refDate)
         {
             List<int> result = [];
-            GeneralHelper gh = new(_dbContext, _configuration);
+            GeneralHelper gh = new(_configuration);
             DateTime startFY = gh.StartFinancialYear(refDate);
 
             //get contract
@@ -279,7 +274,7 @@ namespace MyFinances.Controllers
         {
             List<ItemDetail> result = [];
             ContractFull cf = await GetContractOnID(idcont);
-            if(cf is null) { return result; }
+            if (cf is null) { return result; }
             // ************************************
             // Fill out the main contract details *
             // ************************************
@@ -294,7 +289,7 @@ namespace MyFinances.Controllers
             result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.InvoiceNetDays)), ItemValue = cf.FinContract.InvoiceNetDays.ToString() });
             result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdFrequency)), ItemValue = await detailsService.GetFrequencyNameByID(cf.FinContract.IdFrequency) });
             result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdFinAccount)), ItemValue = cf.FinContract.IdFinAccount.ToString() + " : " + await detailsService.GetAccountNameByID(cf.FinContract.IdFinAccount) });
-            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdPayAccount)), ItemValue = cf.FinContract.IdPayAccount + ":" +  await detailsService.GetAccountNameByID(cf.FinContract.IdPayAccount) }); //Pay Account
+            result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdPayAccount)), ItemValue = cf.FinContract.IdPayAccount + ":" + await detailsService.GetAccountNameByID(cf.FinContract.IdPayAccount) }); //Pay Account
             result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IdBankAccount)), ItemValue = cf.FinContract.IdBankAccount + ":" + await detailsService.GetAccountNameByID(cf.FinContract.IdBankAccount) }); //Bank Account
             result.Add(new ItemDetail() { ItemName = GetDisplayName<FinContract>(nameof(FinContract.IsActiveContract)), ItemValue = cf.FinContract.IsActiveContract.ToString() });
             if (cf.FinContract.ClosedDate <= DateTime.Today)
@@ -308,7 +303,7 @@ namespace MyFinances.Controllers
             // ************************************
             // Fill out the supplementary contract details *
             // ************************************
-            switch(cf.FinContract.ContractType)
+            switch (cf.FinContract.ContractType)
             {
                 case 1: //deposit
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Deposit>(nameof(Deposit.DepositRate)), ItemValue = cf.Deposit.DepositRate.ToString("c", default) });
@@ -320,14 +315,14 @@ namespace MyFinances.Controllers
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.IdLoanType)), ItemValue = cf.Loan.IdLoanType ? "FIX" : "VARIABLE" });
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanAmount)), ItemValue = cf.Loan.LoanAmount.ToString("c", default) });
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanInterest)), ItemValue = cf.Loan.LoanInterest.ToString() + "%" });
-                    if(cf.Loan.LoanSecurity == Guid.Empty || cf.Loan.LoanSecurity is null)
+                    if (cf.Loan.LoanSecurity == Guid.Empty || cf.Loan.LoanSecurity is null)
                     {
                         result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanSecurity)), ItemValue = "Unsecured" });
                     }
                     else
                     {
                         Guid ls = cf.Loan.LoanSecurity ?? Guid.Empty;
-                        result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanSecurity)), ItemValue = await detailsService.GetLoanSecurityNameById(ls) });                        
+                        result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.LoanSecurity)), ItemValue = await detailsService.GetLoanSecurityNameById(ls) });
                     }
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.IdAccountInterest)), ItemValue = cf.Loan.IdAccountInterest + ":" + await detailsService.GetAccountNameByID(cf.Loan.IdAccountInterest) }); //Interest Account
                     result.Add(new ItemDetail() { ItemName = GetDisplayName<Loan>(nameof(Loan.ExtraPay)), ItemValue = cf.Loan.ExtraPay.ToString("c", default) });

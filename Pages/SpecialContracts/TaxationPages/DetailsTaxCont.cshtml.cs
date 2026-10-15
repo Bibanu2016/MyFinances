@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MyFinances.Controllers;
 using MyFinances.Data;
-using MyFinances.Models;
 using MyFinances.Services;
 
 namespace MyFinances.Pages.SpecialContracts.TaxationPages
@@ -14,7 +13,7 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
 
         public List<ViewModels.ItemDetail> ICDetails { set; get; } = [];
 
-        public string ItemID { private set; get; } = Guid.Empty.ToString();
+        public string ItemID { set; get; } = Guid.Empty.ToString();
 
         public async Task<IActionResult> OnGet(string id)
         {

@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 namespace MyFinances.Models
 {
     [Table("deposit")]
-    public class Deposit: IEquatable<object>
+    public class Deposit : IEquatable<object>
     {
         [Key, Column("iddeposit"), Display(Name = "ID")] public required Guid IdDeposit { get; set; }
-        [Required, Column("depositrate"), Display(Name = "Deposit rate"), DataType(DataType.Currency), Range(20,100000, ErrorMessage="Value {0} shall be between {1} and {2}")] public decimal DepositRate { get; set; } = 0;
-        [Required, Column("interestrate"), Display(Name = "Anual interest rate [%]"), RegularExpression(@"^[0-9]{1,2}(\.[0-9]{1,2})$", ErrorMessage="A value between 0 and 99.99 is required")] public decimal InterestRatePerYear { get; set; } = 0;
-        [Required, Column("initialbalance"), Display(Name = "Initial balance"), DataType(DataType.Currency), Range(0, 1000000000, ErrorMessage="A value between {1} and {2} is required")] public decimal DepositInitialBalance { get; set; } = 0;
+        [Required, Column("depositrate"), Display(Name = "Deposit rate"), DataType(DataType.Currency), Range(20, 100000, ErrorMessage = "Value {0} shall be between {1} and {2}")] public decimal DepositRate { get; set; } = 0;
+        [Required, Column("interestrate"), Display(Name = "Anual interest rate [%]"), RegularExpression(@"^[0-9]{1,2}(\.[0-9]{1,2})$", ErrorMessage = "A value between 0 and 99.99 is required")] public decimal InterestRatePerYear { get; set; } = 0;
+        [Required, Column("initialbalance"), Display(Name = "Initial balance"), DataType(DataType.Currency), Range(0, 1000000000, ErrorMessage = "A value between {1} and {2} is required")] public decimal DepositInitialBalance { get; set; } = 0;
         [Required, Column("idinterestaccount"), Display(Name = "Interest account")] public int InterestAccount { get; set; } = 0;
 
         public override int GetHashCode()

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
-using NuGet.Packaging;
-using System.ComponentModel;
 
 namespace MyFinances.Pages.FinTransactions
 {
@@ -15,40 +13,40 @@ namespace MyFinances.Pages.FinTransactions
         private readonly AppDBContext _appDbContext = appDBContext;
         private readonly IComboFillService _comboFill = comboFill;
 
-        [BindProperty(SupportsGet =true)]
-        public DateTime FilterStartdate {  get; set; } = DateTime.Now.AddDays(-30);
+        [BindProperty(SupportsGet = true)]
+        public DateTime FilterStartdate { get; set; } = DateTime.Now.AddDays(-30);
 
-        [BindProperty(SupportsGet =true)]
+        [BindProperty(SupportsGet = true)]
         public DateTime FilterEnddate { get; set; } = DateTime.Now.AddDays(30);
 
         [BindProperty(SupportsGet = true)]
         public int FilterAccount { get; set; } = 0;
 
-        public decimal[] categorySums = [0,0,0];
+        public decimal[] categorySums = [0, 0, 0];
 
         public SelectList AccountsList { get; set; } = default!;
 
         public IList<ViewModels.AccountLedger> APlanned { get; set; } = [];
-        public IList<ViewModels.AccountLedger> AOverdue {  get; set; } = [];
+        public IList<ViewModels.AccountLedger> AOverdue { get; set; } = [];
         public IList<ViewModels.AccountLedger> ARecorded { get; set; } = [];
-        
+
         public async Task OnGetAsync(string text)
         {
             AccountsList = await _comboFill.GetFinancialAccountsList();
             DateTime fromDate = FilterStartdate <= FilterEnddate ? FilterStartdate : FilterEnddate;
             DateTime toDate = FilterEnddate >= FilterStartdate ? FilterEnddate : FilterStartdate;
-            if(FilterAccount > 0)
+            if (FilterAccount > 0)
             {
                 //planned transactions
                 string accountName = string.Empty;
                 string contractName = string.Empty;
                 string sourceName = string.Empty;
                 var aptl = await _appDbContext.PlanTransactions
-                    .Where(p=>p.TransactionDate >= DateTime.Today && p.TransactionDate <= toDate && (p.DebitAccount == FilterAccount || p.CreditAccount == FilterAccount))
-                    .AsNoTracking().OrderByDescending(o=>o.TransactionDate).ToListAsync();
-                if(aptl.Count > 0)
+                    .Where(p => p.TransactionDate >= DateTime.Today && p.TransactionDate <= toDate && (p.DebitAccount == FilterAccount || p.CreditAccount == FilterAccount))
+                    .AsNoTracking().OrderByDescending(o => o.TransactionDate).ToListAsync();
+                if (aptl.Count > 0)
                 {
-                    List<PlanTransaction> onlySource = [.. aptl.Where(p=>p.IdSource == FilterAccount || p.IdSource == 0)];
+                    List<PlanTransaction> onlySource = [.. aptl.Where(p => p.IdSource == FilterAccount || p.IdSource == 0)];
                     foreach (var pt in onlySource)
                     {
                         ViewModels.AccountLedger al = new()

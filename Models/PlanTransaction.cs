@@ -7,7 +7,7 @@ namespace MyFinances.Models
     public class PlanTransaction
     {
         [Key, Column("idtransaction")] public required long IdTransaction { set; get; }
-        [Required, Column("idfacontract"), Display(Name ="Contract")] public int ContractIdentifier { set; get; } = 0;
+        [Required, Column("idfacontract"), Display(Name = "Contract")] public int ContractIdentifier { set; get; } = 0;
         [Required, Column("transactiondate"), Display(Name = "Date")] public DateTime TransactionDate { set; get; } = DateTime.MinValue;
         [Required, Column("debit"), Display(Name = "Debit")] public int DebitAccount { set; get; } = 0;
         [Required, Column("credit"), Display(Name = "Credit")] public int CreditAccount { set; get; } = 0;
@@ -19,7 +19,7 @@ namespace MyFinances.Models
 
         public override string ToString()
         {
-            return base.ToString()??string.Empty;
+            return base.ToString() ?? string.Empty;
         }
 
         public override int GetHashCode()

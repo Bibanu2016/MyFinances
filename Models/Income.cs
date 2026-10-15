@@ -5,11 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MyFinances.Models
 {
     [Table("income")]
-    public class Income: IEquatable<object>, IValidatableObject
+    public class Income : IEquatable<object>, IValidatableObject
     {
         [Key, Column("idincome"), Display(Name = "ID")]
         public required Guid IdIncome { get; set; }
-        [Required, Column("grosspercycle"), DisplayName("Gross pay per cycle"), DataType(DataType.Currency), Range(100, 10000000, ErrorMessage ="A value between {1} and {2} is required")]
+        [Required, Column("grosspercycle"), DisplayName("Gross pay per cycle"), DataType(DataType.Currency), Range(100, 10000000, ErrorMessage = "A value between {1} and {2} is required")]
         public decimal GrossPerCycle { get; set; } = 0;
         [Required, Column("taxpaidcycle"), Display(Name = "Tax paid per cycle"), DataType(DataType.Currency), Range(0, 10000000, ErrorMessage = "A value between {1} and {2} is required")] public decimal TaxPaidCycle { get; set; } = 0;
 
@@ -36,7 +36,7 @@ namespace MyFinances.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if(TaxPaidCycle > GrossPerCycle) {  yield return new ValidationResult("A gross paid value greater than Tax is required", [nameof(GrossPerCycle)]); }
+            if (TaxPaidCycle > GrossPerCycle) { yield return new ValidationResult("A gross paid value greater than Tax is required", [nameof(GrossPerCycle)]); }
         }
     }
 }

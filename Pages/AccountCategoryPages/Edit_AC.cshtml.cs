@@ -24,13 +24,13 @@ namespace MyFinances.Pages.AccountCategoryPages
         public string AccClassName { set; get; } = string.Empty;
         public string StringCategRole { set; get; } = string.Empty;
 
-        [BindProperty(SupportsGet =true)]
+        [BindProperty(SupportsGet = true)]
         public CategRole CRole { set; get; } = new();
-        
+
         public async Task<IActionResult> OnGet(int id)
         {
-            AccCategEdit = await _dbctxt.AccountCategories.Where(p=>p.IdAccountCategory == id).FirstOrDefaultAsync() ?? default!;
-            if(AccCategEdit is null) { return NotFound(); }
+            AccCategEdit = await _dbctxt.AccountCategories.Where(p => p.IdAccountCategory == id).FirstOrDefaultAsync() ?? default!;
+            if (AccCategEdit is null) { return NotFound(); }
             // get Account Class Name value
             AccClassName = await _mc.GetOrCreateAsync("ACN", () => _details.GetAccountClassByID(AccCategEdit.IdAccountClass));
             // get list for ContractType
@@ -79,7 +79,7 @@ namespace MyFinances.Pages.AccountCategoryPages
                 await _dbctxt.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"Account category {AccCategEdit.AccountCategoryName} \n was successfully updated";
             }
-            catch(DbException dex)
+            catch (DbException dex)
             {
                 TempData["ErrorMessage"] = $"Ooops there was an error updating {AccCategEdit.AccountCategoryName} \n {dex.Message}";
             }

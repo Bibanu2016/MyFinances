@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MyFinances.Models;
-using MyFinances.ViewModels;
 
 namespace MyFinances.Services
 {

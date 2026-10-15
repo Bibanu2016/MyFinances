@@ -15,11 +15,11 @@ namespace MyFinances.Pages.Organisations
             _context = context;
         }
 
-        public IList<Organisation> Organisation { get;set; } = default!;
+        public IList<Organisation> Organisation { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Organisation = await _context.Organisations.OrderBy(m =>m.IdOrg).ToListAsync();
+            Organisation = await _context.Organisations.OrderBy(m => m.IdOrg).ToListAsync();
             _orgTypes = await _context.OrganisationTypes.ToListAsync();
         }
     }

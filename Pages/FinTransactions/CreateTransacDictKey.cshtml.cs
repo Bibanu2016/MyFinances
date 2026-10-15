@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
@@ -38,13 +36,13 @@ namespace MyFinances.Pages.FinTransactions
                     }
                 }
             }
-            var sol = await _dbcontext.FinAccounts.Where(p=>p.AccountCategory >=1000).Select(v => new {v.IdFinAccount, v.Name, v.AccountCategory }).ToListAsync();
-            if(sol.Count > 0)
+            var sol = await _dbcontext.FinAccounts.Where(p => p.AccountCategory >= 1000).Select(v => new { v.IdFinAccount, v.Name, v.AccountCategory }).ToListAsync();
+            if (sol.Count > 0)
             {
-                foreach(var sl in sol)
+                foreach (var sl in sol)
                 {
-                    TargetList.Add(new ViewModels.ComboIntStrLVM() {ItemID = sl.IdFinAccount, Name = sl.Name });
-                    if(AccCategories.AsQueryable().Where(x => x == sl.AccountCategory).FirstOrDefault(0) != 0)
+                    TargetList.Add(new ViewModels.ComboIntStrLVM() { ItemID = sl.IdFinAccount, Name = sl.Name });
+                    if (AccCategories.AsQueryable().Where(x => x == sl.AccountCategory).FirstOrDefault(0) != 0)
                     {
                         SourcesList.Add(new ViewModels.ComboIntStrLVM() { ItemID = sl.IdFinAccount, Name = sl.Name });
                     }
@@ -59,7 +57,8 @@ namespace MyFinances.Pages.FinTransactions
             if (count > 1) { this.ModelState.TryAddModelError("Name", "Maximum two words are permited!"); }
             Regex rx = new(@"[^a-zA-Z0-9]");
             bool hasSpecial = rx.IsMatch(Tdictionary.Name);
-            if (hasSpecial) {
+            if (hasSpecial)
+            {
                 this.ModelState.TryAddModelError("Name", "No special characters are permited!");
             }
             if (!ModelState.IsValid)

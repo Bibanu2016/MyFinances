@@ -12,7 +12,7 @@ namespace MyFinances.Pages.FinTransactions
     {
         private readonly AppDBContext _dbContext = dBContext;
         private readonly IComboFillService _fillService = fillService;
-        
+
         [BindProperty]
         public PlanTransaction DueTransaction { get; set; } = default!;
 
@@ -34,18 +34,18 @@ namespace MyFinances.Pages.FinTransactions
         {
             _dbContext.PlanTransactions.Update(DueTransaction);
             int r = await _dbContext.SaveChangesAsync();
-            if(r == 1) { TempData["SuccessMessage"] = $"Planned transaction with ID {DueTransaction.IdTransaction} has been executed"; }
+            if (r == 1) { TempData["SuccessMessage"] = $"Planned transaction with ID {DueTransaction.IdTransaction} has been executed"; }
             return RedirectToPage("OverduePlanTransactions");
         }
 
         private async Task<int> CountTotalExecTransac(PlanTransaction refTra)
         {
             if (refTra == null) { return 0; }
-            return await _dbContext.FinTransactions.Where(p => 
-            p.DebitAccount == refTra.DebitAccount && 
-            p.CreditAccount == refTra.CreditAccount && 
-            p.IdSource == refTra.IdSource && 
-            p.ContractIdentifier == refTra.ContractIdentifier && 
+            return await _dbContext.FinTransactions.Where(p =>
+            p.DebitAccount == refTra.DebitAccount &&
+            p.CreditAccount == refTra.CreditAccount &&
+            p.IdSource == refTra.IdSource &&
+            p.ContractIdentifier == refTra.ContractIdentifier &&
             p.TransactionDate <= refTra.TransactionDate)
                 .CountAsync();
         }

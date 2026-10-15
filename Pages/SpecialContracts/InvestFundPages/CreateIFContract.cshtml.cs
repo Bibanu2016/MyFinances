@@ -1,3 +1,4 @@
+using FinanceCalculator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,7 +10,6 @@ using MyFinances.Models;
 using MyFinances.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using FinanceCalculator;
 
 namespace MyFinances.Pages.SpecialContracts.InvestFundPages
 {
@@ -38,7 +38,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
         public SelectList Frequency { get; set; } = default!;
         public SelectList Organisation { get; set; } = default!;
         public SelectList Users { get; set; } = default!;
-        
+
 
 
         public async Task OnGet()
@@ -62,7 +62,6 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             short ifoc = _configuration.GetSection("OrgTypes").GetValue<short>("InvestmentFund");
             Organisation = await _comboFill.GetOrganisationsList(ifoc);
             Users = await _comboFill.GetUsersList();
- 
             return;
         }
 
@@ -74,7 +73,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
             // --- model validation start ---
             // check if the balance date is before start of the financial year
             DateTime sFY = new GeneralHelper(_configuration).StartFinancialYear(DateTime.Today);
-            if(BalanceDate < sFY)
+            if (BalanceDate < sFY)
             {
                 ModelState.TryAddModelError("BalanceDate", $"Balance date cannot be before the start of the financial year {sFY:d}");
             }
@@ -118,7 +117,7 @@ namespace MyFinances.Pages.SpecialContracts.InvestFundPages
         {
             IConfiguration sectionCategory = _configuration.GetSection("AccountCategoriesSettings");
             int accCateg = sectionCategory.GetValue<int>("InvestmentManagementFund");
-            if(accCateg == 0) { accCateg = 1004; } //guard against misreading of value 
+            if (accCateg == 0) { accCateg = 1004; } //guard against misreading of value 
             //get contract idfinaccount
             FinAccountHelper fah = new(_context, _configuration);
             //update contract data

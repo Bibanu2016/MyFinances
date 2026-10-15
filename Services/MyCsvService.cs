@@ -1,6 +1,5 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using MySqlX.XDevAPI.Common;
 using System.Data;
 using System.Globalization;
 
@@ -128,7 +127,7 @@ namespace MyFinances.Services
                     }
                     dt.Rows.Add(row);
                 }
-            } 
+            }
             return dt;
         }
 

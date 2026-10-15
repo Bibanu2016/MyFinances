@@ -4,13 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.ViewModels;
-using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
-using MySqlX.XDevAPI.Common;
-using Org.BouncyCastle.Utilities.Zlib;
 using System.Data.Common;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyFinances.Controllers
 {
@@ -24,7 +18,7 @@ namespace MyFinances.Controllers
 
         public async Task<List<PlanTransaction>> OverdueTransactions(DateTime referenceDate)
         {
-            return await _dBContext.PlanTransactions.AsQueryable().Where(m=>m.TransactionDate <= referenceDate && !m.ExecutedTransaction).AsNoTracking().ToListAsync();
+            return await _dBContext.PlanTransactions.AsQueryable().Where(m => m.TransactionDate <= referenceDate && !m.ExecutedTransaction).AsNoTracking().ToListAsync();
         }
 
         public async Task<string> DeleteAllContractTransactions()
@@ -32,7 +26,7 @@ namespace MyFinances.Controllers
             string result = string.Empty;
             if (_contractFull != null)
             {
-                List<FinTransaction> finTransactions = await _dBContext.FinTransactions.Where(m=>m.ContractIdentifier == _contractFull.FinContract.IdFinAccount).ToListAsync();
+                List<FinTransaction> finTransactions = await _dBContext.FinTransactions.Where(m => m.ContractIdentifier == _contractFull.FinContract.IdFinAccount).ToListAsync();
                 if (finTransactions.Count > 0)
                 {
                     foreach (FinTransaction transaction in finTransactions)
@@ -41,7 +35,7 @@ namespace MyFinances.Controllers
                     }
                 }
                 List<PlanTransaction> planTransactions = await _dBContext.PlanTransactions.Where(m => m.ContractIdentifier == _contractFull.FinContract.IdFinAccount).ToListAsync();
-                if(planTransactions.Count > 0)
+                if (planTransactions.Count > 0)
                 {
                     foreach (var item in planTransactions)
                     {
@@ -90,17 +84,17 @@ namespace MyFinances.Controllers
             //get the enddate for plantransactions
             CalculatorDates cada = new(_contractFull.FinContract.IdFrequency);
             DateTime firstInvoice = cada.NextCycleDate(_contractFull.FinContract.InvoiceDate, startDate);
-            GeneralHelper gh = new(_dBContext, _configuration);
+            GeneralHelper gh = new(_configuration);
             DateTime endDatePT = gh.EndPeriodPlanTransaction(firstInvoice, _contractFull.FinContract.EndDate, _contractFull.FinContract.IdEndAction);
             //get user tax account id
             int idtaxacc = 0;
             if (_contractFull.FinContract.ContractType == 4 || _contractFull.FinContract.ContractType == 5)
             {
-                idtaxacc = await _dBContext.UserContracts.Where(p=>p.IdUser == _contractFull.FinContract.IdContractor).Select(s=>s.UserTaxAccount).FirstOrDefaultAsync();
+                idtaxacc = await _dBContext.UserContracts.Where(p => p.IdUser == _contractFull.FinContract.IdContractor).Select(s => s.UserTaxAccount).FirstOrDefaultAsync();
             }
             int tnt = cada.NumberCyclesPerPeriod(firstInvoice, endDatePT);
             DateTime startThisFY = gh.StartFinancialYear(startDate);
-            int ua = await _dBContext.UserContracts.Where(p=>p.IdUser == _contractFull.FinContract.IdContractor).Select(s=>s.UserAccountID).FirstOrDefaultAsync();
+            int ua = await _dBContext.UserContracts.Where(p => p.IdUser == _contractFull.FinContract.IdContractor).Select(s => s.UserAccountID).FirstOrDefaultAsync();
             switch (_contractFull.FinContract.ContractType)
             {
                 case 1:
@@ -150,7 +144,7 @@ namespace MyFinances.Controllers
                     {
                         await _dBContext.SaveChangesAsync();
                     }
-                    catch (Exception ex)
+                    catch (DbException ex)
                     {
                         result = ex.Message + "\n" + ex.Source;
                     }
@@ -255,7 +249,7 @@ namespace MyFinances.Controllers
                 // balance
                 lb += (_contractFull.Deposit.DepositRate + interestValue);
                 td = cda.IncrementCycleDate(td);
-                if(td > endFY) //next plan transactions will be in the new FY
+                if (td > endFY) //next plan transactions will be in the new FY
                 {
                     //Add ending FY closure transaction
                     PlanTransaction closeFY = new()
@@ -290,12 +284,12 @@ namespace MyFinances.Controllers
                     endFY = startFY.AddYears(1);
                 }
             }
-            return ;
+            return;
         }
 
         private void AddLoanPlanTransaction(DateTime firstInvoice, int numberPT, decimal lastBalance, int totalRates, DateTime startFY, int userAccount)
         {
-            if (lastBalance <= 0 || totalRates<=0 || numberPT <=0)
+            if (lastBalance <= 0 || totalRates <= 0 || numberPT <= 0)
             {
                 return;
             }
@@ -319,7 +313,7 @@ namespace MyFinances.Controllers
             if (_contractFull.Loan.IdLoanType)
             {
                 //variable loan
-                for(int k = 0; k < numberPT;k++)
+                for (int k = 0; k < numberPT; k++)
                 {
                     payrates[k] = cf.LoanVarRateOnBalance(lastBalance);
                     interestPaid[k] = cf.InterestValuePerCycle(lastBalance);
@@ -424,7 +418,7 @@ namespace MyFinances.Controllers
                 }
             }
             //reoncile accounts if Payment account != Bank account
-            if(_contractFull.FinContract.IdPayAccount != _contractFull.FinContract.IdBankAccount)
+            if (_contractFull.FinContract.IdPayAccount != _contractFull.FinContract.IdBankAccount)
             {
                 for (int i = 0; i < numberPT; i++)
                 {
@@ -512,7 +506,7 @@ namespace MyFinances.Controllers
                     td = cda.IncrementCycleDate(td);
                 }
                 // update EMR for the taxation contract
-                var etx = await _dBContext.FinContracts.Where(p=>p.IdFinAccount == userTaxAcc).FirstOrDefaultAsync();
+                var etx = await _dBContext.FinContracts.Where(p => p.IdFinAccount == userTaxAcc).FirstOrDefaultAsync();
                 if (etx != null)
                 {
                     int etpc = fc.CycletoMonthConversion(_contractFull.Employment.TaxPaidCycle);
@@ -555,8 +549,8 @@ namespace MyFinances.Controllers
                     td = cda.IncrementCycleDate(td);
                 }
                 // update EMR for the superannuation contract
-                var saa = await _dBContext.FinContracts.Where(p=>p.IdFinAccount == _contractFull.Employment.IdSuperAccount).FirstOrDefaultAsync();
-                if(saa != null )
+                var saa = await _dBContext.FinContracts.Where(p => p.IdFinAccount == _contractFull.Employment.IdSuperAccount).FirstOrDefaultAsync();
+                if (saa != null)
                 {
                     int semr = fc.CycletoMonthConversion(_contractFull.Employment.SuperPaidCycle);
                     saa.EquivMonthlyRate -= semr;
@@ -594,7 +588,7 @@ namespace MyFinances.Controllers
             }
             td = firstInvoice;
             FrequencyConversion fc = new(_contractFull.FinContract.IdFrequency);
-            if(_contractFull.Income.TaxPaidCycle > 0)
+            if (_contractFull.Income.TaxPaidCycle > 0)
             {
                 for (int i = 0; i < numberPT; i++)
                 {
@@ -631,7 +625,7 @@ namespace MyFinances.Controllers
         {
             CalculatorDates cda = new(_contractFull.FinContract.IdFrequency);
             IConfigurationSection section = _configuration.GetSection("TransactionDetails");
-            string cc = _configuration.GetSection("AccountCategoriesSettings").GetValue<string>("CardCategory")??"21";
+            string cc = _configuration.GetSection("AccountCategoriesSettings").GetValue<string>("CardCategory") ?? "21";
             string detailRate = section.GetValue<string>("PayOut") ?? "Payment to ";
             string detailCard = section.GetValue<string>("PayIn") ?? "Pay from ";
             DateTime td = firstInvoice;
@@ -721,20 +715,20 @@ namespace MyFinances.Controllers
             decimal[] balance = new decimal[numberPT];
             decimal[] insurancePaid = new decimal[numberPT];
             bool hasInsurance = _contractFull.CreditCard.CreditCardInsuranceRate > 0;
-            for (int i = 0; i<cf.TotalPayments; i++)
+            for (int i = 0; i < cf.TotalPayments; i++)
             {
-                purchaseRate[i] = cf.CardRateOnBalance(clBal,(decimal)_contractFull.CreditCard.CreditCardPayPercent, payOff );
+                purchaseRate[i] = cf.CardRateOnBalance(clBal, (decimal)_contractFull.CreditCard.CreditCardPayPercent, payOff);
                 interestPurch[i] = cf.InterestValuePerCycle(clBal);
                 cashRate[i] = cf.CardRateOnBalance(clCash, (decimal)_contractFull.CreditCard.CreditCardPayPercent, payOff, _contractFull.CreditCard.CashRate);
                 interestCash[i] = cf.InterestValuePerCycle(clCash, _contractFull.CreditCard.CashRate);
-                if(_contractFull.CreditCard.ExtraPay > 0)
+                if (_contractFull.CreditCard.ExtraPay > 0)
                 {
-                    if(cashRate[i] > 0) { cashRate[i] += _contractFull.CreditCard.ExtraPay; }
+                    if (cashRate[i] > 0) { cashRate[i] += _contractFull.CreditCard.ExtraPay; }
                     else { purchaseRate[i] += _contractFull.CreditCard.ExtraPay; }
                 }
                 clBal += (interestPurch[i] - purchaseRate[i]);
                 clCash += (interestCash[i] - cashRate[i]);
-                if(clCash < 0) { clBal += clCash; clCash = 0; } // in the event that the ExtraPay brings the balance to negative, transfer the funds to purchses
+                if (clCash < 0) { clBal += clCash; clCash = 0; } // in the event that the ExtraPay brings the balance to negative, transfer the funds to purchses
                 balance[i] = clBal + clCash;
                 if (hasInsurance)
                 {
@@ -838,7 +832,7 @@ namespace MyFinances.Controllers
                 };
                 _dBContext.PlanTransactions.Add(fee);
                 // card insurance
-                if(hasInsurance)
+                if (hasInsurance)
                 {
                     PlanTransaction insurance = new()
                     {

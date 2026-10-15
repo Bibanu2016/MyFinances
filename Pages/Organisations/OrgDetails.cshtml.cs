@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MyFinances.Data;
 using MyFinances.Models;
 
 namespace MyFinances.Pages.Organisations
@@ -33,7 +28,7 @@ namespace MyFinances.Pages.Organisations
             {
                 Organisation = organisation;
                 var oc = await _context.OrganisationTypes.FindAsync(id);
-                if(oc != null) { NameCategory = oc.CategoryName; }
+                if (oc != null) { NameCategory = oc.CategoryName; }
             }
             return Page();
         }

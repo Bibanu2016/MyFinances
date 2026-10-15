@@ -1,22 +1,14 @@
-using CsvHelper;
-using CsvHelper.Configuration;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MyFinances.Services;
-using MySqlX.XDevAPI;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Globalization;
-using System.Text.Json;
 
 namespace MyFinances.Pages.FinTransactions
 {
     public class UploadForDictionaryKeyModel(IMyCsvService csvService) : PageModel
     {
         private readonly IMyCsvService _csvService = csvService;
-        [BindProperty, Required(ErrorMessage ="A file selection is required!")]
+        [BindProperty, Required(ErrorMessage = "A file selection is required!")]
         public IFormFile? Upload { get; set; } = default!;
 
         public string? JsonOutput { get; set; }
@@ -24,7 +16,7 @@ namespace MyFinances.Pages.FinTransactions
         public void OnGet()
         {
         }
-               
+
 
         public async Task<IActionResult> OnPostAsync()
         {

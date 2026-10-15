@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
 using MyFinances.Services;
@@ -33,7 +34,6 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
             if (cct == 0) { CategoryContract = 5005; } else { CategoryContract = cct; }
             ViewData["Title"] = "Create Taxation Contract";
             await FillUpLists();
-
         }
 
         // --- Procedures to create the lists ---
@@ -57,14 +57,18 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
                 await FillUpLists();
                 return Page();
             }
-            MainContract.IdFinContract = new Guid();
-            var ctype = _configuration.GetSection("ContractTypes").GetValue<short>("Taxation");
-            MainContract.ContractType = ctype > 0 ? ctype : (short)22;
-            _context.FinContracts.Add(MainContract);        
+            int ct = _configuration.GetSection("ContractTypes").GetValue<short>("Taxation");
+            // consider getting the contract type from the DB
+            ct = ct == 0 ? 22 : ct;
+            MainContract.IdFinContract = Guid.NewGuid();
+            FinAccountHelper fah = new(_context, _configuration);
+            MainContract.IdFinAccount = (await fah.NewIdAccountByCateg(CategoryContract))[0];
+            MainContract.ContractType = (short)ct;
+            _context.FinContracts.Add(MainContract);
             try
             {
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Contract {MainContract.ContractName} created successfully.";
+                TempData["SuccessMessage"] = $"Contract {MainContract.ContractName} created successfully. \n Contract identifier is {MainContract.IdFinAccount}.";
             }
             catch (DbException dex)
             {
@@ -72,7 +76,5 @@ namespace MyFinances.Pages.SpecialContracts.TaxationPages
             }
             return RedirectToPage("../IndexSpecialContracts");
         }
-
-
     }
 }

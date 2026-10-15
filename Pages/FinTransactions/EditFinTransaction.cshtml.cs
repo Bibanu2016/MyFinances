@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using MyFinances.Controllers;
 using MyFinances.Data;
 using MyFinances.Models;
@@ -19,28 +18,33 @@ namespace MyFinances.Pages.FinTransactions
 
         [BindProperty]
         public FinTransaction EditingFT { get; set; } = default!;
-        [BindProperty, Required, MaxLength(45, ErrorMessage ="A lenght of less than 45 char is required"), MinLength(3, ErrorMessage ="A minimum length of 3 char is required")]
+        [BindProperty, Required, MaxLength(45, ErrorMessage = "A lenght of less than 45 char is required"), MinLength(3, ErrorMessage = "A minimum length of 3 char is required")]
         public string AccountKey { get; set; } = string.Empty;
         public string NameContract { get; set; } = string.Empty;
 
         [BindProperty]
         public short IsCreditTheSource { get; set; } = -1;
         [BindProperty]
-        public string ReturnRoute {  get; set; } = string.Empty;
-
+        public string ReturnRoute { get; set; } = string.Empty;
 
         public SelectList FAList { get; set; } = default!;
-        public async Task<IActionResult> OnGet(long id, string ift)
+        public async Task<IActionResult> OnGet(long id, string ift, int? accnew)
         {
             var eft = await _dbContext.FinTransactions.FindAsync(id);
-            if(eft == null) return NotFound();
+            if (eft == null) return NotFound();
             EditingFT = eft;
-            if(!string.IsNullOrEmpty(ift))
+            if (!string.IsNullOrEmpty(ift))
             {
                 ReturnRoute = ift;
             }
+            if (accnew.HasValue)
+            {
+                if (EditingFT.DebitAccount == 0) { EditingFT.DebitAccount = accnew ?? 0; }
+                if (EditingFT.CreditAccount == 0) { EditingFT.CreditAccount = accnew ?? 0; }
+            }
             ViewData["Title"] = $"Edit Transaction ID: {EditingFT.IdTransaction}";
-            if(EditingFT.DebitAccount == EditingFT.IdSource) { IsCreditTheSource = 0; }
+            TempData["OrigTD"] = EditingFT.TransactionDetail;
+            if (EditingFT.DebitAccount == EditingFT.IdSource) { IsCreditTheSource = 0; }
             if (EditingFT.CreditAccount == EditingFT.IdSource) { IsCreditTheSource = 1; }
             FAList = await _fillService.GetFinancialAccountsList();
             NameContract = await _myDetailsService.GetAccountNameByID(EditingFT.ContractIdentifier);
@@ -49,35 +53,34 @@ namespace MyFinances.Pages.FinTransactions
 
         public async Task<IActionResult> OnPostAsync()
         {
-            switch(IsCreditTheSource)
+            switch (IsCreditTheSource)
             {
                 case -1:
                     ModelState.Remove(nameof(AccountKey)); // no account key or if one exists change target and source in the TransDictionary
                     break;
                 case 0:
-                    if(EditingFT.CreditAccount == 0) { ModelState.TryAddModelError(nameof(EditingFT.CreditAccount), errorMessage:"A values is required"); }
+                    if (EditingFT.CreditAccount == 0) { ModelState.TryAddModelError(nameof(EditingFT.CreditAccount), errorMessage: "A values is required"); }
                     break;
                 case 1:
                     if (EditingFT.DebitAccount == 0) { ModelState.TryAddModelError(nameof(EditingFT.DebitAccount), errorMessage: "A values is required"); }
                     break;
-            }          
-            if (!string.IsNullOrEmpty(AccountKey)) {
-                // guard against more than 4 words in the AccountKey
-                if (AccountKey.Trim().Split(' ').Length > 4) ModelState.TryAddModelError("AccountKey", errorMessage: "A maximum of 4 words are allowed");
-                // guard against missmatched AccountKey and TransactionDetail
-                if(!EditingFT.TransactionDetail.Contains(AccountKey))
+            }
+            if (AccountKey.Trim().Split(' ').Length > 4) ModelState.TryAddModelError("AccountKey", errorMessage: "A maximum of 4 words are allowed");
+            if (TempData["OrigTD"] != null) //guard against change in Transaction Detail if the IdSource > 1000000
+            {
+                if (TempData["OrigTD"]?.ToString() != EditingFT.TransactionDetail && EditingFT.IdSource > 1000000)
                 {
-                    ModelState.TryAddModelError("AccountKey", errorMessage: "The account key does not match the transaction detail");
+                    ModelState.TryAddModelError(nameof(EditingFT.TransactionDetail), errorMessage: "Change of transaction detail is not allowed");
                 }
             }
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 FAList = await _fillService.GetFinancialAccountsList();
                 NameContract = await _myDetailsService.GetAccountNameByID(EditingFT.ContractIdentifier);
-                return Page(); 
+                return Page();
             }
             // Create TransactionKey
-            if(IsCreditTheSource >=0)
+            if (IsCreditTheSource >= 0)
             {
                 //record transaction key for the IdSource
                 int target = IsCreditTheSource == 1 ? EditingFT.DebitAccount : EditingFT.CreditAccount;
@@ -90,7 +93,7 @@ namespace MyFinances.Pages.FinTransactions
                 };
                 _dbContext.TransacDictionary.Add(td);
             }
-            switch(IsCreditTheSource)
+            switch (IsCreditTheSource)
             {
                 case -1: //Both Debit and Credit cannot be updated; No AccountKey
                     break;
@@ -100,7 +103,7 @@ namespace MyFinances.Pages.FinTransactions
                     {
                         foreach (var d in debl)
                         {
-                            if(d.TransactionDetail.Contains(AccountKey))
+                            if (d.TransactionDetail.Contains(AccountKey))
                             {
                                 d.CreditAccount = EditingFT.CreditAccount;
                                 _dbContext.FinTransactions.Attach(d).State = EntityState.Modified;
@@ -122,17 +125,17 @@ namespace MyFinances.Pages.FinTransactions
                         }
                     }
                     break;
-            }            
+            }
             try
             {
                 int i = await _dbContext.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"{i} transaction are updated.";
             }
-            catch(DbUpdateException dux)
+            catch (DbUpdateException dux)
             {
                 TempData["ErrorMessage"] = $"Ooops there was an error updating the transation. \n {dux.Message}";
             }
-            return RedirectToPage("IndexFinTransactions", new {rfe = ReturnRoute });
+            return RedirectToPage("IndexFinTransactions", new { rfe = ReturnRoute });
         }
 
     }

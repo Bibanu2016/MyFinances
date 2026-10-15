@@ -21,7 +21,7 @@ namespace MyFinances.Pages.FinTransactions
         public async Task<IActionResult> OnGet(int id)
         {
             var pt = await _appDbContext.PlanTransactions.FindAsync((long)id);
-            if(pt == null) { return NotFound(); }
+            if (pt == null) { return NotFound(); }
             MyPlanTransaction = pt;
             FAList = await _fillService.GetFinancialAccountsList();
             ViewData["Title"] = $"Delete plan transaction id: {MyPlanTransaction.IdTransaction}?";
@@ -37,7 +37,7 @@ namespace MyFinances.Pages.FinTransactions
                 TempData["SuccessMessage"] = $"Plan transaction with id: {MyPlanTransaction.IdTransaction} was deleted successfuly";
 
             }
-            catch(DbException dex)
+            catch (DbException dex)
             {
                 TempData["ErrorMessage"] = $"Ooops there was an error with processing this transaction. \n {dex.Message}";
             }

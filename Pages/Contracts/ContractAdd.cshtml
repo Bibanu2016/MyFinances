@@ -10,7 +10,6 @@
     ViewBag.Users = Model.Users;
     ViewBag.TangibleAsset = Model.TangibleAsset;
     ViewBag.ContractCategory = Model.ContractCategory;
-    ViewBag.SuperAccount = Model.SuperAccount;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -19,11 +18,11 @@
 <div class="container container-sm">
     <h4><strong>Main contract data</strong></h4>
     <div class="row pb-sm-3">
-        <div class="col col-sm-3">
+        <div class="col col-3">
             <span class="text-danger">*</span>
             <label asp-for="CategoryContract" class="control-label"></label>
         </div>
-        <div class="col col-sm">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select category" asp-for="CategoryContract" asp-items="@ViewBag.ContractCategory">
                 <option selected>Choose a value..</option>
             </select>
@@ -31,11 +30,11 @@
         </div>
     </div>
     <div class="row pb-sm-3">
-        <div class="col col-sm-3">
+        <div class="col col-3">
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.ContractName" class="control-label"></label>        
         </div>
-        <div class="col col-sm">
+        <div class="col col-3">
             <input type="text" asp-for="ContractFull.FinContract.ContractName" class="form-control" />
             <span asp-validation-for="ContractFull.FinContract.ContractName" class="text-danger"></span>
         </div>
@@ -45,7 +44,7 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.ContractDetails" class="control-label"></label>           
         </div>
-        <div class="col">
+        <div class="col col-3">
             <input type="text" asp-for="ContractFull.FinContract.ContractDetails" class="form-control" />
             <span asp-validation-for="ContractFull.FinContract.ContractDetails" class="text-danger"></span>
         </div>
@@ -55,7 +54,7 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.IdOrganisation" class="control-label"></label>         
         </div>
-        <div class="col">
+        <div class="col col-3">
             <div class="input-group">
                 <select class="form-select" aria-label="Select organisation" asp-for="ContractFull.FinContract.IdOrganisation" asp-items="@ViewBag.Organisation">
                     <option selected>Choose a value..</option>
@@ -70,7 +69,7 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.IdContractor" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select contractor" asp-for="ContractFull.FinContract.IdContractor" asp-items="@ViewBag.Users">
                 <option selected>Choose a value..</option>
             </select>
@@ -82,15 +81,17 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.StartDate" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <input type="date" asp-for="ContractFull.FinContract.StartDate" class="form-control" value="@DateTime.Today" />
             <span asp-validation-for="ContractFull.FinContract.StartDate" class="text-danger"></span>
-        </div>
+        </div> 
+    </div>
+    <div class="row pb-sm-3">
         <div class="col col-3">
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.EndDate" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <input type="date" asp-for="ContractFull.FinContract.EndDate" class="form-control" value="@DateTime.Today" />
             <span asp-validation-for="ContractFull.FinContract.EndDate" class="text-danger"></span>
         </div>
@@ -100,7 +101,7 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.IdEndAction" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select end action" asp-for="ContractFull.FinContract.IdEndAction" asp-items="@ViewBag.EndAction">
                 <option selected>Choose an option..</option>
             </select>
@@ -112,15 +113,17 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.InvoiceDate" class="control-label"></label>         
         </div>
-        <div class="col">
+        <div class="col col-3">
             <input type="date" asp-for="ContractFull.FinContract.InvoiceDate" class="form-control" value="@DateTime.Today" />
             <span asp-validation-for="ContractFull.FinContract.InvoiceDate" class="text-danger"></span>
         </div>
+    </div>
+    <div class="row pb-sm-3">
         <div class="col col-3">
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.InvoiceNetDays" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <input type="number" asp-for="ContractFull.FinContract.InvoiceNetDays" class="form-control" value="0" />
             <span asp-validation-for="ContractFull.FinContract.InvoiceNetDays" class="text-danger"></span>
         </div>
@@ -130,7 +133,7 @@
             <span class="text-danger">*</span>
             <label asp-for="ContractFull.FinContract.IdFrequency" class="control-label"></label>
         </div>
-        <div class="col">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select payment cycle" asp-for="ContractFull.FinContract.IdFrequency" asp-items="@ViewBag.Frequency">
                 <option selected>Choose an option..</option>
             </select>
@@ -143,7 +146,7 @@
             <label asp-for="ContractFull.FinContract.IdPayAccount" class="control-label"></label>
             
         </div>
-        <div class="col">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select payment account" asp-for="ContractFull.FinContract.IdPayAccount" asp-items="@ViewBag.Payable">
                 <option value="-1" selected>Choose an option</option>
             </select>
@@ -156,7 +159,7 @@
             <label asp-for="ContractFull.FinContract.IdBankAccount" class="control-label"></label>
             
         </div>
-        <div class="col">
+        <div class="col col-3">
             <select class="form-select" aria-label="Select bank account" asp-for="ContractFull.FinContract.IdBankAccount" asp-items="@ViewBag.Bank">
                 <option value="-1" selected>Choose an option</option>
             </select>
@@ -165,7 +168,7 @@
     </div>
     <div class="row pb-sm-3">
         <div class="col-sm-3"></div>
-        <div class="col">
+        <div class="col col-3">
             <div class="form-text text-secondary text-wrap">
                 A bank account is required to reconcile the payment account if it is a liability.
                 NOTE: If the bank account is selected and different from the payment account all transactions from the payment account will be reconciled by the bank account.
@@ -419,38 +422,43 @@
             </div>
             break;
         case 4:
-            <div class="row pb-sm-3">
-                <div class="col col-3">
+            <div class="row justify-content-center gx-5">
+                <div class="col col-3 p-3">
                     <span class="text-danger">*</span>
                     <label asp-for="ContractFull.Employment.GrossPaidCycle" class="control-label"></label>
                 </div>
-                <div class="col">
+                <div class="col col-3 p-3">
+                    <label asp-for="ContractFull.Employment.TaxPaidCycle" class="control-label"></label>
+                </div>
+            </div>
+            <div class="row justify-content-center gx-5">
+                <div class="col col-3 p-3">
                     <input type="number" asp-for="ContractFull.Employment.GrossPaidCycle" class="form-control" value="0" />
                     <span asp-validation-for="ContractFull.Employment.GrossPaidCycle" class="text-danger"></span>
                 </div>
-                <div class="col col-3">
-                    <label asp-for="ContractFull.Employment.TaxPaidCycle" class="control-label"></label>
-                </div>
-                <div class="col">
-                    <input type="number" asp-for="ContractFull.Employment.TaxPaidCycle" class="form-control" value="0" />
+                <div class="col col-3 p-3">
+                     <input type="number" asp-for="ContractFull.Employment.TaxPaidCycle" class="form-control" value="0" />
                     <span asp-validation-for="ContractFull.Employment.TaxPaidCycle" class="text-danger"></span>
                 </div>
             </div>
-            <div class="row pb-sm-3">
-                <div class="col col-3">
+            <div class="row justify-content-center gx-5">
+                <div class="col col-3 p-3">
+                    <span class="text-danger">*</span>
+                    <label asp-for="ContractFull.Employment.IdTaxAccount" class="control-label"></label>
+                </div>
+                <div class="col col-3 p-3">
                     <label asp-for="ContractFull.Employment.SuperPaidCycle" class="control-label"></label>
                 </div>
-                <div class="col">
-                    <input type="number" asp-for="ContractFull.Employment.SuperPaidCycle" class="form-control" value="0" />
-                    <span asp-validation-for="ContractFull.Employment.SuperPaidCycle" class="text-danger"></span>
+            </div>
+            <div class="row justify-content-center gx-5">
+                <div class="col col-3 p-3">
+                    <select class="form-select" aria-label="Select tax account" asp-for="ContractFull.Employment.IdTaxAccount" asp-items="@Model.TaxAccountList">
+                        <option value="-1" selected>Choose an option</option>
+                    </select>
+                    <span asp-validation-for="ContractFull.Employment.IdTaxAccount" class="text-danger"></span> 
                 </div>
-                <div class="col col-3">
-                    <span class="text-danger">*</span>
-                    <label asp-for="ContractFull.Employment.IdSuperAccount" class="control-label"></label>
-
-                </div>
-                <div class="col">
-                    <select class="form-select" aria-label="Select loan security" asp-for="ContractFull.Employment.IdSuperAccount" asp-items="@ViewBag.SuperAccount">
+                <div class="col col-3 p-3">
+                    <select class="form-select" aria-label="Select super paid cycle" asp-for="ContractFull.Employment.SuperPaidCycle" asp-items="@Model.SuperAccountList">
                         <option value="-1" selected>Choose an option</option>
                     </select>
                     <span asp-validation-for="ContractFull.Employment.IdSuperAccount" class="text-danger"></span>
@@ -549,23 +557,19 @@
     }
 </div>
 <br />
-<div class="container-sm align-content-end">
-    <div class="row justify-content-end">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="col col-sm-9">
-                <input type="hidden" asp-for="SelectedContractType" />
-            </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-        </form>
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="SelectedContractType" />
+    <div class="row align-items-center gx-3">
+        <div class="col col-3 p-2">
+            <a asp-page="./ContractsList">Back to Contracts List</a>
+        </div>
+        <div class="col col-6 p-2"></div>
+        <div class="col col-3 p-2">
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
     </div>
-</div>
-<br />
-<div class="row">
-    <a asp-page="./ContractsList">Back to List</a>
-</div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
