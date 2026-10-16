@@ -29,102 +29,108 @@
     </script>
 }
 
-<div class="page-header">
-    <h1 class="page-title">@ViewData["Title"]</h1>
-    <h2>@Model.TotalCount total transactions</h2>
+<h1 class="page-title">@ViewData["Title"]</h1>
+<h4>@Model.TotalCount total transactions </h4>
+<br />
+<div class="row gx-5 align-items-center">
+    <div class="col col-sm-1">
+        <a asp-page="New transaction" class="btn btn-outline-primary">Create New</a>
+    </div>
 </div>
-
-<p>
-    <a asp-page="Create" class="btn btn-outline-primary">Create New</a>
-</p>
 <hr />
 <br />
-<form method="get" class="row row-gap-3 align-items-center">
-    <div class="col col-sm-3">
-        <label class="form-label" for="startDate">From date</label>
-        <input type="date" class="form-control" id="startDate" placeholder="From date .." asp-for="ItemsFilter.FromDate" />
-    </div>
-    <div class="col col-sm-3">
-        <label class="form-label" for="endDate">To date</label>
-        <input type="date" class="form-control" id="endDate" placeholder="To date .." asp-for="ItemsFilter.ToDate" />
-    </div>
-    <div class="col-sm-3">
-        <label class="form-label" for="finAccount">Account</label>
-        <select class="form-select" id="finAccount" asp-for="ItemsFilter.IdFilterAccount" asp-items="@ViewBag.AccList" placeholder="Select account ..">
-            <option value="-1" selected>Choose...</option>
-        </select>
-    </div>
+<form method="get" class="contrainer text-center">
     <input type="hidden" asp-for="ItemsFilter.PageIndex" />
-    <div class="col-sm-auto">
-        <a class="btn btn-close" aria-label="Close" asp-page="./IndexFinTransactions"></a>
-    </div>
-    <div class="col-sm-auto">
-        <button type="submit" class="btn btn-primary" >Filter</button>
+    <div class="row gx-5 align-items-center">
+        <div class="col col-sm"></div>
+            <div class="col col-sm-3">
+                <div class="input-group">
+                  <span class="input-group-text">From</span>
+                  <input type="date" class="form-control" id="startDate" placeholder="From date" asp-for="ItemsFilter.FromDate" />
+                </div>
+            </div>
+            <div class="col col-sm-3">
+                <div class="input-group">
+                  <span class="input-group-text">To</span>
+                  <input type="date" class="form-control" id="endDate" placeholder="To date" asp-for="ItemsFilter.ToDate" />
+                </div>
+            </div>
+            <div class="col col-sm-3">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="finAccount">Account</label>
+                  <select class="form-select" id="finAccount" asp-for="ItemsFilter.IdFilterAccount" asp-items="@ViewBag.AccList" placeholder="Select account ..">
+                    <option selected>Choose..</option>
+                  </select>
+                </div>
+            </div>
+            <div class="col col-sm-1">
+                <a class="btn btn-close" aria-label="Close" asp-page="./IndexFinTransactions"></a>
+            </div>
+            <div class="col col-sm-1">
+                <button type="submit" class="btn btn-primary" >Filter</button>
+            </div>
     </div>
 </form>
+<hr />
 <br />
-@if(Model.FinTransactionList.Count > 0)
-{
+<div class="container continer-sm align-items-center">
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].DebitAccount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].CreditAccount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionValue)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].ContractIdentifier)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FinTransactionList[0].IdSource)
-                </th>
-                <th></th>
+                <th>@Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionDate)</th>
+                <th>@Html.DisplayNameFor(model => model.FinTransactionList[0].DebitAccount)</th>
+                <th>@Html.DisplayNameFor(model => model.FinTransactionList[0].CreditAccount)</th>
+                <th>@Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionValue)</th>
+                <th>@Html.DisplayNameFor(model => model.FinTransactionList[0].TransactionDetail)</th>
+                <th>From contract</th>
+                <th>Source account</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.FinTransactionList)
+            @if(Model.FinTransactionList.Count > 0)
+            {
+                @foreach(var item in Model.FinTransViewModelList)
+                {
+                    <tr>
+                        <td>
+                            @item.TransDate
+                        </td>
+                        <td>
+                            @item.DebitAccountName
+                        </td>
+                        <td>
+                            @item.CreditAccountName
+                        </td>
+                        <td style="text-align:right; padding-right: 20px">
+                            @item.Amount.ToString("C2", System.Globalization.CultureInfo.CurrentCulture)
+                        </td>
+                        <td>
+                            @item.Description
+                        </td>
+                        <td>
+                            @(item.IsContract ? "Yes" : "No")
+                        </td>
+                        <td>
+                            @item.SourceAccount
+                        </td>
+                        <td>
+                            <a asp-page="./EditFinTransaction" asp-route-id="@item.Id" asp-route-ift="@Model.ItemsFilter.ToString()"><i class="bi-pencil-fill" style="color:grey" alt="Edit"></i></a>    
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>
-                        @item.TransactionDate.ToShortDateString()
-                    </td>
-                    <td>
-                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.DebitAccount.ToString())?.Text
-                    </td>
-                    <td>
-                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.CreditAccount.ToString())?.Text
-                    </td>
-                    <td style="text-align:right; padding-right: 20px">
-                        @Html.DisplayFor(modelItem => item.TransactionValue)
-                    </td>
-                    <td>
-                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.ContractIdentifier.ToString())?.Text
-                    </td>
-                    <td>
-                        @Model.AccList.FirstOrDefault(predicate => predicate.Value == item.IdSource.ToString())?.Text
-                    </td>
-                    <td>
-                        <a asp-page="./EditFinTransaction" asp-route-id="@item.IdTransaction" asp-route-ift="@Model.ItemsFilter.ToString()">Edit</a>
+                    <td colspan="8" style="text-align: center;">
+                        No transactions found.
                     </td>
                 </tr>
             }
         </tbody>
-    </table>
-}
-else
-{
-    <h3>No transactions found</h3>
-}
+</div>
 <hr />
-
 <nav aria-label="paginationIndex">
     <span class="text-bg-info">
         Showing @first–@last of @Model.TotalCount items

@@ -62,6 +62,7 @@ namespace MyFinances.Pages.FinTransactions
         private readonly IMemoryCache _cache = cache;
 
         public List<FinTransaction> FinTransactionList { get; set; } = [];
+        public List<FinTransViewModel> FinTransViewModelList { get; set; } = [];
 
         [BindProperty(SupportsGet = true)]
         public TransactionsFilter ItemsFilter { get; set; } = new();
@@ -76,7 +77,7 @@ namespace MyFinances.Pages.FinTransactions
 
         public async Task OnGetAsync(string? rfe = null)
         {
-            AccList = await _cache.GetOrCreateAsync("AList", () => GetAccountLists());
+            AccList = await _cache.GetOrCreateAsync("AccList", () => GetAccountLists());
             bool checkReturn = false;
             TransactionsFilter temp = new();
             if (!string.IsNullOrEmpty(rfe))
@@ -130,6 +131,7 @@ namespace MyFinances.Pages.FinTransactions
             if (ItemsFilter.PageIndex > TotalPages && TotalPages > 0) { ItemsFilter.PageIndex = TotalPages; }
             PageNumbers = _cache.GetOrCreate("Pages", () => BuildPageNumbers(ItemsFilter.PageIndex, TotalPages));
             FinTransactionList = await ApplyFilters(_context.FinTransactions).Skip((ItemsFilter.PageIndex - 1) * ItemsFilter.PageSize).Take(ItemsFilter.PageSize).ToListAsync();
+            CreateViewModelList();
             TransactionsFilter OrigIF = _cache.GetOrCreate("OIF", () => ItemsFilter);
         }
 
@@ -175,6 +177,42 @@ namespace MyFinances.Pages.FinTransactions
             return await _fillService.GetAccListFromTransactions();
         }
 
+        private void CreateViewModelList()
+        {
+            foreach(var trans in FinTransactionList)
+            {
+                string temp = string.Empty;
+                if (trans.IdSource > 0)
+                {
+                    temp = trans.DebitAccount > 0 && trans.DebitAccount == trans.IdSource ? "Debit" : temp;
+                    temp = trans.CreditAccount > 0 && trans.CreditAccount == trans.IdSource ? "Credit" : temp;
+                }
+                FinTransViewModelList.Add(new FinTransViewModel
+                {
+                    Id = trans.IdTransaction,
+                    TransDate = trans.TransactionDate.ToString("yyyy-MM-dd"),
+                    Description = trans.TransactionDetail,
+                    Amount = trans.TransactionValue,
+                    DebitAccountName = AccList.FirstOrDefault(a => a.Value == trans.DebitAccount.ToString())?.Text ?? string.Empty,
+                    CreditAccountName = AccList.FirstOrDefault(a => a.Value == trans.CreditAccount.ToString())?.Text ?? string.Empty,
+                    IsContract = trans.ContractIdentifier > 0,
+                    SourceAccount = trans.IdSource > 0 ? temp : string.Empty
+                });
+            }
+            return;
+        }
 
+    }
+
+    public class FinTransViewModel()
+    {
+        public long Id { get; set; }
+        public string TransDate { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Amount { get; set; } = 0;
+        public string DebitAccountName { get; set; } = string.Empty;
+        public string CreditAccountName { get; set; } = string.Empty;
+        public bool IsContract { get; set; } = false;
+        public string SourceAccount { get; set; } = string.Empty;
     }
 }
