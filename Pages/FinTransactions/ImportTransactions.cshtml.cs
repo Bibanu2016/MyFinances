@@ -94,7 +94,7 @@ namespace MyFinances.Pages.FinTransactions
             {
                 foreach (var item in result)
                 {
-                    if (MyBitOperations.GetBit(item.CategoryRoles[0], 2))
+                    if (MyBitOperations.GetBit(item.CategoryRoles, 2))
                     {
                         returnlist.Add(new ViewModels.ComboIntStrLVM { ItemID = item.IdFinAccount, Name = item.Name });
                     }

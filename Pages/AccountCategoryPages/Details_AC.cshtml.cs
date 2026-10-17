@@ -33,7 +33,7 @@ namespace MyFinances.Pages.AccountCategoryPages
             string[] rn = ["Paying asset", "Paying liability", "Import transactions", "Invest fund", "Tax", "User account", "Spare", "Locked for editing"];
             for (int i = 0; i < 8; i++)
             {
-                if (MyBitOperations.GetBit(aca.CategoryRoles[0], i))
+                if (MyBitOperations.GetBit(aca.CategoryRoles, i))
                 {
                     sb.Append(rn[i]);
                     sb.Append(", ");

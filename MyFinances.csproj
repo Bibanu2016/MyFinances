@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\AssetsPages\" />
     <Folder Include="Pages\SpecialContracts\TaxationPages\" />
     <Folder Include="Pages\Statements\" />
     <Folder Include="Properties\" />

@@ -66,7 +66,7 @@ namespace MyFinances.Pages.FinTransactions
             List<int> CtgSourceList = [];
             foreach (var item in acl)
             {
-                if (MyBitOperations.GetBit(item.CategoryRoles[0], 2))
+                if (MyBitOperations.GetBit(item.CategoryRoles, 2))
                 {
                     CtgSourceList.Add(item.IdAccountCategory);
                 }

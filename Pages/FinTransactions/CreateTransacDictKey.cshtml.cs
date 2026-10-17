@@ -30,7 +30,7 @@ namespace MyFinances.Pages.FinTransactions
             {
                 foreach (var c in acl)
                 {
-                    if (MyBitOperations.GetBit(c.CategoryRoles[0], 2))
+                    if (MyBitOperations.GetBit(c.CategoryRoles, 2))
                     {
                         AccCategories.Add(c.IdAccountCategory);
                     }

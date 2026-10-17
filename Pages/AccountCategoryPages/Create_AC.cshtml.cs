@@ -43,14 +43,14 @@ namespace MyFinances.Pages.AccountCategoryPages
                 return Page();
             }
             //update category roles
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 0, CRoles.PaymentAsset);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 1, CRoles.PaymentLiability);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 2, CRoles.ImportTransaction);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 3, CRoles.InvestmentFund);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 4, CRoles.Tax);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 5, CRoles.UserAccount);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 6, CRoles.Spare);
-            NewAC.CategoryRoles[0] = MyBitOperations.SetBit(NewAC.CategoryRoles[0], 7, CRoles.Locked);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 0, CRoles.PaymentAsset);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 1, CRoles.PaymentLiability);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 2, CRoles.ImportTransaction);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 3, CRoles.InvestmentFund);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 4, CRoles.Tax);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 5, CRoles.UserAccount);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 6, CRoles.Spare);
+            NewAC.CategoryRoles = MyBitOperations.SetBit(NewAC.CategoryRoles, 7, CRoles.Locked);
             //update acc category
             NewAC.IdAccountCategory = await GetACID(NewAC.IdAccountClass);
             _dbctxt.AccountCategories.Add(NewAC);

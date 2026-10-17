@@ -158,9 +158,9 @@ namespace MyFinances.Controllers
             if (categFA >= 1000)
             {
                 var acr = await _context.AccountCategories.Where(p => p.IdAccountCategory == categFA).Select(s => s.CategoryRoles).FirstOrDefaultAsync();
-                if (acr != null)
+                if (acr > 0)
                 {
-                    result = MyBitOperations.GetBit(acr[0], 2);
+                    result = MyBitOperations.GetBit(acr, 2);
                 }
             }
             return result;

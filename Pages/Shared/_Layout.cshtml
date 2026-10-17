@@ -43,6 +43,13 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="ddlAssets" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#">Assets</a>
+                            <ul class="dropdown-menu" aria-labelledby="ddlAssets">
+                                <li><a class="dropdown-item" asp-page="/AssetsPages/Index_NTA">Non-tangible</a></li>
+                                <li><a class="dropdown-item" asp-page="/AssetsPages/Index_Tangible">Tangible</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="ddlStatements" role="button" data-bs-toggle="dropdown" aria-expanded="false" asp-page="">Statements</a>
                             <ul class="dropdown-menu" aria-labelledby="ddlStatements">
                                 <li><a class="dropdown-item" asp-page="">Cash Flow</a></li>

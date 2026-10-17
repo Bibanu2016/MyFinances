@@ -45,7 +45,7 @@ namespace MyFinances.Pages.Contracts
         //
         // Contract data
         [BindProperty]
-        public ContractFull ContractFull { get; set; } = default!;
+        public ContractFull ContractFull { get; set; } = new();
 
         [BindProperty, Display(Name = "Contract category"), Range(1000, 9999, ErrorMessage = "Value {0} shall be between {1} and {2}")]
         public int CategoryContract { get; set; } = 0;

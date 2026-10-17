@@ -36,15 +36,15 @@ namespace MyFinances.Pages.AccountCategoryPages
             // get list for ContractType
             ContTypeList = await _mc.GetOrCreateAsync("CTL", () => _cfill.GetStandardContractTypes(100));
             // deconstruct values from CategoryRole
-            CRole.PaymentAsset = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 0);
-            CRole.PaymentLiability = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 1);
-            CRole.ImportTransaction = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 2);
-            CRole.InvestmentFund = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 3);
-            CRole.Tax = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 4);
-            CRole.UserAccount = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 5);
-            CRole.Spare = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 6);
-            CRole.Locked = MyBitOperations.GetBit(AccCategEdit.CategoryRoles[0], 7);
-            StringCategRole = AccCategEdit.CategoryRoles[0].ToString("b").PadLeft(8, '0');
+            CRole.PaymentAsset = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 0);
+            CRole.PaymentLiability = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 1);
+            CRole.ImportTransaction = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 2);
+            CRole.InvestmentFund = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 3);
+            CRole.Tax = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 4);
+            CRole.UserAccount = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 5);
+            CRole.Spare = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 6);
+            CRole.Locked = MyBitOperations.GetBit(AccCategEdit.CategoryRoles, 7);
+            StringCategRole = AccCategEdit.CategoryRoles.ToString("b").PadLeft(8, '0');
             ViewData["Title"] = $"Edit account category id: {AccCategEdit.IdAccountCategory}";
             return Page();
         }

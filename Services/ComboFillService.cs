@@ -31,7 +31,7 @@ namespace MyFinances.Services
             {
                 foreach (var item in qr)
                 {
-                    if (MyBitOperations.GetBit(item.CategoryRoles[0], 0)) temp = temp.Append(item.IdAccountCategory);
+                    if (MyBitOperations.GetBit(item.CategoryRoles, 0)) temp = temp.Append(item.IdAccountCategory);
                 }
             }
             var fal = await _dbcontext.FinAccounts.Where(p => p.AccountCategory < 2000 && p.AccountCategory >= 1000).AsNoTracking().ToListAsync();
@@ -81,7 +81,7 @@ namespace MyFinances.Services
             {
                 foreach (var item in qr)
                 {
-                    if (MyBitOperations.GetBit(item.CategoryRoles[0], 0) || MyBitOperations.GetBit(item.CategoryRoles[0], 1)) temp = temp.Append<int>(item.IdAccountCategory);
+                    if (MyBitOperations.GetBit(item.CategoryRoles, 0) || MyBitOperations.GetBit(item.CategoryRoles, 1)) temp = temp.Append<int>(item.IdAccountCategory);
                 }
             }
             int minVal = temp.Min();
@@ -139,7 +139,7 @@ namespace MyFinances.Services
             List<int> sourcesCtgList = [];
             foreach (var rawAC in rawACList)
             {
-                if (MyBitOperations.GetBit(rawAC.CategoryRoles[0], 2)) sourcesCtgList.Add(rawAC.IdAccountCategory);
+                if (MyBitOperations.GetBit(rawAC.CategoryRoles, 2)) sourcesCtgList.Add(rawAC.IdAccountCategory);
             }
             if (sourcesCtgList.Count == 0) { return default!; }
             //get list of FinAccount with an AccountCategory value betwen [1000, 3000) - Assets and Liabilities
@@ -181,7 +181,7 @@ namespace MyFinances.Services
             List<int> sourcesCtgList = [];
             foreach (var rawAC in rawACList)
             {
-                if (!MyBitOperations.GetBit(rawAC.CategoryRoles[0], 2)) sourcesCtgList.Add(rawAC.IdAccountCategory);
+                if (!MyBitOperations.GetBit(rawAC.CategoryRoles, 2)) sourcesCtgList.Add(rawAC.IdAccountCategory);
             }
             if (sourcesCtgList.Count == 0) { return default!; }
             //get list of FinAccount with an AccountCategory value betwen [1000, 3000) - Assets and Liabilities
@@ -250,7 +250,7 @@ namespace MyFinances.Services
                         List<short> crlist = [];
                         foreach (var item in listAC)
                         {
-                            if (MyBitOperations.GetBit(item.CategoryRoles[0], bitOrder)) { crlist.Add(item.IdContractCategory); }
+                            if (MyBitOperations.GetBit(item.CategoryRoles, bitOrder)) { crlist.Add(item.IdContractCategory); }
                         }
                         var tempList = await GetFinAccountListByCateg(crlist);
                         result.AddRange([.. tempList]);
