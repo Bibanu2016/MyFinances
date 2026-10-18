@@ -45,7 +45,7 @@ namespace MyFinances.Pages.Contracts
         //
         // Contract data
         [BindProperty]
-        public ContractFull ContractFull { get; set; } = new();
+        public ContractFull ContractFull { get; set; } = default!;
 
         [BindProperty, Display(Name = "Contract category"), Range(1000, 9999, ErrorMessage = "Value {0} shall be between {1} and {2}")]
         public int CategoryContract { get; set; } = 0;
@@ -59,30 +59,18 @@ namespace MyFinances.Pages.Contracts
         // GET Method
         public async Task<PageResult> OnGetAsync(int? sct)
         {
-            if (_memoryCache.TryGetValue("UserFCont", out FinContract? UserFCont))
+            if (sct.HasValue)
             {
-                if (UserFCont != null)
+                SelectedContractType = (short)sct.Value;
+                var ct = await _context.ContractTypes.FindAsync((short)sct);
+                if (ct != null)
                 {
-                    ContractFull.FinContract = UserFCont;
-                    _memoryCache.Remove("UserFCont");
+                    ViewData["Title"] = $"Create {ct.ContractTypeName} contract";
                 }
             }
             else
             {
-                if (sct.HasValue)
-                {
-                    SelectedContractType = (short)sct.Value;
-                    var ct = await _context.ContractTypes.FindAsync((short)sct);
-                    if (ct != null)
-                    {
-                        ViewData["Title"] = $"Create {ct.ContractTypeName} contract";
-                    }
-
-                }
-                else
-                {
-                    ViewData["Title"] = "No contract type selected!";
-                }
+                ViewData["Title"] = "No contract type selected!";
             }
             await FillUpLists();
             return Page();
@@ -151,18 +139,61 @@ namespace MyFinances.Pages.Contracts
         {
             if (SelectedContractType > 0)
             {
-                Frequency = await _comboFill.GetPaymentFrequencyList();
-                EndAction = await _comboFill.GetContractEndActionList();
-                Organisation = await _comboFill.GetOrganisationsList();
-                Payable = await _comboFill.GetFinAccountListByRole(payableRoles);
-                Bank = await _comboFill.GetFinAccountListByRole(bankRoles);
-                Users = await _comboFill.GetUsersList();
-                ContractCategory = await _comboFill.GetAccountCategoryList(SelectedContractType);
-                SuperAccountList = await _comboFill.GetFinAccountListByRole(superRoles);
-                TangibleAsset = await _comboFill.GetTangibleAssetsList();
+                Frequency = _memoryCache.GetOrCreateAsync("PaymentFrequency", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetPaymentFrequencyList();
+                }).Result;
+                EndAction = _memoryCache.GetOrCreateAsync("ContractEndAction", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetContractEndActionList();
+                }).Result;
+                Organisation = _memoryCache.GetOrCreateAsync("OrganisationList", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetOrganisationsList();
+                }).Result;
+                Payable = _memoryCache.GetOrCreateAsync("PayableList", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetFinAccountListByRole(payableRoles);
+                }).Result;
+                Bank = _memoryCache.GetOrCreateAsync("BankList", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetFinAccountListByRole(bankRoles);
+                }).Result;
+                Users = _memoryCache.GetOrCreateAsync("UsersList", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetUsersList();
+                }).Result;
+                ContractCategory = _memoryCache.GetOrCreateAsync("ContractCategoryList", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                    return await _comboFill.GetAccountCategoryList(SelectedContractType);
+                }).Result;
+                if(SelectedContractType == 2) // secured loans fill the tangble asset list for the security selection
+                {
+                    TangibleAsset = _memoryCache.GetOrCreateAsync("TangibleAssetList", async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                        return await _comboFill.GetTangibleAssetsList();
+                    }).Result;
+                }
                 if (SelectedContractType == 4 || SelectedContractType == 5)
                 {
-                    TaxAccountList = await _comboFill.GetFinAccountListByRole(taxRole);
+                    SuperAccountList = _memoryCache.GetOrCreateAsync("SuperAccountList", async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                        return await _comboFill.GetFinAccountListByRole(superRoles);
+                    }).Result;
+                    TaxAccountList = _memoryCache.GetOrCreateAsync("TaxAccountList", async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                        return await _comboFill.GetFinAccountListByRole(taxRole);
+                    }).Result;
                 }
             }
             return;
